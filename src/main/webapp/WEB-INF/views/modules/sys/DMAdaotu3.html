@@ -1,0 +1,1391 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<link rel="stylesheet" type="text/css" href="${request.contextPath}/statics/libs/gqct.css">
+<title>d3+jQuery横向树图</title>
+<script src="${request.contextPath}/statics/libs/d3.min.js"></script>
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+</head>
+
+<body>
+
+   <div class="container" id="treecontainer">
+       <div class="menu">
+		   <div id="product_tree"></div>
+	   </div>
+   </div>
+   
+
+<script type="text/javascript">
+	console.log(document.body.clientWidth,document.body.clientHeight);
+        var container;
+        var zoom;
+        var rootData;
+        var depthInfo;
+		var rootName;//根节点名称
+
+        jQuery(document).ready(function () {
+           /* resizeScreen();*/
+          
+          //selectChange();
+		   var child=document.getElementById("product_tree");
+            child.innerHTML = '';
+			getData();
+        });
+
+        $(function(){
+        	Request = GetRequest();
+        	console.log(Request);
+        	searchSon(Request["dareaId"]);
+        })
+        function GetRequest() {	  
+        	  var url = location.search; //获取url中"?"符后的字串
+        	   var theRequest = new Object();
+        	   if (url.indexOf("?") != -1) {
+        	      var str = url.substr(1);
+        	      strs = str.split("&");
+        	      for(var i = 0; i < strs.length; i ++) {
+        	         theRequest[strs[i].split("=")[0]]=(strs[i].split("=")[1]);
+        	      }
+        	   }
+        	   return theRequest;
+        	}
+
+        function searchSon(obj){
+        	$.ajax({
+        	    type: "GET",
+        	    url: "../../dma/data/queryByMonth",
+        	    contentType: "application/json",
+        	    async:true,
+        	    data:JSON.stringify(),
+        	    dataType:"json",
+        	    success: function(r){
+        	    	console.log(r.data);
+        	    	r = r.data;
+        	    	for(var i=0;i<r.length;i++){
+        	    		console.log(r[i].dareaId,obj);
+        	    		if(r[i].dareaId==obj){
+        	    			list = r[i];
+        	    			console.log(r[i]);
+        	    			list = JSON.parse(JSON.stringify(list).replace(/sonList/g, 'children'));
+        	    			
+        	    		   	var child=document.getElementById("product_tree");
+        	    		    child.innerHTML = '';
+        	    		    console.log(list);
+        	    		    rootName = list.dareaName;
+        	    		    list.dareaName = "origin";
+        	    			getData(list);
+        	    		}
+        	    	}
+        		  }
+        		});
+        }
+		
+var rj = "";	
+var getData =function(ls) {
+    // 测试内容
+    rootData = {
+    "downward": {
+        "name": "origin",
+        "amount": "100",
+        "ratio": "55%",
+        "rj":6284,
+        "children": [
+            {
+                "name": "二级分区",
+                "amount": "100",
+                "ratio": "55%",
+                "rj":6284,
+                "children": [
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    },
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": [
+                            {
+                                "name": "四级分区",
+                                "amount": "100",
+                                "ratio": "55%",
+                                "rj":6284,
+                                "children": []
+                            },
+                            {
+                                "name": "四级分区",
+                                "amount": "100",
+                                "ratio": "55%",
+                                "rj":6284,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "二级分区",
+                "amount": "100",
+                "ratio": "55%",
+                "rj":6284,
+                "children": [
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    },
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "二级分区",
+                "amount": "100",
+                "ratio": "55%",
+                "rj":6284,
+                "children": [
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    },
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "二级分区",
+                "amount": "100",
+                "ratio": "55%",
+                "rj":6284,
+                "children": []
+            },
+            {
+                "name": "二级分区",
+                "amount": "100",
+                "ratio": "55%",
+                "rj":6284,
+                "children": [
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    },
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    },
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    },
+                    {
+                        "name": "三级分区",
+                        "amount": "100",
+                        "ratio": "55%",
+                        "rj":6284,
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+}
+    rootData.downward = ls;
+    console.log(rootData)
+    drawing();
+  };
+var	drawing = function() {
+      var _this = this;
+      var forUpward = true;
+ 
+      var treeChart = function(d3Object) {
+        this.d3 = d3Object;
+        this.directions = ['downward'];
+      };
+ 
+ 
+      treeChart.prototype.drawChart = function() {
+        // First get tree data for both directions.
+        this.treeData = {};
+        var self = this;
+		self.directions.forEach(function(direction) {
+            self.treeData[direction] = _this.rootData[direction];
+          });
+          self.graphTree(self.getTreeConfig());
+      };
+ 
+      treeChart.prototype.getTreeConfig = function() {
+        var treeConfig = {
+          'margin': {
+            'top': 0,
+            'right': 0,
+            'bottom': 0,
+            'left': 0
+          }
+        }
+ 
+        treeConfig.chartWidth = document.body.clientWidth;
+        treeConfig.chartHeight = 800;
+        treeConfig.centralHeight = treeConfig.chartHeight / 2;
+        treeConfig.centralWidth = treeConfig.chartWidth / 8;
+        treeConfig.linkLength = 300;
+        treeConfig.duration = 500; //动画时间
+        return treeConfig;
+      };
+ 
+      treeChart.prototype.graphTree = function(config) {
+		  
+
+        var self = this;
+        var d3 = this.d3;
+        var linkLength = config.linkLength;
+        var duration = config.duration;
+        var hasChildNodeArr = [];
+        var id = 0;
+        var diagonal = d3.svg.diagonal()
+          .projection(function(d) {
+            return [d.y, d.x];
+          }); 
+		  	var pathFunc;
+			if (false) {
+			   pathFunc = diagonal;
+		   } else {
+			   pathFunc = funLine;
+		   }
+        var zoom = d3.behavior.zoom()
+          .scaleExtent([0.5, 2])
+          .on('zoom', redraw);
+        var svg = d3.select('#product_tree')
+          .append('svg')
+          .attr('width', config.chartWidth + config.margin.right + config.margin.left)
+          .attr('height', config.chartHeight + config.margin.top + config.margin.bottom)
+          .attr('xmlns','http://www.w3.org/2000/svg')
+          .on('mousedown', disableRightClick)
+          .call(zoom)
+          .on('dblclick.zoom', null);
+           var treeG = svg.append('g')
+          .attr('class', 'gbox')
+          .attr('transform', 'translate(' + config.margin.left + ',' + config.margin.top + ')');
+ 
+        //箭头
+        var markerDown = svg.append("marker")
+          .attr("id", "resolvedDown")
+          .attr("markerUnits", "strokeWidth") //设置为strokeWidth箭头会随着线的粗细发生变化
+          .attr("markerUnits", "userSpaceOnUse")
+          .attr("viewBox", "0 -5 10 10") //坐标系的区域
+          .attr("refX", 18) //箭头坐标
+          .attr("refY", 0)
+          .attr("markerWidth", 12) //标识的大小
+          .attr("markerHeight", 12)
+          .attr("orient", "0") //绘制方向，可设定为：auto（自动确认方向）和 角度值
+          .attr("stroke-width", 2) //箭头宽度
+          .append("path")
+          .attr("d", "M0,-5L10,0L0,5") //箭头的路径
+          .attr('fill', '#000'); //箭头颜色  
+ 
+        // Initialize the tree nodes and update chart.
+		
+        for(var d in this.directions) {
+          var direction = this.directions[d];
+          var data = self.treeData[direction];
+			if (typeof(data) != "undefined") {
+			  data.x0 = config.centralHeight;
+			  data.y0 = config.centralWidth;
+			  data.children.forEach(collapse);
+			  update(data, data, treeG);
+			}		   
+        }
+        function update(source, originalData, g) {
+          console.log(source)
+          var direction = originalData['direction'];
+          var node_class = direction + 'Node';
+          var link_class = direction + 'Link';
+          var downwardSign =1;
+          var nodeColor = '#337ab7';
+ 
+          var isExpand = false;
+          var nodeSpace = 270;
+          var tree = d3.layout.tree().nodeSize([nodeSpace, 0]);
+          var nodes = tree.nodes(originalData);
+          var links = tree.links(nodes);
+          var offsetY = -config.centralHeight;
+		  
+           nodes.forEach(function(d) {
+            d.y = downwardSign * (d.depth * linkLength) + config.centralWidth;
+            d.x = d.x - offsetY;
+          });
+ 
+          // Update the node.
+          var node = g.selectAll('g.' + node_class)
+            .data(nodes, function(d) {
+              return d.id || (d.id = ++id);
+            });
+          var nodeEnter = node.enter().append('g')
+					
+            .attr('class', node_class)
+//			.classed('alink',true)//为选择名称而添加的统一class
+			.attr('data-text', function(d) {
+              return d.dareaName;
+            })
+            .attr('transform', function(d) {
+              return 'translate(' + source.y0 + ',' + source.x0 + ')';
+            })
+			
+            .style('cursor', function(d) {
+              return (d.children || d._children) ? 'pointer' : '';
+            });
+            // .on('click', click);
+          
+ 
+          nodeEnter.append("svg:rect")
+            .attr("x", function(d) {
+              return 75;
+            })
+            .attr("y", function(d) {
+              return -130;
+            })
+            .attr("width", function(d) {
+              return (d.dareaName == 'origin') ? 265 : 250;
+            })
+            .attr("height", 255)
+            //.attr("rx", 10)
+            .style("stroke", function(d) {
+			  //#0505ee #337ab7
+              return "#337ab7";//外边框颜色
+            })
+            .style("fill", function(d) {
+              return "#ffffff";//节点背景色
+            });
+			 
+          nodeEnter.append("svg:rect")
+            .attr("x", function(d) {
+              return 75;
+            })
+            .attr("y", function(d) {
+              return -130;
+            })
+            .attr("width", function(d) {
+              return (d.dareaName == 'origin') ? 265 : 250;
+            })
+            .attr("height", 40)
+            //.attr("rx", 10)
+            .style("stroke", function(d) {
+			  //#0505ee #337ab7
+              return "#337ab7";//外边框颜色
+            })
+            .style("fill", function(d) {
+              return "#337ab7";//节点背景色
+            });
+ 		  nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",75)
+		  .attr("y1",-90)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 340 : 325;
+		  })
+		  .attr("y2",-90)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			/*表格*/
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",75)
+		  .attr("y1",-55)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 340 : 325;
+		  })
+		  .attr("y2",-55)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",100)
+		  .attr("y1",-25)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 250 : 235;
+		  })
+		  .attr("y2",-25)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+		nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",75)
+		  .attr("y1",5)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 340 : 325;
+		  })
+		  .attr("y2",5)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+/* 		nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",function(d){
+			  return (d.dareaName == 'origin') ? 290 : 275;
+		  })
+		  .attr("y1",5)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 340 : 325;
+		  })
+		  .attr("y2",5)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  }); */
+			
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",100)
+		  .attr("y1",35)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 250 : 235;
+		  })
+		  .attr("y2",35)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			
+		nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",75)
+		  .attr("y1",65)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 340 : 325;
+		  })
+		  .attr("y2",65)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			
+/* 		nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",function(d){
+			  return (d.dareaName == 'origin') ? 290 : 275;
+		  })
+		  .attr("y1",65)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 340 : 325;
+		  })
+		  .attr("y2",65)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  }); */
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",100)
+		  .attr("y1",95)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 250 : 235;
+		  })
+		  .attr("y2",95)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+		nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",75)
+		  .attr("y1",125)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 340 : 325;
+		  })
+		  .attr("y2",125)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			
+			/*竖线*/
+			
+/*		nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",75)
+		  .attr("y1",-90)
+		  .attr("x2",75)
+		  .attr("y2",125)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });*/
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",100)
+		  .attr("y1",-90)
+		  .attr("x2",100)
+		  .attr("y2",125)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",135)
+		  .attr("y1",-55)
+		  .attr("x2",135)
+		  .attr("y2",125)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",function(d){
+			  return (d.dareaName == 'origin') ? 210 : 195;
+		  })
+		  .attr("y1",-90)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 210 : 195;
+		  })
+		  .attr("y2",125)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",function(d){
+			  return (d.dareaName == 'origin') ? 250 : 235;
+		  })
+		  .attr("y1",-90)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 250 : 235;
+		  })
+		  .attr("y2",125)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+			nodeEnter.append("svg:line")
+		  //x1="0" y1="0" x2="200" y2="0" style="stroke:rgb(0,0,0);stroke-width:5"
+		  .attr("x1",function(d){
+			  return (d.dareaName == 'origin') ? 290 : 275;
+		  })
+		  .attr("y1",-90)
+		  .attr("x2",function(d){
+			  return (d.dareaName == 'origin') ? 290 : 275;
+		  })
+		  .attr("y2",125)
+		  .style("stroke", function(){
+			 return "#337ab7"
+		  })
+		  .style("stroke-width", function(){
+			 return 1
+		  });
+
+			/*表格内容*/
+			nodeEnter.append("svg:text")
+			.attr("x",'75')
+            .attr('dy', '-68')
+            .attr('fill', '#363636')
+            .text("月份")
+            .style({
+                'font-size':11
+              })
+			
+			nodeEnter.append("svg:text")
+			.attr("x",'75')
+            .attr('dy', '-20')
+            .attr('fill', '#363636')
+            .text(function(d) { 
+                var str = (d.dataList.length)?d.dataList[0].time:""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+			
+			nodeEnter.append("svg:text")
+			.attr("x",'75')
+            .attr('dy', '40')
+            .attr('fill', '#363636')
+            .text(function(d) { 
+            	var str = (d.dataList.length>0)?d.dataList[1].time:""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+			
+			nodeEnter.append("svg:text")
+			.attr("x",'75')
+            .attr('dy', '100')
+            .attr('fill', '#363636')
+            .text(function(d) { 
+                var str = (d.dataList.length>1)?d.dataList[2].time:""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+			
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'100')
+            .attr('dy', '-35')
+            .attr('fill', '#363636')
+            .text("日均")
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'100')
+            .attr('dy', '-5')
+            .attr('fill', '#363636')
+            .text("月总量")
+            .style({
+                'font-size':11
+              })
+              
+              nodeEnter.append("svg:text")
+			.attr("x",'138')
+            .attr('dy', '-35')
+            .attr('fill', '#363636')
+            .text(function(d) { //第一个月的供水量日均
+            	var str = (d.dataList.length)?(d.dataList[0].dayWaterSupply?d.dataList[0].dayWaterSupply:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'138')
+            .attr('dy', '-5')
+            .attr('fill', '#363636')
+            .text(function(d) { //第一个月的供水量月总量
+            	var str = (d.dataList.length)?(d.dataList[0].monthWaterSupply?d.dataList[0].monthWaterSupply:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+               nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 212 : 197;
+			  })
+            .attr('dy', '-35')
+            .attr('fill', '#363636')
+            .text(function(d) { //第一个月的按日抄见量
+                var str = (d.dataList.length)?(d.dataList[0].dayCjl?d.dataList[0].dayCjl:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 212 : 197;
+			  })
+            .attr('dy', '-5')
+            .attr('fill', '#363636')
+            .text(function(d) { //第一个月的按月抄见量
+            	var str = (d.dataList.length)?(d.dataList[0].cjl?d.dataList[0].cjl:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'100')
+            .attr('dy', '25')
+            .attr('fill', '#363636')
+            .text("日均")
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'100')
+            .attr('dy', '55')
+            .attr('fill', '#363636')
+            .text("月总量")
+            .style({
+                'font-size':11
+              })
+              
+               nodeEnter.append("svg:text")
+			.attr("x",'138')
+            .attr('dy', '25')
+            .attr('fill', '#363636')
+            .text(function(d) { //第二个月的供水量日总量
+            	var str = (d.dataList.length>0)?(d.dataList[1].dayWaterSupply?d.dataList[1].dayWaterSupply:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'138')
+            .attr('dy', '55')
+            .attr('fill', '#363636')
+            .text(function(d) { //第二个月的供水量月总量
+            	var str = (d.dataList.length>0)?(d.dataList[1].monthWaterSupply?d.dataList[1].monthWaterSupply:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+               
+               nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 212 : 197;
+			  })
+            .attr('dy', '25')
+            .attr('fill', '#363636')
+            .text(function(d) { //第二个月的按日抄见量
+                var str = (d.dataList.length>0)?(d.dataList[1].dayCjl?d.dataList[1].dayCjl:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 212 : 197;
+			  })
+            .attr('dy', '55')
+            .attr('fill', '#363636')
+            .text(function(d) { //第二个月的按月抄见量
+                var str = (d.dataList.length>0)?(d.dataList[1].cjl?d.dataList[1].cjl:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+			nodeEnter.append("svg:text")
+			.attr("x",'100')
+            .attr('dy', '85')
+            .attr('fill', '#363636')
+            .text("日均")
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'100')
+            .attr('dy', '115')
+            .attr('fill', '#363636')
+            .text("月总量")
+            .style({
+                'font-size':11
+              })
+              
+               nodeEnter.append("svg:text")
+			.attr("x",'138')
+            .attr('dy', '85')
+            .attr('fill', '#363636')
+            .text(function(d) { //第三个月的供水量日总量
+            	var str = (d.dataList.length>1)?(d.dataList[2].dayWaterSupply?d.dataList[2].dayWaterSupply:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",'138')
+            .attr('dy', '115')
+            .attr('fill', '#363636')
+            .text(function(d) { //第三个月的供水量月总量
+            	var str = (d.dataList.length>1)?(d.dataList[2].monthWaterSupply?d.dataList[2].monthWaterSupply:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+             
+              
+               nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 212 : 197;
+			  })
+            .attr('dy', '85')
+            .attr('fill', '#363636')
+            .text(function(d) { //第三个月的按日抄见量
+                var str = (d.dataList.length>1)?(d.dataList[2].dayCjl?d.dataList[2].dayCjl:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 212 : 197;
+			  })
+            .attr('dy', '115')
+            .attr('fill', '#363636')
+            .text(function(d) { //第二个月的按月抄见量
+                var str = (d.dataList.length>1)?(d.dataList[2].cjl?d.dataList[2].cjl:""):""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+			  return (d.dareaName == 'origin') ? 145 : 137;
+		  })
+            .attr('dy', '-68')
+            .attr('fill', '#363636')
+            .text("供水量")
+            .style({
+                'font-size':11
+              })
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+			  return (d.dareaName == 'origin') ? 218 : 203;
+		  })
+            .attr('dy', '-74')
+            .attr('fill', '#363636')
+            .text("总抄")
+            .style({
+                'font-size':11
+              })
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+			  return (d.dareaName == 'origin') ? 218 : 203;
+		  })
+            .attr('dy', '-60')
+            .attr('fill', '#363636')
+            .text("见量")
+            .style({
+                'font-size':11
+              })
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+			  return (d.dareaName == 'origin') ? 258 : 243;
+		  })
+            .attr('dy', '-74')
+            .attr('fill', '#363636')
+            .text("总用")
+            .style({
+                'font-size':11
+              })
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+			  return (d.dareaName == 'origin') ? 258 : 243;
+		  })
+            .attr('dy', '-60')
+            .attr('fill', '#363636')
+            .text("户数")
+            .style({
+                'font-size':11
+              })
+              
+               
+/*                nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 258 : 243;
+			  })
+            .attr('dy', '0')
+            .attr('fill', '#363636')
+            .text(function(d){
+            	return "总用户数"
+            })
+            .style({
+                'font-size':11
+              }) */
+              
+              nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 258 : 243;
+			  })
+            .attr('dy', '-20')
+            .attr('fill', '#363636')
+            .text(function(d) { 
+                var str = (d.dataList.length)?d.dataList[0].users:""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+			
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 258 : 243;
+			  })
+            .attr('dy', '40')
+            .attr('fill', '#363636')
+            .text(function(d) { 
+            	var str = (d.dataList.length>0)?d.dataList[1].users:""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+			
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 258 : 243;
+			  })
+            .attr('dy', '100')
+            .attr('fill', '#363636')
+            .text(function(d) { 
+                var str = (d.dataList.length>1)?d.dataList[2].users:""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              
+              
+			nodeEnter.append("svg:text")
+			.attr("x",function(d){
+			  return (d.dareaName == 'origin') ? 295 : 280;
+		  })
+            .attr('dy', '-68')
+            .attr('fill', '#363636')
+            .text("产销差")
+            .style({
+                'font-size':11
+              })
+			
+               nodeEnter.append("svg:text")
+			.attr("x",function(d){
+				  return (d.dareaName == 'origin') ? 295 : 280;
+			  })
+            .attr('dy', '-20')
+            .attr('fill', '#363636')
+            .text(function(d) { 
+                var str = (d.dataList.length>1)?d.dataList[0].cxc:""; 
+                return str;
+              })
+            .style({
+                'font-size':11
+              })
+              nodeEnter.append("svg:text")
+  			.attr("x",function(d){
+  				  return (d.dareaName == 'origin') ? 295 : 280;
+  			  })
+              .attr('dy', '40')
+              .attr('fill', '#363636')
+              .text(function(d) { 
+                  var str = (d.dataList.length>1)?d.dataList[1].cxc:""; 
+                  return str;
+                })
+              .style({
+                  'font-size':11
+                })
+                nodeEnter.append("svg:text")
+    			.attr("x",function(d){
+    				  return (d.dareaName == 'origin') ? 295 : 280;
+    			  })
+                .attr('dy', '100')
+                .attr('fill', '#363636')
+                .text(function(d) { 
+                    var str = (d.dataList.length>1)?d.dataList[2].cxc:""; 
+                    return str;
+                  })
+                .style({
+                    'font-size':11
+                  })
+			nodeEnter.append("svg:text")
+			.attr("x",'85')
+            .attr('dy', '-105')
+            .attr('fill', '#ffffff')
+            .text(function(d) {              
+            	var str = (d.dareaName == 'origin') ? rootName : d.dareaName;
+            	return(str.length > 18) ? str.substr(0, 18) + ".." : str
+
+            })
+            .style({
+              'font-size':13
+            })
+			nodeEnter.append('circle')
+            .attr('r', 1e-6);
+          nodeEnter.append("text")
+            .attr("class", "linkname")
+			.attr("x",function(d) {
+              return '195';
+            })
+            .attr('dy', function(d) {
+              return '-105';
+            })
+			.attr("text-anchor",'middle')
+            .attr('fill', '#337ab7')
+            .text(function(d) {
+              if(d.repeated) {
+                return '[Recurring] ' + d.dareaName;
+              }
+              return d.dareaName;
+            })
+            .style({
+              'fill-opacity': 1e-6,
+              'fill': function(d) {
+              },
+              'font-size': function(d) {
+                return 13;
+              },
+              'cursor': "pointer"
+            })
+            .on('click', Change_modal);
+ 
+/*          nodeEnter.append("text")
+            .attr("class", "linkname")
+			.attr("x",function(d) {
+              return '200';
+            })
+            .attr("dy", function(d) {
+              return '9';
+            })
+			.attr("text-anchor",'middle')
+            .text(function(d) {
+              return d.dareaName.substr(10, d.dareaName.length);
+            })
+            .style({
+              'fill': '#337ab7',
+              'font-size': function(d) {
+                return 13;
+              },
+              'cursor': "pointer"
+            });*/
+            // .on('click', Change_modal);
+/*			nodeEnter.append("text")
+		.attr("x",function(d) {
+              return '180';
+            })
+            .attr("dy", function(d) {
+              return '60';
+            })
+            .attr("text-anchor",'middle')
+            .attr("class", "linkname")
+            .style("fill", "#363636")
+            .style('font-size', 14)
+            .text(function(d) { 
+              var str = "认缴金额:"+ d.amount +"万"; 
+              return(str.length > 13) ? str.substr(0, 13) + ".." : str;
+            });*/
+ 
+          // Transition nodes to their new position.原有节点更新到新位置
+          var nodeUpdate = node.transition()
+            .duration(duration)
+            .attr('transform', function(d) {
+              return 'translate(' + d.y + ',' + d.x + ')';
+            });
+          nodeUpdate.select('circle')
+            .attr('r', function(d) {
+              return (hasChildNodeArr.indexOf(d) == -1) ? 0 : 6;
+            })
+            .attr('cx', function(d) {
+              return  334;
+            })
+            .style('fill', function(d) {
+              return hasChildNodeArr.indexOf(d) != -1 ? "#fff" : "";
+              // if (d._children || d.children) { return "#fff"; } else { return "rgba(0,0,0,0)"; }
+            })
+            .style('stroke', function(d) {
+              return hasChildNodeArr.indexOf(d) != -1 ? "#337ab7" : "";
+              // if (d._children || d.children) { return "#337ab7"; } else { return "rgba(0,0,0,0)"; }
+            })
+            .style('fill-opacity', function(d) {
+              if(d.children) {
+                return 0.35;
+              }
+            })
+            // Setting summary node style as class as mass style setting is
+            // not compatible to circles.
+            .style('stroke-width', function(d) {
+              if(d.repeated) {
+                return 5;
+              }
+            });
+          //代表是否展开的+-号
+          nodeEnter.append("svg:text")
+            .attr("class", "isExpand")
+            .attr("x", "334")
+            .attr("dy", function(d) {
+              return 5;
+            })
+            .attr("text-anchor", "middle")
+            .style("fill", "#000")
+            .text(function(d) {
+              return hasChildNodeArr.indexOf(d) != -1 ? "+" : "";
+              /* if (d._children || d.children) {
+                return "+";
+              } */
+            })
+            .on('click',click);
+ 
+          nodeUpdate.select('text').style('fill-opacity', 1);
+          
+          var nodeExit = node.exit().transition()
+            .duration(duration)
+            .attr('transform', function(d) {
+              return 'translate(' + source.y + ',' + source.x + ')';
+            })
+            .remove();
+          nodeExit.select('circle')
+            .attr('r', 1e-6);
+          nodeExit.select('text')
+            .style('fill-opacity', 1e-6);
+ 
+          var link = g.selectAll('path.' + link_class)
+            .data(links, function(d) {
+              return d.target.id;
+            });
+ 
+          link.enter().insert('path', 'g')
+            .attr('class', link_class)
+            .attr('stroke',function(d){
+              return '#337ab7';
+            })
+            .attr('fill',"none")
+            .attr('stroke-width','1px')
+            .attr('opacity', 0.5)
+            .attr('d', function(d) {
+              var o = {
+                x: source.x0,
+                y: source.y0
+              };
+              return pathFunc({
+                source: o,
+                target: o
+              });
+            })
+            .attr("marker-end", function(d) {
+              return "url(#resolvedDown)";
+            }) //根据箭头标记的id号标记箭头;
+            .attr("id", function(d, i) {
+              return "mypath" + i;
+            });
+          link.transition()
+            .duration(duration)
+            .attr('d', pathFunc);
+          link.exit().transition()
+            .duration(duration)
+            .attr('d', function(d) {
+              var o = {
+                x: source.x,
+                y: source.y
+              };
+              return pathFunc({
+                source: o,
+                target: o
+              });
+            })
+            .remove();
+          nodes.forEach(function(d) {
+            d.x0 = d.x;
+            d.y0 = d.y;
+          });
+		  
+
+
+         function Change_modal () {
+            _this.Modal = true
+          }
+          function click(d) {
+            if(forUpward) {
+ 
+            } else {
+              if(d._children) {
+                console.log('对外投资--ok')
+              } else {
+                console.log('对外投资--no')
+              }
+            }
+            isExpand = !isExpand;
+            if(d.children) {
+              d._children = d.children;
+              d.children = null;
+              d3.select(this).text('+')
+            } else {
+              d.children = d._children;
+              d._children = null;
+              d3.select(this).text('-')
+            }
+            update(d, originalData, g);
+          }
+        }
+ 
+        function expand(d) {
+          if(d._children) {
+            d.children = d._children;
+            d.children.forEach(expand);
+            d._children = null;
+          }
+        }
+ 
+ 
+        function collapse(d) {
+          if(d.children && d.children.length != 0) {
+            d._children = d.children;
+            d._children.forEach(collapse);
+            d.children = null;
+            hasChildNodeArr.push(d);
+          }
+        }
+ 
+ 
+        function redraw() {
+          treeG.attr('transform', 'translate(' + d3.event.translate + ')' +
+            ' scale(' + d3.event.scale + ')');
+        }
+ 
+        function disableRightClick() {
+          // stop zoom
+          if(d3.event.button == 2) {
+            console.log('No right click allowed');
+            d3.event.stopImmediatePropagation();
+          }
+        }
+ 
+ 
+/*        function sortByDate(a, b) {
+          var aNum = a.name.substr(a.name.lastIndexOf('(') + 1, 4);
+          var bNum = b.name.substr(b.name.lastIndexOf('(') + 1, 4);
+          return d3.ascending(aNum, bNum) ||
+            d3.ascending(a.name, b.name) ||
+            d3.ascending(a.id, b.id);
+        }*/
+      };
+ 
+      var d3GenerationChart = new treeChart(d3);
+      d3GenerationChart.drawChart();
+ 
+    };
+	var funLine = function(obj) {  //折线
+			var s = obj.source;
+//			console.log('获取折线对象1：'+s.y);
+			var sy = s.y+310;
+//			console.log('获取折线对象2：'+sy);
+			var t = obj.target;
+			var ty = t.y+85;
+			return "M"+sy+","+s.x+"L"+(sy+(ty-sy)/2)+","+s.x+"L"+(sy+(ty-sy)/2)+","+t.x+"L"+ty+","+t.x;
+		}  
+		  
+  var downloadfun = function() { //下载
+         
+        // 注释该方法为svg 直接下载
+        //  var SvgSaver = require('svgsaver');                 // if using CommonJS environment
+        //  var svgsaver = new SvgSaver();                      // creates a new instance
+        //  var svg = document.querySelector('#product_tree');         // find the SVG element
+        //  svgsaver.asSvg(svg);                                // save as SVG
+  
+        var g = document.getElementById('product_tree').getElementsByTagName('g')[0].getBBox();
+        var gbox = document.getElementById('product_tree').getElementsByClassName('gbox')[0];
+        var x = -g.x;//计算偏移位置
+        var y = -g.y;
+        gbox.style.transform = "translate(" + x + 'px' + "," + y + "px" + ")  scale(1)"; //偏移位置
+        var svgbox = $('#product_tree svg')
+        var boxwidth = svgbox.width;
+        var boxheight = svgbox.height;
+        svgbox.attr('width', g.width)
+        svgbox.attr('height', g.height)
+        var canvas = document.createElement("canvas");
+        var c = canvas.getContext('2d');
+        //新建Image对象
+        //svg内容
+        var svg = document.getElementById('product_tree').innerHTML;
+        var img = new Image();
+ 
+        img.src = 'data:image/svg+xml,' + unescape(encodeURIComponent(svg));//svg内容中可以有中文字符
+        img.src = 'data:image/svg+xml,' + svg;//svg内容中不能有中文字符
+        img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svg)));
+        //图片初始化完成后调用
+         img.onload = function() {
+          //将canvas的宽高设置为图像的宽高
+          canvas.width = img.width;
+          canvas.height = img.height+60;
+          c.fillStyle = "#fff";
+          c.fillRect(0, 0, canvas.width, canvas.height);
+          c.drawImage(img, 0, 30);
+          //canvas画图片
+ 
+          var a = document.createElement("a");
+          a.download = "png";
+          a.href= canvas.toDataURL("image/png");
+          a.click();
+        }
+        //图片转换为base64后 传给后端 发邮件 
+        gbox.style.transform = ''
+       // svgbox.attr('width',boxwidth)
+       // svgbox.attr('height',boxheight)
+        svgbox.attr('width',1100)
+        svgbox.attr('height',600)
+    
+    // 结束
+  } 
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DMA分区展示</title>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+a{text-decoration:none}
+a:hover{text-decoration:none}
+.setting{position:fixed; top:0px; right:0px; width:1000px; height:40px;padding:0px; text-align:right; z-index:99;}
+.EC::-webkit-scrollbar{
+    display: none;
+}
+.layui-form-item *{padding:0px; margin:0px;}
+.SEARCH{z-index:99; position:fixed; top:0px; left:0px;}
+.setting{position:fixed; top:0px; right:0px; width:100px; height:40px;padding:0px; text-align:right; z-index:99;}
+</style>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:10px;">
+	<div class="layui-form SEARCH">
+	  <div class="layui-form-item">
+	    <div class="layui-inline" style="width:300px;">
+	      <label class="layui-form-label" style="width:130px; line-height:40px;">DMA分区(一级):&nbsp;</label>
+	      <div class="layui-input-inline" style="width:150px;">
+	          <select id="YYS" lay-filter="YYS">
+		        <option v-for="re in AreaList" :value="re.dareaId" selected=""><span class="site_name">{{re.dareaName}}</span></option>
+		      </select>
+	      </div>
+	    </div>	      
+	    <div class="layui-inline" style="width:340px;">
+		  <div class="layui-input-block">
+		      <input type="radio" name="unit" value="day" title="按日查看" checked>
+		      <input type="radio" name="unit" value="month" title="按月查看">
+		  </div>
+	    </div>
+	  </div>
+	</div>
+	<div class="setting">
+		<button type="button" class="btn btn-primary" onClick="window.location.href='./DMA_zhanshi.html';">地图模式</button>
+	</div>
+	<iframe id="linkHtml" width="100%" height="800px" frameBorder="0" src="" scrolling="no"></iframe>
+</div>
+<script>
+var baseURL = "../../";
+var vm = new Vue({
+  el: '#app',
+  data: {
+	  AreaList:[],
+	  dareaId:"",
+	  type:"day",
+  },
+  methods:{
+	  getIndex:function(ID){
+	  },
+	  searchSiteId:function(ID){
+	  },
+  }
+})
+layui.use(['form'], function(){
+	  var form = layui.form; 
+		form.on("radio", function (data) {
+			console.log(data);
+		       var unit = data.value;
+		       console.log(unit);
+		        if (this.value == 'day') { 
+		        	vm.type = "day";
+		        	document.getElementById('linkHtml').src = "./DMAdaotu2.html?dareaId="+vm.dareaId;
+		        } else if (this.value == 'month') { 
+		        	vm.type = "month";
+		        	document.getElementById('linkHtml').src = "./DMAdaotu3.html?dareaId="+vm.dareaId;
+		        } 
+		    });
+		form.on('select(YYS)', function(data){
+	        var val=data.value;
+	        console.info(val);
+	        vm.dareaId = val;
+	        getDMAdaotu();
+	    });
+		$.ajax({
+		    type: "GET",
+		    url: "../../dma/area/querySonList?dareaParentId=",
+		    contentType: "application/json",
+		    data:JSON.stringify(),
+		    dataType:"json",
+		    success: function(r){
+		    	console.log(r);
+		    	vm.AreaList=[];
+		    	for(var i=0;i<r.length;i++){
+		    		var ls={
+		    				dareaName:r[i].dareaName,
+		    				dareaId:r[i].dareaId,
+		    		}
+		    		vm.AreaList.push(ls);
+		    	}
+				layui.form.render('select');
+			  }
+			});
+		setTimeout(function(){
+			  $("#YYS").val(vm.AreaList[0].dareaId);
+			  layui.form.render('select');
+			  vm.dareaId = vm.AreaList[0].dareaId;
+			  console.log(vm.dareaId);
+			  getDMAdaotu();
+		},1000);
+})
+function getDMAdaotu(){
+	console.log("00000");
+	var hrf=""
+	if(vm.type == "day"){
+		hrf="./DMAdaotu2.html?dareaId="+vm.dareaId
+	}else if(vm.type == "month"){
+		hrf="./DMAdaotu3.html?dareaId="+vm.dareaId
+	}
+	console.log(hrf);
+	$("#linkHtml").attr("src",hrf);
+}
+$(function(){
+})
+
+
+</script>
+</body>
+</html>

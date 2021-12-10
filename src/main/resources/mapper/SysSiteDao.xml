@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.sys.dao.SysSiteDao">
+    <resultMap id="siteResultMap" type="com.enjoyor.modules.sys.entity.SysSiteEntity">
+      <result property="siteId" column="site_id"/>
+      <result property="name" column="site_name"/>
+      <result property="areaId" column="area_id"/>
+      <result property="orderNum" column="site_ordernum"/> 
+      <result property="parentId" column="site_parentId"/>
+      <result property="type" column="dic_value"/> 
+      <result property="x" column="site_x"/> 
+      <result property="y" column="site_y"/>
+      <result property="reportNum" column="reportNum"/>
+      <result property="status" column="site_status"/>
+      <result property="demo" column="demo"/>
+      <result property="upperSiteId" column="upper_site_id"/>  
+    </resultMap>
+    <resultMap id="dicResultMap" type="com.enjoyor.modules.sys.entity.SysDictionaryEntity">
+      <result property="dicId" column="dic_id"/>
+      <result property="dicNum" column="dic_codeNum"/>
+      <result property="type" column="dic_type"/>
+      <result property="item" column="dic_item"/>
+      <result property="name" column="dic_subitem"/>
+      <result property="dicValue" column="dic_value"/>
+      <result property="memo" column="dic_memo"/>
+      <result property="parentId" column="dic_parentId"/>
+    </resultMap>
+    <resultMap id="vedioResultMap" type="com.enjoyor.modules.sys.entity.SysVideoEntity">
+      <result property="name" column="name"/>
+      <result property="ip" column="ip"/>
+      <result property="port" column="port"/>
+      <result property="channel" column="channel"/> 
+      <result property="username" column="username"/>
+      <result property="password" column="password"/> 
+      <result property="url" column="url"/> 
+      <result property="areaId" column="areaid"/>
+      <result property="siteId" column="siteid"/>
+      <result property="x" column="x"/>
+      <result property="y" column="y"/>
+      <result property="type" column="type"/>  
+    </resultMap>
+    <resultMap id="regResultMap" type="com.enjoyor.modules.sys.entity.SysRegionEntity">
+     <id property="id" column="id"/>
+     <result property="regionId" column="area_id"/>
+     <result property="name" column="area_name"/>
+     <result property="parentId" column="area_parentId"/>
+     <result property="orderNum" column="area_ordernum"/>
+     <result property="type" column="area_type"/> 
+    </resultMap>
+    
+	<select id="queryObject" resultMap="siteResultMap">
+		select * from "BASESYS".sys_site where id = #{value}
+	</select>
+	
+	<select id="queryVideoInfo" resultMap="vedioResultMap">
+		select * from "BASESYS".sys_vedioinfo 
+       <where>
+        siteid = #{siteId}
+        <if test="queryRegionId != null">
+          and areaid in     
+       <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		  #{item}
+	   </foreach>
+      </if> 
+       </where>
+	</select>
+
+	<select id="queryList" resultMap="siteResultMap">		
+       select * from 
+		( select d.*,(select p.area_name from sys_area p where p.area_id = d.area_id) as areaName,
+		(select i.site_name from sys_site i where i.site_id = d.site_parentId) as parentName,
+		(select dic.dic_subitem from sys_dictionary dic where dic.dic_value=d.dic_value and dic.dic_parentId=4) as typeName,
+		(select dic2.dic_subitem from sys_dictionary dic2 where dic2.dic_value=d.site_status and dic2.dic_parentId=10) as statusName,
+		rownum rn from (select s.* from sys_site s order by s.site_ordernum asc) d		
+    <where>
+            <!-- b.site_parentId is null -->
+            <if test="name != null and name.trim() != ''">
+			 and d.site_name like concat('%',concat(#{name},'%'))
+			</if>
+			<if test="areaId != null and areaId.trim() != ''">
+			 and d.area_id like concat('%',concat(#{areaId},'%'))
+			</if>
+			<if test="siteId != null and siteId.trim() != ''">
+			 and d.site_id like concat('%',concat(#{siteId},'%'))
+			</if>
+			<if test="type != null and type.trim() != ''">
+			 and d.dic_value = #{type}
+			</if>
+			<if test="reportNum != null and reportNum.trim() != ''">
+			 and d.reportnum like concat('%',concat(#{reportNum},'%'))
+			</if>
+			<if test="queryRegionId != null">
+			and d.area_id IN
+			 <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+			 #{item}
+			 </foreach>
+		    </if>
+	</where>
+	) b		
+	<where>		
+      		<if test="offset != null and limit != null">
+			 and b.rn between #{offset} and #{limit}
+		    </if>
+    </where>		
+						
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by b.${sidx} ${order}
+            </when>
+
+        </choose>
+	</select>
+
+    <select id="querySite" resultMap="siteResultMap">
+      select * from "BASESYS".sys_site where site_parentId in(select site_id from sys_site where id=#{value}) order by id asc
+    </select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(*) from sys_site u
+		<where>
+			<if test="name != null and name.trim() != ''">
+				and u.site_name like concat('%',concat(#{name},'%'))
+			</if>
+			<if test="areaId != null and areaId.trim() != ''">
+				and u.area_id like concat('%',concat(#{areaId},'%'))
+			</if>
+			<if test="type != null and type.trim() != ''">
+				and u.dic_value like concat('%',concat(#{type},'%'))
+			</if>
+			<if test="queryRegionId != null">
+			and u.area_id IN
+			 <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+			 #{item}
+			 </foreach>
+		    </if>
+		</where>
+	</select>
+
+	<select id="selectuser" resultMap="siteResultMap">
+		select site_name from sys_site u
+		<where>
+			<if test="name != null and name.trim() != ''">
+				and u.site_name like concat('%',concat(#name},'%'))
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByUserName" resultMap="siteResultMap">
+		select * from sys_site where site_name = #{name}
+	</select>
+	
+	<delete id="deleteBatch">
+		delete from sys_site where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="queryAreaIdList" resultType="String">
+		select site_id from sys_site where area_id = #{value}
+	</select>
+	
+	<select id="checkSiteId" resultMap="siteResultMap">
+		select id from sys_site 
+        <where>
+         <if test="siteId != null and siteId.trim() != ''">
+          site_id = #{siteId}
+         </if>
+        </where>
+	</select>
+	
+	<select id="querySiteType" resultMap="dicResultMap">
+		select * from sys_dictionary where dic_parentId=4
+	</select>
+	
+	<select id="querySiteStatus" resultMap="dicResultMap">
+		select * from sys_dictionary where dic_parentId=10
+	</select>
+	
+	<select id="queryFactory" resultMap="dicResultMap">
+		select * from sys_dictionary where dic_parentId=19
+	</select>
+
+	<select id="queryFacSite" resultMap="siteResultMap">
+		select * from "BASESYS".sys_site
+		<where>
+			dic_value in('S03','S02','W01','P01') and site_parentId is null
+			<if test="queryRegionId != null">
+				and area_id in
+				<foreach collection="queryRegionId" index="index" item="item"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		order by site_ordernum asc
+	</select>
+	
+	<select id="queryFacSite4Ps" resultMap="siteResultMap">
+	  select * from "BASESYS".sys_site 
+     <where>
+      dic_value in('P02','P01') and site_parentId is null
+      <if test="queryRegionId != null">
+          and area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+      </if> 
+     </where>    
+	</select>
+	
+	<select id="queryFacSite4Ws" resultMap="siteResultMap">
+	  select * from "BASESYS".sys_site 
+     <where>
+      dic_value = 'W01' and site_parentId is null
+      <if test="queryRegionId != null">
+          and area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+      </if> 
+     </where>    
+	</select>
+	
+	<select id="queryfpSite" resultMap="siteResultMap">
+		select d.*,(select p.area_name from "BASESYS".sys_area p where p.area_id = d.area_id) as areaName,
+		(select i.site_name from "BASESYS".sys_site i where i.site_id = d.site_parentId) as parentName,
+		(select dic.dic_subitem from "BASESYS".sys_dictionary dic where dic.dic_value=d.dic_value and dic.dic_parentId=4) as typeName,
+		(select dic2.dic_subitem from "BASESYS".sys_dictionary dic2 where dic2.dic_value=d.site_status and dic2.dic_parentId=10) as statusName
+		 from (select s.* from "BASESYS".sys_site s order by s.site_ordernum asc) d 
+       <where>
+         1=1
+        <if test="type != null and type.trim() != ''">
+		  and d.dic_value = #{type} 
+		 </if>
+	     <if test="queryRegionId != null">
+          and d.area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+         </if>  
+         and site_parentId is null
+        </where>
+	</select>
+	<select id="queryfpSite2" resultMap="siteResultMap">
+		select d.*,(select p.area_name from "BASESYS".sys_area p where p.area_id = d.area_id) as areaName,
+		(select i.site_name from "BASESYS".sys_site i where i.site_id = d.site_parentId) as parentName,
+		(select dic.dic_subitem from "BASESYS".sys_dictionary dic where dic.dic_value=d.dic_value and dic.dic_parentId=4) as typeName,
+		(select dic2.dic_subitem from "BASESYS".sys_dictionary dic2 where dic2.dic_value=d.site_status and dic2.dic_parentId=10) as statusName
+		 from (select s.* from "BASESYS".sys_site s order by s.site_ordernum asc) d 
+       <where>
+         1=1
+        <if test="type != null and type.trim() != ''">
+		  and d.dic_value = #{type} 
+		 </if>
+		 <if test="areaId != null and areaId.trim() != ''">
+		  and d.area_id = #{areaId} 
+		 </if>
+		 <if test="queryRegionId != null">
+          and d.area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+         </if>
+         and site_parentId is null
+        </where>
+        ORDER BY dic_value ASC
+	</select>
+	
+	<select id="queryParentSite" resultMap="siteResultMap">
+		select * from "BASESYS".sys_site 
+		<where>
+		site_parentid = #{parentId} and ((dic_value !='S11' and dic_value !='S04' )or dic_value is null )
+		 <if test="queryRegionId != null">
+          and area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+         </if>		
+		</where>
+		ORDER BY site_ordernum ASC 
+	</select>
+	
+	<select id="querySiteName" resultMap="siteResultMap">
+		select s.*,
+		(select dic.dic_subitem from "BASESYS".sys_dictionary dic where dic.dic_value=s.dic_value and dic.dic_parentId=4) as typeName
+		 from "BASESYS".sys_site s where s.site_id = #{siteId}
+	</select>
+	
+	<select id="queryNameById" resultType="String">	
+	  select site_name from "BASESYS".sys_site where site_id=#{siteId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="querySiteByParent" resultMap="siteResultMap">	
+	  select * from "BASESYS".sys_site
+	  <where>
+	   site_parentid = #{parentId,jdbcType=VARCHAR} and dic_value = #{dicValue,jdbcType=VARCHAR}
+	   <if test="queryRegionId != null">
+          and area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+       </if>	
+	  </where>
+	</select>
+	
+	<!-- 根据权限，查询所有思源供水的片区 -->
+	<select id="queryAreaInfo" resultMap="regResultMap">	
+	  select * from "BASESYS".sys_area 
+     <where>
+      <!-- AREA_PARENTID not in('0','1','99','2','3','4') -->
+      AREA_PARENTID in (
+      	select AREA_ID from "BASESYS".SYS_AREA
+      	<where>
+      		AREA_PARENTID = '1'
+      	</where>  
+      )
+      <if test="queryRegionId != null">
+          and area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+      </if>	 
+      order by AREA_ORDERNUM ASC
+     </where> 
+	</select>
+	
+	<select id="querySiteByArea" resultMap="siteResultMap">	
+	 select * from "BASESYS".sys_site 
+     <where>
+     area_id = #{areaId,jdbcType=VARCHAR}
+     <!--  and SITE_PARENTID is null -->
+     and ( dic_value ='S03' or (dic_value ='S04' and demo is not null))  
+     <if test="queryRegionId != null">
+          and area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+     </if>	
+     ORDER BY SITE_ORDERNUM ASC
+     </where>     
+	</select>
+
+	<select id="querySiteByAreaType" resultMap="siteResultMap">
+		select *
+		from "BASESYS".sys_site
+		<where>
+			1=1
+			<!-- site_parentid is null -->
+			<if test="areaId != null and areaId.trim() != ''">
+				and area_id=#{areaId,jdbcType=VARCHAR}
+			</if>
+			<if test="dicValue != null">
+				and dic_value in
+				<foreach collection="dicValue" index="index" item="item"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="queryRegionId != null">
+				and area_id in
+				<foreach collection="queryRegionId" index="index" item="item"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		order by site_ordernum asc
+	</select>
+
+	<select id="queryInsData" resultType="int">
+		select count(*) from "BASESYS".sys_site
+		<where>
+			1=1
+			<if test="siteId != null and siteId.trim() != ''">
+				and site_id = #{siteId}
+			</if>
+			<if test="queryRegionId != null">
+				and area_id in
+				<foreach collection="queryRegionId" index="index" item="item"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<select id="querySewageImpExp" resultMap="siteResultMap">
+	select * 
+	from "BASESYS".sys_site 
+	<where>
+		site_parentid = #{siteParentId}
+		and dic_value = 'W01'
+	</where>
+	</select>
+	
+	<select id="queryS03Site" resultMap="siteResultMap">
+	select * 
+	from "BASESYS".sys_site 
+	<where>
+		dic_value = 'S03'
+	</where>
+	</select>
+	
+	<select id="queryAllSite" resultMap="siteResultMap">
+	select site_id, site_name 
+	from "BASESYS".sys_site 
+	</select>
+	
+	<select id="queryPsbzSite" resultMap="siteResultMap">
+		select d.*,(select p.area_name from "BASESYS".sys_area p where p.area_id = d.area_id) as areaName,
+		(select i.site_name from "BASESYS".sys_site i where i.site_id = d.site_parentId) as parentName,
+		(select dic.dic_subitem from "BASESYS".sys_dictionary dic where dic.dic_value=d.dic_value and dic.dic_parentId=4) as typeName,
+		(select dic2.dic_subitem from "BASESYS".sys_dictionary dic2 where dic2.dic_value=d.site_status and dic2.dic_parentId=10) as statusName
+		 from (select s.* from "BASESYS".sys_site s order by s.site_ordernum asc) d 
+       <where>
+         1=1
+        <if test="type != null and type.trim() != ''">
+		  and d.dic_value = #{type} 
+		 </if>
+		  and d.area_id = #{areaId} 
+        </where>
+	</select>
+	
+	<!-- 分页查询sysSite和waterUser的数据集 -->
+	<select id="querySysSiteAndDmaUser" resultMap="siteResultMap">	
+		SELECT * 
+	    FROM (SELECT c.*, ROWNUM ROW_ID 
+			FROM (
+				<!-- sysSite -->
+				select a.site_id, a.site_name, b.dic_subitem as dic_value
+				from "BASESYS".sys_site a
+				left join
+				"BASESYS".sys_dictionary b
+				on a.dic_value = b.dic_value
+				  <where>
+				  1=1
+				  <!-- 4为字典表中点位类别编号 -->
+				  and b.dic_parentId = '4' 
+				  	<if test="siteId != null and siteId.trim() != ''">
+					  and a.site_id like concat('%',concat(#{siteId}, '%'))
+					</if>
+					<if test="name != null and name.trim() != ''">
+					  and a.site_name like concat('%',concat(#{name}, '%')) 
+					</if>
+				  	<if test="type != null and type.trim() != ''">
+					  and a.dic_value = #{type} 
+					</if>
+					<if test="areaName != null and areaName.trim() != ''">
+					  and a.area_id in (select AREA_ID from "BASESYS".sys_area where area_name like concat('%',concat(#{areaName},'%')))
+					</if>
+				  </where>
+				<!-- union
+				waterUser
+				select a.user_id, a.user_name, b.dic_subitem as dic_value
+				from "MONITOR".wateruser a
+				left join
+				"BASESYS".sys_dictionary b
+				on a.user_type = b.dic_value
+				<where> 
+				1=1
+				20为字典表中用户类别编号
+				and b.dic_parentId = '20' 
+				  <if test="siteId != null and siteId.trim() != ''">
+				    and a.user_id like concat('%',concat(#{siteId},'%'))
+				  </if>
+				  <if test="name != null and name.trim() != ''">
+				    and a.user_name like concat('%',concat(#{name},'%'))
+				  </if>
+				  选择点位类型时，不查询用户表
+				  <if test="type != null and type.trim() != ''">
+					and b.dic_parentId = '99999'
+				  </if>
+				  <if test="areaName != null and areaName.trim() != ''">
+					and a.area_id in (select AREA_ID from "BASESYS".sys_area where area_name like concat('%',concat(#{areaName},'%')))
+				  </if>
+				</where>  -->		  
+			) c  
+			WHERE ROWNUM &lt;= #{limit})
+ 		WHERE ROW_ID &gt;= #{offset}
+	</select>
+	
+	<!-- 分页统计数量，条件可自己添加 -->
+	<select id="count" resultType="int">
+	  select count(1) 
+	  from (
+	  			<!-- sysSite -->
+				select a.site_id, a.site_name, b.dic_subitem 
+				from "BASESYS".sys_site a
+				left join
+				"BASESYS".sys_dictionary b
+				on a.dic_value = b.dic_value
+				  <where>
+				  1=1
+				  <!-- 4为字典表中点位类别编号 -->
+				  and b.dic_parentId = '4' 
+				  	<if test="siteId != null and siteId.trim() != ''">
+					  and a.site_id like concat('%',concat(#{siteId}, '%'))
+					</if>
+					<if test="name != null and name.trim() != ''">
+					  and a.site_name like concat('%',concat(#{name}, '%')) 
+					</if>
+				  	<if test="type != null and type.trim() != ''">
+					  and a.dic_value = #{type} 
+					</if>
+					<if test="areaName != null and areaName.trim() != ''">
+					  and a.area_id in (select AREA_ID from "BASESYS".sys_area where area_name like concat('%',concat(#{areaName},'%')))
+					</if>
+				  </where>
+				<!-- union
+				waterUser
+				select a.user_id, a.user_name, b.dic_subitem 
+				from "MONITOR".wateruser a
+				left join
+				"BASESYS".sys_dictionary b
+				on a.user_type = b.dic_value
+				<where> 
+				1=1
+				and b.dic_parentId = '20' 20为字典表中用户类别编号
+				  <if test="siteId != null and siteId.trim() != ''">
+				    and a.user_id like concat('%',concat(#{siteId},'%'))
+				  </if>
+				  <if test="name != null and name.trim() != ''">
+				    and a.user_name like concat('%',concat(#{name},'%'))
+				  </if>
+				  选择点位类型时，不查询用户表
+				  <if test="type != null and type.trim() != ''">
+					and b.dic_parentId = '99999'
+				  </if>
+				  <if test="areaName != null and areaName.trim() != ''">
+					and a.area_id in (select AREA_ID from "BASESYS".sys_area where area_name like concat('%',concat(#{areaName},'%')))
+				  </if>			  
+				</where> 	 -->
+		)
+	</select>
+	
+	<select id="querySingleSiteBySiteId" resultMap="siteResultMap">	
+	  select * from "BASESYS".sys_site where site_id = #{siteId,jdbcType=VARCHAR}
+	</select>	
+	
+	<select id="querySiteByS04" resultMap="siteResultMap">	
+	  select * from "BASESYS".sys_site where site_parentid = #{parentId,jdbcType=VARCHAR} and dic_value='S04'
+	</select>
+	<select id="queryOutWaterSite" resultMap="siteResultMap">	
+	  select * from "BASESYS".sys_site where site_parentid = #{parentId,jdbcType=VARCHAR} and dic_value='S02' and site_name like '%出%水%'
+	</select>
+	
+	<select id="queryByAreaId" resultMap="siteResultMap">	
+	  select site_id, site_name 
+	  from "BASESYS".sys_site 
+	  where 
+	  area_id = #{areaId,jdbcType=VARCHAR}
+	  and dic_value in ('S04','S05')
+	</select>
+		
+	<select id="queryS02Site" resultMap="siteResultMap">	
+	  select * 
+	  from "BASESYS".sys_site 
+	  where 
+	  SITE_PARENTID is null
+	  and dic_value = 'S02'
+	</select>	
+	
+	<select id="updateSiteStatus">	
+	  update
+	  BASESYS.SYS_SITE
+	  set SITE_STATUS = #{siteStatus}
+	  where SITE_ID in
+	  <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+	   #{item}
+      </foreach>
+	</select>	
+	
+	<select id="queryByStatus" resultMap="siteResultMap">	
+	  select * 
+	  from "BASESYS".sys_site 
+	  where 
+	  SITE_STATUS = #{siteStatus}
+	</select>
+	
+	<select id="queryDicValue" resultType="String">	
+	  select dic_value 
+	  from "BASESYS".sys_site 
+	  where 
+	  site_id = #{siteId}
+	</select>	
+	
+	<select id="querySewageFactory" resultMap="siteResultMap">	
+	  select * 
+	  from "BASESYS".sys_site 
+	  <where>
+	  site_parentid is null
+	  and dic_value = 'W01'
+	  </where>
+	  order by site_ordernum asc
+	</select>
+	
+	<select id="queryAllWsc" resultMap="siteResultMap">
+		select ID, SITE_ID, SITE_NAME, AREA_ID
+		from BASESYS.SYS_SITE
+		where DIC_VALUE = 'W01' and SITE_parentId is null
+		ORDER BY SITE_ORDERNUM
+	</select>
+</mapper>

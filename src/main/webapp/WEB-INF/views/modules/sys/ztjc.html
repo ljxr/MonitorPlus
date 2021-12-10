@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>组态监测</title>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/jqgrid/ui.jqgrid.css">
+<link rel="stylesheet" href="../../statics/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../statics/plugins/jqgrid/ui.jqgrid-bootstrap-ui.css">
+<script src="${request.contextPath}/statics/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="${request.contextPath}/statics/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<style type="text/css">
+.site_name{font-size:14px; color:#363636;}
+.site_id{font-size:12px; color:#999999;}
+.table_tit{height:50px;}
+.table_tit th{line-height:50px; height:50px; background-color:#1abb9c; color:#fff;}
+.tr td{line-height:40px; height:40px;}
+.tr:hover{background-color:#f1f1f1;}
+.layui-inline input{}
+</style>
+</head>
+<body>
+<!-- <button type="button" class="btn btn-warning" style="position:fixed; top:20px; right:20px;" onClick="sssj();">实时数据</button> -->
+<!-- <button type="button" class="btn btn-warning" style="position:fixed; top:20px; right:20px;" onClick="window.location.href='websocket.html';">websocket测试</button> -->
+<!-- <button type="button" class="btn btn-warning" style="position:fixed; top:0px; right:20px;" onClick="window.location.href='jksj.html';">监控数据</button> -->
+<!-- <button type="button" class="btn btn-warning" style="position:fixed; top:40px; right:20px;" onClick="window.location.href='layui_test2.html';">layui测试</button> -->
+
+ <div class="table-responsive" id="app">
+	 <div class="demoTable">
+		<div class="navbar-form" role="search" style="padding:0px;">
+			<div class="layui-inline chaxun">
+			    <input class="layui-input" v-model="zt_search.gytName" placeholder="工艺图名称">
+			</div>
+			<div class="layui-inline chaxun">
+			    <input class="layui-input" v-model="zt_search.siteParentId" placeholder="父点位ID">
+			</div>
+			<button type="button" class="layui-btn chaxun" data-type="reload">查询</button>
+			<button class="layui-btn layui-btn-normal" data-toggle="modal" data-target="#new_Modal" id="xinzengGY"><span class="glyphicon glyphicon-plus"></span>&nbsp&nbsp新增工艺图</button>
+			<button class="layui-btn layui-btn-normal" data-toggle="modal" data-target="#newZL_Modal" id="xinzengZL"><span class="glyphicon glyphicon-plus"></span>&nbsp&nbsp新增总览图</button>
+		</div>
+		<table class="layui-hide chaxun" id="LAY_table_user" lay-filter="LAY_table_user"></table>
+	</div>
+	<div class="modal fade" id="new_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						新增工艺图
+					</h4>
+				</div>
+				<div class="modal-body gyt_container"> 
+	               <form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="firstname" class="col-sm-3 control-label">工艺图名称</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="firstname" placeholder="组态名称" v-model="zt_new.gytName">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">关联点位</label>
+							<div class="col-sm-9">
+							  <select class="form-control" id="site1" v-model="zt_new.siteParentId">
+								  <option value="">关联点位</option>  
+				                  <option v-for="re in site" :value="re.value"><span class="site_name">{{re.name}}</span></option> 
+				               </select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">关联子点位</label>
+							<div class="col-sm-9">
+							  <select class="form-control" id="site2" v-model="zt_new.siteId">
+								  <option value="">关联子点位</option>  
+				                  <option v-for="re in site2" :value="re.value"><span class="site_name">{{re.name}}</span></option> 
+				               </select>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onClick="add_gyt()">添加</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="newZL_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						新增总览图
+					</h4>
+				</div>
+				<div class="modal-body gyt_container"> 
+	               <form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="firstname" class="col-sm-3 control-label">总览图名称</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="firstname" placeholder="组态名称" v-model="ztZL_new.gytName">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">总览图点位</label>
+							<div class="col-sm-9">
+							  <select class="form-control" id="site1" v-model="ztZL_new.siteParentId">
+								  <option value="S">供水总览图</option>  
+								  <option value="W">污水总览图</option>  
+								  <option value="P">排水总览图</option>
+				               </select>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onClick="add_zlt()">添加</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="edit_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="app">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						组态信息维护
+					</h4>
+				</div>
+				<div class="modal-body tit_container">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="firstname" class="col-sm-3 control-label">组态名称</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="firstname" placeholder="组态名称" v-model="zt_edit.gytName">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">关联点位</label>
+							<div class="col-sm-9">
+							  <select class="form-control" id="site1" v-model="zt_edit.siteParentId">
+								  <option value="">关联点位</option>  
+				                  <option v-for="re in site" :value="re.value"><span class="site_name">{{re.name}}</span></option> 
+				               </select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">关联子点位</label>
+							<div class="col-sm-9">
+							  <select class="form-control" id="site2" v-model="zt_edit.siteId">
+								  <option value="">关联子点位</option>  
+				                  <option v-for="re in site2" :value="re.value"><span class="site_name">{{re.name}}</span></option> 
+				               </select>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onClick="change_list()">保存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-primary layui-btn-xs chakan" lay-event="detail" id="chakan">查看</a>
+  <a class="layui-btn layui-btn-normal layui-btn-xs yulan" lay-event="preview" id="yulan">预览</a>
+  <a class="layui-btn layui-btn-xs bianji" lay-event="edit" lay-event="edit" data-toggle="modal" data-target="#edit_Modal" id="bianji">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs shanchu" lay-event="del" id="shanchu">删除</a>
+</script>
+<script>
+</script>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/ztjc.js"></script>
+</body>
+</html>

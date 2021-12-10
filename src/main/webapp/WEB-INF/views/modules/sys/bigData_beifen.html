@@ -1,0 +1,3063 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>安吉国源智慧水务综合管理平台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+<!-- <script type="text/javascript" src="../js/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../js/echarts.min.js"></script> -->
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/js/circleChart.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<!--<script src="https://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>--><!-- 
+<script src="https://heerey525.github.io/layui-v2.4.3/layui-v2.4.5/layui.js"></script>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://heerey525.github.io/layui-v2.4.3/layui-v2.4.5/css/layui.css"> -->
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<link rel="stylesheet" href="../../statics/css/normalize.css">
+
+<style type="text/css">
+	body{background:url(../../statics/img/bigData/bgn.png); background-repeat: repeat-y; background-size: cover;}
+	*{font-family:"微软雅黑"; overflow: hidden;}
+	@font-face {
+	    font-family: MyFontName;
+	    src: url(../../statics/img/bigData/AgencyFB.ttf)
+	}
+	#container div{position:absolute;}
+	#CT1 p{display:inline-block;}
+	#timeL{font-family:MyFontName; font-size:34px; color:#3ffff8; width:100px;}
+	#timeC{margin-top:-5px; position:relative; top:-5px;}
+	#timeC span{display:block; font-size:13px; line-height:16px; color:#ffffff; text-align:right;}
+	#timeR{border:solid 0.5px #3ffff8; font-size:22px; font-family:MyFontName; padding:0 5px; width:26px; text-align:center; color:#ffffff; margin-top:-10px; position:relative; top:-8px;}
+	#CT2iframe{position:absolute; pointer-events: none; padding:0px!important;}
+	
+	.CThr{background-color:#3ffff8; height:1px; border:none; margin:4px 0;}
+	.CTtitHD{color:#ffffff; font-size:16px; height:24px; line-height:22px; text-align:left; font-weight:bold;}
+	.CTtit{color:#3ffff8; font-size:16px; height:24px; line-height:22px; text-align:left; font-weight:bold;}
+	.CTtitHD span{cursor:pointer}
+	.innerList{height:48px; line-height:50px; vertical-align:center;}
+	.innerListTop{margin-top:40px;}
+	.innerList span{display:inline-block; height:48px; line-height:50px; margin:0px; padding:0px;}
+	.innerTit{font-size:16px; color:#3ffff8; padding:0 10px; width:37%;}
+	.innerTit span{font-size:16px; color:#3ffff8; padding:0px;}
+	.innerUnit{font-size:16px; color:#3ffff8; padding:0 10px; width:5%; text-align:right;}
+	.innerNum{font-family:MyFontName; font-weight:bold; color:#ffffff; font-size:28px; width:28%; text-align:right;}
+	.innerIcon{display:inline-block; height:44px; line-height:44px; width:8%; text-align:right;}
+	.innerIcon span{display:inline-block; height:44px; line-height:44px; font-size:22px;}
+	.innerPercent{font-size:16px; color:#ffffff; width:16%;}
+	
+	.innerList2{height:50px; line-height:50px; vertical-align:center;}
+	.innerList2 span{display:inline-block; height:50px; line-height:50px;  margin:0px; padding:0px;}
+	.innerTit2{font-size:16px; color:#3ffff8; padding:0 10px; width:24%;}
+	.innerTit2 span{font-size:16px; color:#3ffff8; padding:0px;}
+	.innerNum2{font-family:MyFontName; font-weight:bolder; color:#11e425; font-size:28px; width:30%; text-align:right;}
+	.innerIcon2{display:inline-block; height:44px; line-height:44px; text-align:right; width:20%;}
+	.innerIcon2 span{display:inline-block; height:44px; line-height:44px; font-size:22px;}
+	.innerPercent2{font-size:16px; color:#ffffff; width:18%; text-align:right;}
+	
+	.innerTit3{font-size:16px; color:#ffffff; padding:0 10px; min-width:200px;}
+	.innerTit3 span{font-size:16px; color:#ffffff; padding:0px;}
+	.innerNum3{font-family:MyFontName; font-weight:bold; color:#3ffff8; font-size:30px; width:20%; text-align:right;}
+	.innerIcon3{display:inline-block; height:60px; line-height:60px; width:10%; text-align:right;}
+	.innerIcon3 span{display:inline-block; height:60px; line-height:60px; font-size:24px;}
+	.innerUnit3{font-size:16px; color:#ffffff; padding:0 10px; width:9%; text-align:right;}
+	
+	
+	table{margin:auto;border-collapse: collapse; width:100%; position:relative;}
+	tr{width:100%;}
+	th{font-size:14px; color:#3ffff8; text-align:center; width:22%; height:26px; line-height:27px; border:solid 1px rgba(180,180,180,0.5); font-weight:normal;}
+	td{font-size:14px; color:#ffffff; text-align:center; width:22%; height:26px; line-height:27px; border:solid 1px rgba(180,180,180,0.5);}
+	.td1{width:34%}
+	.td2{width:20%}
+	.td3{width:25%}
+	.CTtableBottom5 th{font-size:14px; color:#3ffff8; text-align:center; width:22%; height:22px; line-height:22px; border:solid 1px rgba(180,180,180,0.5); font-weight:normal;}
+	.CTtableBottom5 td{font-size:14px; color:#ffffff; text-align:center; width:22%; height:22px; line-height:22px; border:solid 1px rgba(180,180,180,0.5);}
+	.CTtableBottom6 th{font-size:14px; color:#3ffff8; text-align:center; width:20%; height:30px; line-height:30px; border:solid 1px rgba(180,180,180,0.5); font-weight:normal;}
+	.CTtableBottom6 td{font-size:14px; color:#ffffff; text-align:center; width:20%; height:30px; line-height:30px; border:solid 1px rgba(180,180,180,0.5);}
+	.CTtableBottom7 th{font-size:14px; color:#3ffff8; text-align:center; width:22%; height:24px; line-height:24px; border:solid 1px rgba(180,180,180,0.5); font-weight:normal;}
+	.CTtableBottom7 td{font-size:14px; color:#ffffff; text-align:center; width:22%; height:24px; line-height:24px; border:solid 1px rgba(180,180,180,0.5);}
+	#CT11C{background-color:rgba(255,0,0,0.2);}
+	.up span{color:#ff0000;}
+	.down span{color:#00ff00;}
+	.processList{width:100%; height:55px; line-height:55px;}
+	.processList div{float:left;}
+	/* #processList1{position:absolute; left:0; top:110px;}
+	#processList2{position:absolute; left:0; top:160px;}
+	#processList3{position:absolute; left:0; top:210px;}
+	#processTit1{position:absolute; left:0; width:20%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	#progress1{position:absolute; left:20%; width:65%; height:10px; margin-top:25px;}
+	#processNum1{position:absolute; left:87%; width:10%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	#processTit2{position:absolute; left:0; width:20%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	#progress2{position:absolute; left:20%; width:65%; height:10px; margin-top:25px;}
+	#processNum2{position:absolute; left:87%; width:10%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	#processTit3{position:absolute; left:0; width:20%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	#progress3{position:absolute; left:20%; width:65%; height:10px; margin-top:25px;}
+	#processNum3{position:absolute; left:87%; width:10%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+ */
+
+	.processTit1{position:absolute; left:0; width:20%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	.progress1{position:absolute; left:20%; width:65%; height:10px; margin-top:25px;}
+	.processNum1{position:absolute; left:87%; width:10%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	.processTit2{position:absolute; left:0; width:20%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	.progress2{position:absolute; left:20%; width:65%; height:10px; margin-top:25px;}
+	.processNum2{position:absolute; left:87%; width:10%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	.processTit3{position:absolute; left:0; width:20%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+	.progress3{position:absolute; left:20%; width:65%; height:10px; margin-top:25px;}
+	.processNum3{position:absolute; left:87%; width:10%; font-size:16px; color:#ffffff; height:55px; line-height:55px;}
+ 
+	.CT6container{position:relative;}
+	.CT6L{width:60%; height:100px; padding:0px; margin:0px; position:absolute; top:20px; left:0;}
+	.CT6R{width:35%; height:120px; padding:0px; margin:0px; position:absolute; top:10px; left:60%;}
+	
+	.circleChart_canvas{margin:auto;}
+	.circleChart_text{margin:auto; z-index:99!important; font-size:18px!important; color:#3ffff8;}
+	.CTtable{position:absolute; bottom:0px; margin-bottom:14px;}
+	.CTtableBottom{position:absolute; bottom:0px; margin:0px;}
+	.circleTit{position:absolute; height:40px; display:block; font-size:14px; line-height:40px; text-align:center; color:#ffffff;}
+	.circleCenter{color:#3ffff8; position:absolute; height:60px; line-height:60px; font-size:14px; text-align:center;}
+
+	.CT7container{width:100%; height:140px; position:relative;}
+	.CT7L{width:35%; padding:0px; margin:0px; position:absolute; left:5%;}
+	.CT7C{width:30%; padding:0px; margin:0px; position:absolute; left:35%;}
+	.CT7R{width:35%; padding:0px; margin:0px; position:absolute; left:60%;}
+
+	.innerHead{width:100%; height:40px; line-height:40px; position:relative;}
+	#innerHead1{width:33%; position:absolute; height:40px; line-height:40px; top:0px; left:0px; display:inline-block;}
+	#innerHead2{width:33%; position:absolute; height:40px; line-height:40px; top:0px; left:33%; display:inline-block;}
+	/* #innerHead3{width:33%; position:absolute; height:40px; line-height:40px; top:0px; left:66%; display:inline-block;} */
+	.innerHeadShow{color:#3ffff8;cursor:pointer}
+	.innerHeadHide{color:#ffffff;cursor:pointer}
+	
+	.echart10{width:100%; overflow: hidden; padding:0; margin:0; position:absolute; bottom:0px;}
+	
+	#CT11L{position:relative; top:30px; left:8%; width:30%; height:70px;}
+	#CT11R{position:relative; top:30px; left:74%; width:30%; height:70px;}
+	#CT11C{position:relative; overflow:visible; background:url(../../statics/img/bigData/anjiMap.png); background-repeat:no-repeat; background-size: cover;}
+	.CT11Cinner{position:absolute; display:none; width:280px; height:26px; background-color:rgba(0,0,0,0.8); color:#ffffff; font-size:12px; line-height:26px;}
+	#CT11Ctit1{display:block;}
+	.CT11Cinner span{color:#3ffff8; font-size:12px;}
+	.CT11tit{font-size:18px; color:#3ffff8; height:30px; line-height:30px;}
+	.CT11inner{height:40px;}
+	.CT11Num{height:40px; line-height:40px; font-size:38px; font-weight:bolder; font-family:MyFontName; color:#ffffff;}
+	.CT11Unit{height:40px; line-height:40px;  color:#3ffff8;}
+	
+	
+#banner6{width:50%; position: absolute;left:0px; top:0px; overflow: hidden;}
+#banner4{width:50%; position: absolute;left:50%; top:0px; overflow: hidden;}
+#banner5{width:50%; position: absolute;left:50%; top:0px; overflow: hidden;}
+#banner10{width:50%; position: absolute;left:50%; top:0px; overflow: hidden;}
+#banner9{width:50%; position: absolute;left:50%; top:0px; overflow: hidden;}
+.banner {width:100%; height:500px; margin:0px auto; position:relative; overflow:hidden;}
+.banner .bannerList{width:1000%; height:500px; position:absolute; left:0px;top:0px;}
+.banner .bannerList li{float:left; width:10%; height:500px; position:relative;}
+#logout{display:inline-block; position:absolute; top:20px; right:20px; width:20px; height:22px; z-index:99;}
+#logout img{display:inline-block; width:20px; height:20px; z-index:99;}
+
+.btn{position:absolute; top:12px; height:20px; width:20px; font-size:12px; line-height:18px; border:solid 1px #838f9f; border-radius:2px; color:#ffffff; padding:0; margin:0;}
+.btn:hover{color:#838f9f;}
+.btn_0{ right:36px;}
+.btn_1{right:18px;}
+.btn_2{right:0;}
+.btShow{background-color:rgba(17,131,228,1)!important; z-index:99;}
+.btHide{background-color:rgba(17,131,228,0.1)!important; z-index:9;}
+.CT11CtitG{color:#3ffff8; position:absolute; font-size:12px; line-height:12px; margin:0px; padding:0px;cursor:pointer}
+.CT11CtitW{color:#ffff00; position:absolute; font-size:12px; line-height:12px; margin:0px; padding:0px;cursor:pointer}
+.CT11CtitWB{white-space:nowrap;color:#ffffff; position:absolute; font-size:10px; line-height:10px; margin:0px; padding:0px;cursor:pointer}
+
+</style>
+</head>
+
+<body bgcolor="#FFFFFF" id="app">
+	<div id="container">
+		<a id="logout" href="http://192.168.101.10:8080/BasePlatForm/win10Menu.html"><img src="../../statics/img/bigData/home.png"/></a>
+		<div id="CT1">
+			<p id="timeL">12:23:34</p>
+			<p id="timeC"><span id="week">星期一</span><span id="month">三月</span></p>
+			<p id="timeR">23</p>
+		</div>
+		<iframe allowtransparency="true" id="CT2iframe" frameborder="0" width="300" height="64" scrolling="no" src="//tianqi.eastday.com/plugin/widget_v1.html?sc=2&z=3&t=1&v=2&d=1&bd=0&k=&f=ffffff&q=1&a=0&c=70910&w=300&h=64&align=left"></iframe>
+		<div id="CT3">
+			<hr class="CThr"/>
+			<p class="CTtit">供售信息</p>
+			<hr class="CThr"/>
+			<p class="innerList">
+				<span class="innerTit"><span class="lastM"></span><span>供水量</span></span>
+				<span class="innerNum" id="gsl"></span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon up" id="tag31"></span>
+				<span class="innerPercent" id="mom31"></span>
+			</p>
+			<p class="innerList">
+				<span class="innerTit"><span class="currentY"></span><span>供水量</span></span>
+				<span class="innerNum" id="yeargsl"></span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon up" id="yeartag31"></span>
+				<span class="innerPercent" id="yearmom31"></span>
+			</p>
+			<p class="innerList">
+				<span class="innerTit"><span class="lastM"></span><span>售水量</span></span>
+				<span class="innerNum" id="ssl"></span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon up" id="tag32"></span>
+				<span class="innerPercent" id="mom32"></span>
+			</p>
+			<p class="innerList">
+				<span class="innerTit"><span class="currentY"></span><span>售水量</span></span>
+				<span class="innerNum" id="yearssl"></span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon up" id="yeartag32"></span>
+				<span class="innerPercent" id="yearmom32"></span>
+			</p>
+		</div>
+		<div id="CT4">
+			<hr class="CThr"/>
+			<p class="CTtit">产销差</p>
+			<hr class="CThr"/>
+			<div class="btn btn_1 btShow">月</div>
+			<div class="btn btn_2 btHide">年</div>
+			<div id="banner4">
+				<div class="banner">
+					<ul class="bannerList">
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="lastM"></span><span>产销差</span></span>
+								<span class="innerNum2" id="innerNum41"></span>
+								<span class="innerIcon2 up" id="innerIcon41"></span>
+								<span class="innerPercent2" id="innerPercent41"></span>
+							</p>
+							<table class="CTtable CTtable4">
+								<tr>
+									<th class="td1"></th>
+									<th>供水量</th>
+									<th>售水量</th>
+									<th>产销差</th>
+								</tr>
+								<tr>
+									<td class="td1">孝丰营业所</td>
+									<td id="XFG1">0</td>
+									<td id="XFS1">0</td>
+									<td id="XFC1">0</td>
+								</tr>
+								<tr>
+									<td class="td1">梅溪营业所</td>
+									<td id="MXG1">0</td>
+									<td id="MXS1">0</td>
+									<td id="MXC1">0</td>
+								</tr>
+								<tr>
+									<td class="td1">天子湖营业所</td>
+									<td id="TZHG1">0</td>
+									<td id="TZHS1">0</td>
+									<td id="TZHC1">0</td>
+								</tr>
+								<tr>
+									<td class="td1">孝源营业所</td>
+									<td id="XYG1">0</td>
+									<td id="XYS1">0</td>
+									<td id="XYC1">0</td>
+								</tr>
+								<tr>
+									<td class="td1">上墅营业所</td>
+									<td id="SSG1">0</td>
+									<td id="SSS1">0</td>
+									<td id="SSC1">0</td>
+								</tr>
+							</table>
+						</li>
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="currentY"></span><span>产销差</span></span>
+								<span class="innerNum2" id="innerNum42"></span>
+								<span class="innerIcon2 up" id="innerIcon42"></span>
+								<span class="innerPercent2" id="innerPercent42"></span>
+							</p>
+							<table class="CTtable CTtable4">
+								<tr>
+									<th class="td1"></th>
+									<th>供水量</th>
+									<th>售水量</th>
+									<th>产销差</th>
+								</tr>
+								<tr>
+									<td class="td1">孝丰营业所</td>
+									<td id="XFG2">0</td>
+									<td id="XFS2">0</td>
+									<td id="XFC2">0</td>
+								</tr>
+								<tr>
+									<td class="td1">梅溪营业所</td>
+									<td id="MXG2">0</td>
+									<td id="MXS2">0</td>
+									<td id="MXC2">0</td>
+								</tr>
+								<tr>
+									<td class="td1">天子湖营业所</td>
+									<td id="TZHG2">0</td>
+									<td id="TZHS2">0</td>
+									<td id="TZHC2">0</td>
+								</tr>
+								<tr>
+									<td class="td1">孝源营业所</td>
+									<td id="XYG2">0</td>
+									<td id="XYS2">0</td>
+									<td id="XYC2">0</td>
+								</tr>
+								<tr>
+									<td class="td1">上墅营业所</td>
+									<td id="SSG2">0</td>
+									<td id="SSS2">0</td>
+									<td id="SSC2">0</td>
+								</tr>
+							</table>
+						</li>
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="lastM"></span><span>产销差</span></span>
+								<span class="innerNum2" id="innerNum43"></span>
+								<span class="innerIcon2 up" id="innerIcon43"></span>
+								<span class="innerPercent2" id="innerPercent43"></span>
+							</p>
+							<table class="CTtable CTtable4">
+								<tr>
+									<th class="td1"></th>
+									<th>供水量</th>
+									<th>售水量</th>
+									<th>产销差</th>
+								</tr>
+								<tr>
+									<td class="td1">孝丰营业所</td>
+									<td id="XFG3">0</td>
+									<td id="XFS3">0</td>
+									<td id="XFC3">0</td>
+								</tr>
+								<tr>
+									<td class="td1">梅溪营业所</td>
+									<td id="MXG3">0</td>
+									<td id="MXS3">0</td>
+									<td id="MXC3">0</td>
+								</tr>
+								<tr>
+									<td class="td1">天子湖营业所</td>
+									<td id="TZHG3">0</td>
+									<td id="TZHS3">0</td>
+									<td id="TZHC3">0</td>
+								</tr>
+								<tr>
+									<td class="td1">孝源营业所</td>
+									<td id="XYG3">0</td>
+									<td id="XYS3">0</td>
+									<td id="XYC3">0</td>
+								</tr>
+								<tr>
+									<td class="td1">上墅营业所</td>
+									<td id="SSG3">0</td>
+									<td id="SSS3">0</td>
+									<td id="SSC3">0</td>
+								</tr>
+							</table>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="CT5">
+			<hr class="CThr"/>
+			<p class="CTtitHD">
+				<span class="CTtit">热线工单</span>
+				&nbsp;|&nbsp;
+				<span>用户信息</span>
+			</p>
+			<hr class="CThr"/>
+			<div class="btn btn_1 btShow">月</div>
+			<div class="btn btn_2 btHide">年</div>
+			<div id="banner5">
+				<div class="banner">
+					<ul class="bannerList">
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2">今日工单总数</span>
+								<span class="innerNum2" id="banner1Num"></span>
+								<span class="innerIcon2 down" id="banner1Icon"></span>
+								<span class="innerPercent2" id="banner1Percent"></span>
+							</p>
+							<table class="CTtableBottom CTtableBottom5">
+								<tr>
+									<th class="td1">部门</th>
+									<th>片区</th>
+									<th>工单总数</th>
+									<th>及时率</th>
+								</tr>
+								<tr>
+									<td class="td1">上墅营业所</td>
+									<td>上墅片区</td>
+									<td id="shangshuNum">0</td>
+									<td id="shangshuPercent">0</td>
+								</tr>
+								<tr>
+									<td class="td1" rowspan=2>孝源营业所</td>
+									<td>孝源片区</td>
+									<td id="xiaoyuanNum">0</td>
+									<td id="xiaoyuanPercent">0</td>
+								</tr>
+								<tr>
+									<td>天荒坪片区</td>
+									<td id="tianhuangpingNum">0</td>
+									<td id="tianhuangpingPercent">0</td>
+								</tr>
+								<tr>
+									<td class="td1" rowspan=2>孝丰营业所</td>
+									<td>孝丰片区</td>
+									<td id="xiaofengNum">0</td>
+									<td id="xiaofengPercent">0</td>
+								</tr>
+								<tr>
+									<td>杭垓片区</td>
+									<td id="hanggaiNum">0</td>
+									<td id="hanggaiPercent">0</td>
+								</tr>
+								<tr>
+									<td class="td1">梅溪营业所</td>
+									<td>梅溪片区</td>
+									<td id="meixiNum">0</td>
+									<td id="meixiPercent">0</td>
+								</tr>
+								<tr>
+									<td class="td1">天子湖营业所</td>
+									<td>天子湖片区</td>
+									<td id="tianzihuNum">0</td>
+									<td id="tianzihuPercent">0</td>
+								</tr>
+								<tr>
+									<td class="td1">合计</td>
+									<td></td>
+									<td id="totalNum">0</td>
+									<td id="totalPercent">0</td>
+								</tr>
+							</table>
+						</li>
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2">今日工单总数</span>
+								<span class="innerNum2" id="banner2Num"></span>
+								<span class="innerIcon2 down" id="banner2Icon"></span>
+								<span class="innerPercent2" id="banner2Percent"></span>
+							</p>
+							<table class="CTtableBottom CTtableBottom5">
+								<tr>
+									<th class="td1">部门</th>
+									<th>片区</th>
+									<th>工单总数</th>
+									<th>及时率</th>
+								</tr>
+								<tr>
+									<td class="td1">上墅营业所</td>
+									<td>上墅片区</td>
+									<td id="shangshuNum2">0</td>
+									<td id="shangshuPercent2">0</td>
+								</tr>
+								<tr>
+									<td class="td1" rowspan=2>孝源营业所</td>
+									<td>孝源片区</td>
+									<td id="xiaoyuanNum2">0</td>
+									<td id="xiaoyuanPercent2">0</td>
+								</tr>
+								<tr>
+									<td>天荒坪片区</td>
+									<td id="tianhuangpingNum2">0</td>
+									<td id="tianhuangpingPercent2">0</td>
+								</tr>
+								<tr>
+									<td class="td1" rowspan=2>孝丰营业所</td>
+									<td>孝丰片区</td>
+									<td id="xiaofengNum2">0</td>
+									<td id="xiaofengPercent2">0</td>
+								</tr>
+								<tr>
+									<td>杭垓片区</td>
+									<td id="hanggaiNum2">0</td>
+									<td id="hanggaiPercent2">0</td>
+								</tr>
+								<tr>
+									<td class="td1">梅溪营业所</td>
+									<td>梅溪片区</td>
+									<td id="meixiNum2">0</td>
+									<td id="meixiPercent2">0</td>
+								</tr>
+								<tr>
+									<td class="td1">天子湖营业所</td>
+									<td>天子湖片区</td>
+									<td id="tianzihuNum2">0</td>
+									<td id="tianzihuPercent2">0</td>
+								</tr>
+								<tr>
+									<td class="td1">合计</td>
+									<td></td>
+									<td id="totalNum2">0</td>
+									<td id="totalPercent2">0</td>
+								</tr>
+							</table>
+						</li>
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="currentM"></span><span>工单总数</span></span>
+								<span class="innerNum2" id="banner3Num"></span>
+								<span class="innerIcon2 down" id="banner3Icon"></span>
+								<span class="innerPercent2" id="banner3Percent"></span>
+							</p>
+							<table class="CTtableBottom CTtableBottom5">
+								<tr>
+									<th class="td1">部门</th>
+									<th>片区</th>
+									<th>工单总数</th>
+									<th>及时率</th>
+								</tr>
+								<tr>
+									<td class="td1">上墅营业所</td>
+									<td>上墅片区</td>
+									<td id="shangshuNum3">0</td>
+									<td id="shangshuPercent3">0</td>
+								</tr>
+								<tr>
+									<td class="td1" rowspan=2>孝源营业所</td>
+									<td>孝源片区</td>
+									<td id="xiaoyuanNum3">0</td>
+									<td id="xiaoyuanPercent3">0</td>
+								</tr>
+								<tr>
+									<td>天荒坪片区</td>
+									<td id="tianhuangpingNum3">0</td>
+									<td id="tianhuangpingPercent3">0</td>
+								</tr>
+								<tr>
+									<td class="td1" rowspan=2>孝丰营业所</td>
+									<td>孝丰片区</td>
+									<td id="xiaofengNum3">0</td>
+									<td id="xiaofengPercent3">0</td>
+								</tr>
+								<tr>
+									<td>杭垓片区</td>
+									<td id="hanggaiNum3">0</td>
+									<td id="hanggaiPercent3">0</td>
+								</tr>
+								<tr>
+									<td class="td1">梅溪营业所</td>
+									<td>梅溪片区</td>
+									<td id="meixiNum3">0</td>
+									<td id="meixiPercent3">0</td>
+								</tr>
+								<tr>
+									<td class="td1">天子湖营业所</td>
+									<td>天子湖片区</td>
+									<td id="tianzihuNum3">0</td>
+									<td id="tianzihuPercent3">0</td>
+								</tr>
+								<tr>
+									<td class="td1">合计</td>
+									<td></td>
+									<td id="totalNum3">0</td>
+									<td id="totalPercent3">0</td>
+								</tr>
+							</table>
+						</li>
+						<li>
+							<p class="innerList innerListTop">
+								<span class="innerTit">用户总数</span>
+								<span class="innerNum">64777</span>
+								<span class="innerUnit">户</span>
+							</p>
+							<p class="innerList">
+								<span class="innerTit">新开用户数</span>
+								<span class="innerNum">0</span>
+								<span class="innerUnit">户</span>
+							</p>
+							<p class="innerList">
+								<span class="innerTit">沉默用户数</span>
+								<span class="innerNum">1128</span>
+								<span class="innerUnit">户</span>
+							</p>
+						</li>
+						<li>
+							<p class="innerList innerListTop">
+								<span class="innerTit">用户总数</span>
+								<span class="innerNum">64777</span>
+								<span class="innerUnit">户</span>
+							</p>
+							<p class="innerList">
+								<span class="innerTit">新开用户数</span>
+								<span class="innerNum">98</span>
+								<span class="innerUnit">户</span>
+							</p>
+							<p class="innerList">
+								<span class="innerTit">沉默用户数</span>
+								<span class="innerNum">1128</span>
+								<span class="innerUnit">户</span>
+							</p>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="CT6">
+			<hr class="CThr"/>
+			<p class="CTtit">安全隐患</p>
+			<hr class="CThr"/>
+			<div class="btn btn_1 btShow">月</div>
+			<div class="btn btn_2 btHide">年</div>
+			<div id="banner6">
+				<div class="banner">
+					<ul class="bannerList">
+						<li>
+							<div class="CT6container">
+								<div class="CT6L">
+									<p class="innerList3">
+										<span class="innerTit3"><span class="currentM"></span><span>发现隐患数</span></span>
+										<span class="innerNum3" id="innerNum301"></span>
+										<span class="innerUnit3">项</span>
+									</p>
+									<p class="innerList3">
+										<span class="innerTit3"><span class="currentM"></span><span>隐患整改数</span></span>
+										<span class="innerNum3" id="innerNum302"></span>
+										<span class="innerUnit3">项</span>
+									</p>
+								</div>
+								<div class="CT6R">
+									<div class="circleChart" id="CT6_0"></div>
+									<p class="circleTit">隐患整改率</p>
+								</div>
+							</div>
+							<table class="CTtableBottom CTtableBottom6">
+								<tr>
+									<th class="td2"></th>
+									<th class="td2">供水</th>
+									<th class="td2">排水</th>
+									<th class="td2">污水</th>
+									<th class="td2">工程</th>
+								</tr>
+								<tr>
+									<td class="td2">发现</td>
+									<td class="td2" id="GF0">0</td>
+									<td class="td2" id="PF0">0</td>
+									<td class="td2" id="WF0">0</td>
+									<td class="td2" id="CF0">0</td>
+								</tr>
+								<tr>
+									<td class="td2">整改</td>
+									<td class="td2" id="GZ0">0</td>
+									<td class="td2" id="PZ0">0</td>
+									<td class="td2" id="WZ0">0</td>
+									<td class="td2" id="CZ0">0</td>
+								</tr>
+							</table>
+						</li>
+						<li>
+							<div class="CT6container">
+								<div class="CT6L">
+									<p class="innerList3">
+										<span class="innerTit3"><span class="currentY"></span><span>发现隐患数</span></span>
+										<span class="innerNum3" id="innerNum311"></span>
+										<span class="innerUnit3">项</span>
+									</p>
+									<p class="innerList3">
+										<span class="innerTit3"><span class="currentY"></span><span>隐患整改数</span></span>
+										<span class="innerNum3" id="innerNum312"></span>
+										<span class="innerUnit3">项</span>
+									</p>
+								</div>
+								<div class="CT6R">
+									<div class="circleChart" id="CT6_1"></div>
+									<p class="circleTit">隐患整改率</p>
+								</div>
+							</div>
+							<table class="CTtableBottom CTtableBottom6">
+								<tr>
+									<th class="td2"></th>
+									<th class="td2">供水</th>
+									<th class="td2">排水</th>
+									<th class="td2">污水</th>
+									<th class="td2">工程</th>
+								</tr>
+								<tr>
+									<td class="td2">发现</td>
+									<td class="td2" id="GF1">0</td>
+									<td class="td2" id="PF1">0</td>
+									<td class="td2" id="WF1">0</td>
+									<td class="td2" id="CF1">0</td>
+								</tr>
+								<tr>
+									<td class="td2">整改</td>
+									<td class="td2" id="GZ1"></td>
+									<td class="td2" id="PZ1"></td>
+									<td class="td2" id="WZ1"></td>
+									<td class="td2" id="CZ1"></td>
+								</tr>
+							</table>
+						</li>
+						<li>
+							<div class="CT6container">
+								<div class="CT6L">
+									<p class="innerList3">
+										<span class="innerTit3"><span class="currentM"></span><span>发现隐患数</span></span>
+										<span class="innerNum3" id="innerNum321"></span>
+										<span class="innerUnit3">项</span>
+									</p>
+									<p class="innerList3">
+										<span class="innerTit3"><span class="currentM"></span><span>隐患整改数</span></span>
+										<span class="innerNum3" id="innerNum322"></span>
+										<span class="innerUnit3">项</span>
+									</p>
+								</div>
+								<div class="CT6R">
+									<div class="circleChart" id="CT6_2"></div>
+									<p class="circleTit">隐患整改率</p>
+								</div>
+							</div>
+							<table class="CTtableBottom CTtableBottom6">
+								<tr>
+									<th class="td2"></th>
+									<th class="td2">供水</th>
+									<th class="td2">排水</th>
+									<th class="td2">污水</th>
+									<th class="td2">工程</th>
+								</tr>
+								<tr>
+									<td class="td2">发现</td>
+									<td class="td2" id="GF2">0</td>
+									<td class="td2" id="PF2">0</td>
+									<td class="td2" id="WF2">0</td>
+									<td class="td2" id="CF2">0</td>
+								</tr>
+								<tr>
+									<td class="td2">整改</td>
+									<td class="td2" id="GZ2">0</td>
+									<td class="td2" id="PZ2">0</td>
+									<td class="td2" id="WZ2">0</td>
+									<td class="td2" id="CZ2">0</td>
+								</tr>
+							</table>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="CT7">
+			<hr class="CThr"/>
+			<p class="CTtit">水质信息</p>
+			<hr class="CThr"/>
+			<div class="CT7container">
+				<div class="CT7L">
+					<div class="circleChart" id="1"></div>
+					<p class="circleTit">出厂水合格率</p>
+				</div>
+				<div class="CT7C">
+					<p class="circleCenter">----供水----</p>
+				</div>
+				<div class="CT7R">
+					<div class="circleChart" id="2"></div>
+					<p class="circleTit">管网水合格率</p>
+				</div>
+			</div>
+			<table class="CTtableBottom CTtableBottom7">
+				<tr>
+					<th class="td3">水质情况</th>
+					<th class="td3">清源</th>
+					<th class="td3">净源</th>
+					<th class="td3">标准排放值</th>
+				</tr>
+				<tr>
+					<td class="td3">COD</td>
+					<td class="td3" id="qyCOD">0</td>
+					<td class="td3" id="jyCOD">0</td>
+					<td class="td3" id="COD">50</td>
+				</tr>
+				<tr>
+					<td class="td3">氨氮</td>
+					<td class="td3" id="qyAD">0</td>
+					<td class="td3" id="jyAD">0</td>
+					<td class="td3" id="AD">5</td>
+				</tr>
+				<tr>
+					<td class="td3">TP</td>
+					<td class="td3" id="qyTP">0</td>
+					<td class="td3" id="jyTP">0</td>
+					<td class="td3" id="TP">0.5</td>
+				</tr>
+				<tr>
+					<td class="td3">TN</td>
+					<td class="td3" id="qyTN">0</td>
+					<td class="td3" id="jyTN">0</td>
+					<td class="td3" id="TN">15</td>
+				</tr>
+			</table>
+		</div>
+		<div id="CT8">
+			<hr class="CThr"/>
+			<p class="CTtit">污水信息</p>
+			<hr class="CThr"/>
+			<p class="innerList">
+				<span class="innerTit"><span class="lastM"></span><span>处理量</span></span>
+				<span class="innerNum">1469496</span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon up"><span class="glyphicon glyphicon-arrow-up listIconUp"></span></span>
+				<span class="innerPercent">3.07%</span>
+			</p>
+			<p class="innerList">
+				<span class="innerTit"><span class="currentY"></span><span>处理量</span></span>
+				<span class="innerNum">18633628</span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon up"><span class="glyphicon glyphicon-arrow-up listIconUp"></span></span>
+				<span class="innerPercent">1.77%</span>
+			</p>
+			<p class="innerList">
+				<span class="innerTit"><span class="lastM"></span><span>污泥处置量</span></span>
+				<span class="innerNum">1057</span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon down"><span class="glyphicon glyphicon-arrow-down listIconDown"></span></span>
+				<span class="innerPercent">4.35%</span>
+			</p>
+			<p class="innerList">
+				<span class="innerTit"><span class="currentY"></span><span>污泥处置量</span></span>
+				<span class="innerNum">15324</span>
+				<span class="innerUnit">吨</span>
+				<span class="innerIcon up"><span class="glyphicon glyphicon-arrow-up listIconUp"></span></span>
+				<span class="innerPercent">2.68%</span>
+			</p>
+		</div>
+		<div id="CT9">
+			<hr class="CThr"/>
+			<p class="CTtit">设备信息</p>
+			<hr class="CThr"/>
+			<div class="btn btn_0 btShow">供</div>
+			<div class="btn btn_1 btHide">排</div>
+			<div class="btn btn_2 btHide">污</div>
+			<div id="banner9">
+				<div class="banner">
+					<ul class="bannerList">
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="lastM"></span><span>完好率</span></span>
+								<span class="innerNum2" id="banner9Num1"></span>
+								<span class="innerIcon2 up" id="banner9Icon1"></span>
+								<span class="innerPercent2" id="banner9Percent1"></span>
+							</p>
+							<div class="processList processList1" id="processList11">
+								<div class="processTit processTit1" id="processTit11">巡检任务</div>
+								<div class="progress progress1" id="progress11">
+								</div>
+								<div class="processNum processNum1" id="processNum11">90</div>
+							</div>
+							<div class="processList processList2" id="processList21">
+								<div class="processTit processTit2" id="processTit21">保养任务</div>
+								<div class="progress progress2" id="progress21">
+								</div>
+								<div class="processNum processNum2" id="processNum21">30</div>
+							</div>
+							<div class="processList processList3" id="processList31">
+								<div class="processTit processTit3" id="processTit31">维修任务</div>
+								<div class="progress progress3" id="progress31">
+								</div>
+								<div class="processNum processNum3" id="processNum31">10</div>
+							</div>
+						</li>
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="lastM"></span><span>完好率</span></span>
+								<span class="innerNum2" id="banner9Num2"></span>
+								<span class="innerIcon2 up" id="banner9Icon2"></span>
+								<span class="innerPercent2" id="banner9Percent2"></span>
+							</p>
+							<div class="processList processList1" id="processList12">
+								<div class="processTit processTit1" id="processTit12">巡检任务</div>
+								<div class="progress progress1" id="progress12">
+								</div>
+								<div class="processNum processNum1" id="processNum12">90</div>
+							</div>
+							<div class="processList processList2" id="processList22">
+								<div class="processTit processTit2" id="processTit22">保养任务</div>
+								<div class="progress progress2" id="progress22">
+								</div>
+								<div class="processNum processNum2" id="processNum22">30</div>
+							</div>
+							<div class="processList processList3" id="processList32">
+								<div class="processTit processTit3" id="processTit32">维修任务</div>
+								<div class="progress progress3" id="progress32">
+								</div>
+								<div class="processNum processNum3" id="processNum32">10</div>
+							</div>
+						</li>
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="lastM"></span><span>完好率</span></span>
+								<span class="innerNum2" id="banner9Num3"></span>
+								<span class="innerIcon2 up" id="banner9Icon3"></span>
+								<span class="innerPercent2" id="banner9Percent3"></span>
+							</p>
+							<div class="processList processList1" id="processList13">
+								<div class="processTit processTit1" id="processTit13">巡检任务</div>
+								<div class="progress progress1" id="progress13">
+								</div>
+								<div class="processNum processNum1" id="processNum13">90</div>
+							</div>
+							<div class="processList processList2" id="processList23">
+								<div class="processTit processTit2" id="processTit23">保养任务</div>
+								<div class="progress progress2" id="progress23">
+								</div>
+								<div class="processNum processNum2" id="processNum23">30</div>
+							</div>
+							<div class="processList processList3" id="processList33">
+								<div class="processTit processTit3" id="processTit33">维修任务</div>
+								<div class="progress progress3" id="progress33">
+								</div>
+								<div class="processNum processNum3" id="processNum33">10</div>
+							</div>
+						</li>
+						<li>
+							<p class="innerList2">
+								<span class="innerTit2"><span class="lastM"></span><span>完好率</span></span>
+								<span class="innerNum2" id="banner9Num4"></span>
+								<span class="innerIcon2 up" id="banner9Icon4"></span>
+								<span class="innerPercent2" id="banner9Percent4"></span>
+							</p>
+							<div class="processList processList1" id="processList14">
+								<div class="processTit processTit1" id="processTit14">巡检任务</div>
+								<div class="progress progress1" id="progress14">
+								</div>
+								<div class="processNum processNum1" id="processNum14">90</div>
+							</div>
+							<div class="processList processList2" id="processList24">
+								<div class="processTit processTit2" id="processTit24">保养任务</div>
+								<div class="progress progress2" id="progress24">
+								</div>
+								<div class="processNum processNum2" id="processNum24">30</div>
+							</div>
+							<div class="processList processList3" id="processList34">
+								<div class="processTit processTit3" id="processTit34">维修任务</div>
+								<div class="progress progress3" id="progress34">
+								</div>
+								<div class="processNum processNum3" id="processNum34">10</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="CT10">
+			<hr class="CThr"/>
+			<p class="CTtit">成本分析</p>
+			<hr class="CThr"/>
+			<p class="innerHead">
+				<span class="innerHeadShow" id="innerHead1">水厂运营</span>
+				<span class="innerHeadHide" id="innerHead2">污水处理厂运营</span>
+				<!-- <span class="innerHeadHide" id="innerHead3">净源污水处理厂</span> -->
+			</p>
+			<div class="btn btn_1 btShow">月</div>
+			<div class="btn btn_2 btHide">年</div>
+			<div id="banner10">
+				<div class="banner">
+					<ul class="bannerList">
+						<li>
+							<div class="echart10" id="echart101"></div>
+						</li>
+						<li>
+							<div class="echart10" id="echart102"></div>
+						</li>
+						<li>
+							<div class="echart10" id="echart103"></div>
+						</li>
+						<li>
+							<div class="echart10" id="echart104"></div>
+						</li>
+						<li>
+							<div class="echart10" id="echart105"></div>
+						</li>
+						<!-- <li>
+							<div class="echart10" id="echart106"></div>
+						</li>
+						<li>
+							<div class="echart10" id="echart107"></div>
+						</li> -->
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="CT11">
+			<div id="CT11L">
+				<p class="CT11tit">今日供水总量</p>
+				<p class="CT11inner">
+					<span class="CT11Num" id="totalflow">000,000</span>
+					<span class="CT11Unit">立方</span>
+				</p>
+			</div>
+			<div id="CT11R">
+				<p class="CT11tit">今日污水处理总量</p>
+				<p class="CT11inner">
+					<span class="CT11Num" id="wtotalflow">000,000</span>
+					<span class="CT11Unit">立方</span>
+				</p>
+			</div>
+			<div id="CT11C">
+				<p class="CT11CtitG" id="CT11Ctit1">
+					高禹水厂
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit2">
+					彰吴水厂
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit3">
+					赋石水厂
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit4">
+					杭垓水厂
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit5">
+					孝丰水厂
+				</p>
+				<p class="CT11CtitW" id="CT11Ctit6">
+					金山污水厂
+				</p>
+				<p class="CT11CtitW" id="CT11Ctit7">
+					天子湖污水厂
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit8">
+					梅溪水厂
+				</p>
+				<p class="CT11CtitW" id="CT11Ctit9">
+					城北污水厂
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit10">
+					城西水厂
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit11">
+					凤凰水厂
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit12">
+					高禹污水泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit13">
+					天子湖一体化污水泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit14">
+					良朋污水泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit15">
+					梅溪桃园一体化泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit16">
+					梅溪荆湾一体化泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit17">
+					梅溪大斗一体化
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit18">
+					梅溪石头斗一体化泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit19">
+					城北#1污水泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit20">
+					城北#2污水泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit21">
+					周家湾泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit22">
+					万亩泵站
+				</p>
+				<p class="CT11CtitWB" id="CT11Ctit23">
+					灵峰污水泵站
+				</p>
+				<p class="CT11CtitG" id="CT11Ctit24">
+					新老石坎水厂
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner1">
+					&nbsp;&nbsp;瞬时流量：<span id="gaoyuFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="gaoyuPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner2">
+					&nbsp;&nbsp;瞬时流量：<span id="zhangwuFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="zhangwuPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner3">
+					&nbsp;&nbsp;瞬时流量：<span id="fushiFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="fushiPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner4">
+					&nbsp;&nbsp;瞬时流量：<span id="hanggaiFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="hanggaiPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner5">
+					&nbsp;&nbsp;瞬时流量：<span id="xiaofengFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="xiaofengPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner6">
+					&nbsp;&nbsp;瞬时流量：<span id="jinshanFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="jinshanPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner7">
+					&nbsp;&nbsp;瞬时流量：<span id="tianzihuFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="tianzihuPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner8">
+					&nbsp;&nbsp;瞬时流量：<span id="meixiFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="meixiPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner9">
+					&nbsp;&nbsp;瞬时流量：<span id="chengbeiFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="chengbeiPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner10">
+					&nbsp;&nbsp;瞬时流量：<span id="chengxiFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="chengxiPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner11">
+					&nbsp;&nbsp;瞬时流量：<span id="fenghuangFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="fenghuangPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner12">
+					&nbsp;&nbsp;瞬时流量：<span id="gywsbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="gywsbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner13">
+					&nbsp;&nbsp;瞬时流量：<span id="tzhythwsbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="tzhythwsbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner14">
+					&nbsp;&nbsp;瞬时流量：<span id="mlpwsbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="lpwsbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner15">
+					&nbsp;&nbsp;瞬时流量：<span id="mxtyythbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="mxtyythbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner16">
+					&nbsp;&nbsp;瞬时流量：<span id="mxjwythbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="mxjwythbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner17">
+					&nbsp;&nbsp;瞬时流量：<span id="mxddythbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="mxddythbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner18">
+					&nbsp;&nbsp;瞬时流量：<span id="mxstdythbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="mxstdythbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner19">
+					&nbsp;&nbsp;瞬时流量：<span id="cb1wsbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="cb1wsbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner20">
+					&nbsp;&nbsp;瞬时流量：<span id="cb2wsbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="cb2wsbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner21">
+					&nbsp;&nbsp;瞬时流量：<span id="zjwbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="zjwbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner22">
+					&nbsp;&nbsp;瞬时流量：<span id="wmbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="wmbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner23">
+					&nbsp;&nbsp;瞬时流量：<span id="lfwsbzFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="lfwsbzPtout">0</span>Mpa
+				</p>
+				<p class="CT11Cinner" id="CT11Cinner24">
+					&nbsp;&nbsp;瞬时流量：<span id="xinlaoshikanFls">0</span>m³/h&nbsp;&nbsp;&nbsp;&nbsp;出水压力：<span id="xinlaoshikanPtout">0</span>Mpa
+				</p>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+
+	var vm = new Vue({
+	  el: '#app',
+	  data: {
+		  userList:[],
+		  totalUser:null,
+	  },
+	  mounted() {
+		  this.setEchart();
+	  },
+	  methods:{
+		  setEchart:function(){
+		  }
+	  }
+	})
+layui.use('element', function(){
+  var element = layui.element;
+});
+const order = 1;
+function setSelect(){
+	
+}
+
+function showTime(){
+	var time = new Date();
+	var year = time.getFullYear();
+	var month = time.getMonth()+1;
+	var date = time.getDate();
+	var hh = time.getHours();
+	var mm = time.getMinutes();
+	var ss = time.getSeconds();
+	var day = time.getDay();	
+
+ var nowdate = new Date();
+ nowdate.setMonth(nowdate.getMonth()-1);
+ var y = nowdate.getFullYear()-1;
+ var m = nowdate.getMonth()+1;
+	$(".lastM").html(m+"月");
+	$(".currentM").html(month+"月");
+	$(".lastY").html(y+"年");
+	$(".currentY").html(nowdate.getFullYear()+"年");
+	var type = "PM";
+	if(hh<12)
+		type="AM"
+	
+	if(hh<10)
+		hh = "0"+hh;
+	if(mm<10)
+		mm = "0"+mm;
+	if(ss<10)
+		ss = "0"+ss;	
+		
+	var week = "";	
+	switch(day){
+		case 0:
+			week = "星期日";
+			break;
+		case 1:
+			week = "星期一";
+			break;
+		case 2:
+			week = "星期二";
+			break;
+		case 3:
+			week = "星期三";
+			break;
+		case 4:
+			week = "星期四";
+			break;
+		case 5:
+			week = "星期五";
+			break;
+		default:
+			week = "星期六";
+			break;
+	}	
+	switch(month){
+		case 1:
+			month = "一月";
+			break;
+		case 2:
+			month = "二月";
+			break;
+		case 3:
+			month = "三月";
+			break;
+		case 4:
+			month = "四月";
+			break;
+		case 5:
+			month = "五月";
+			break;
+		case 6:
+			month = "六月";
+			break;
+		case 7:
+			month = "七月";
+			break;
+		case 8:
+			month = "八月";
+			break;
+		case 9:
+			month = "九月";
+			break;
+		case 10:
+			month = "十月";
+			break;
+		case 11:
+			month = "十一月";
+			break;
+		case 12:
+			month = "十二月";
+			break;
+		default:
+			month = "*月";
+			break;
+	}	
+	var html = year+"年"+month+"月"+date+"日&nbsp;"+hh+":"+mm+":"+ss+"&nbsp;"+type+"&nbsp;"+week;
+	$("#timeL").html(hh+":"+mm+":"+ss);
+	$("#week").html(week);
+	$("#month").html(month);
+	$("#timeR").html(date);
+	//document.getElementById("time").innerHTML=html;
+}
+function PrefixInteger(num, n) {
+    return (Array(n).join(0) + num).slice(-n);
+}
+const rem=document.body.clientWidth*1080/1920/76;
+	$(function(){
+		var obj = setInterval("showTime()",1000);
+		$("#container").height(rem*76);
+		$(".circleChart").height(rem*6.5);
+		$(".circleChart_canvas").css({"width":rem*6,"height":rem*6});
+		$(".circleChart_text").css({"height:":rem*6.2,"line-height":rem*6.2});
+		$(".circleTit").css({"top":rem*6});
+		$(".circleTit").width(rem*31*35/100);
+		$(".circleCenter").css({"top":rem*3-30,"left":0,"width":rem*31*30/100});
+		$(".CT7L").css({"height":rem*10, "top":rem, "line-height":rem*10});
+		$(".CT7C").css({"height":rem*10, "top":rem, "line-height":rem*10});
+		$(".CT7R").css({"height":rem*10, "top":rem, "line-height":rem*10});
+		$("#CT1").css({"left":rem*2,"top":rem,"height":rem*5.5,"width":rem*30});
+		$("#CT2iframe").css({"top":0,right:0})
+		//$("#CT2iframe").css({"top":-rem,right:0,width: rem*80, height:rem*30})
+		$("#CT3").css({"left":rem*2,"top":rem*5,"height":rem*20.5,"width":rem*32});
+		var innerListH = (rem*15.5-40)/4;
+		$(".innerList").css({"margin-top":rem,"margin-bottom":rem,"height":innerListH});
+		$(".innerListTop").css({"margin-top":innerListH});
+		$("#CT4").css({"left":rem*2,"top":rem*25.5,"height":rem*23.5,"width":rem*32});
+		$("#banner4").css({"left":0,"top":42,"height":rem*23.5-42,"width":rem*32,});
+		$("#banner4 .banner .bannerList li").css({"height":rem*23.5-42});
+		$(".innerList2").css({"left":0,"top":0,"height":rem*5,"width":rem*32});
+		$(".CTtable4").css({"left":0,"bottom":5,"width":rem*32,"height":rem*18.5-70});
+		$(".CTtable4 tr").css({"height":(rem*18.5-70)/6});
+		$(".CTtable4 tr th").css({"height":(rem*18.5-70)/6});
+		$(".CTtable4 tr td").css({"height":(rem*18.5-70)/6});
+		$("#CT5").css({"left":rem*2,"top":rem*49,"height":rem*25,"width":rem*32});
+		$("#banner5").css({"left":0,"top":42,"height":rem*25-42,"width":rem*32});
+		$("#banner5 .banner .bannerList li").css({"height":rem*25-42});
+		$(".CTtableBottom5").css({"left":0,"bottom":0,"height":rem*20-50,"width":rem*32});
+		$(".CTtableBottom5 tr").css({"height":(rem*20-50)/9});
+		$(".CTtableBottom5 th").css({"height":(rem*20-50)/9});
+		$(".CTtableBottom5 td").css({"height":(rem*20-50)/9});
+		$("#CT6").css({"left":rem*36,"top":rem*49,"height":rem*25,"width":rem*31});
+		$(".innerList3").css({"height":rem*4})
+		$("#banner6").css({"left":0,"top":42,"height":rem*25-42,"width":rem*31});
+		$("#banner6 .banner .bannerList li").css({"height":rem*25-42});
+		$(".CT6container").css({"left":0,"top":0,"height":140,"width":rem*31});
+		$(".CTtableBottom6").css({"left":0,"bottom":0,"height":rem*15-80,"width":rem*31});
+		$(".CTtableBottom6 tr").css({"height":(rem*10-10)/3});
+		$(".CTtableBottom6 th").css({"height":(rem*10-10)/3});
+		$(".CTtableBottom6 td").css({"height":(rem*10-10)/3});
+		$(".CTtableBottom7").css({"left":0,"bottom":0,"height":rem*15-60,"width":rem*31});
+		$(".CTtableBottom7 tr").css({"height":(rem*10)/5});
+		$(".CTtableBottom7 th").css({"height":(rem*10)/5});
+		$(".CTtableBottom7 td").css({"height":(rem*10)/5});
+
+		
+		$("#CT7").css({"left":rem*69,"top":rem*49,"height":rem*25,"width":rem*31});
+		$("#CT8").css({"left":rem*102,"top":rem*5,"height":rem*20.5,"width":rem*32});
+		$("#CT9").css({"left":rem*102,"top":rem*25.5,"height":rem*23.5,"width":rem*32});
+		$(".processList").css({"height":(rem*23.5-120)/3});
+		$(".processList1").css({"top":70})
+		$(".processList2").css({"top":70+(rem*23.5-120)/3})
+		$(".processList3").css({"top":70+(rem*23.5-120)*2/3})
+		$("#banner9").css({"left":0,"top":42,"height":rem*23.5-42,"width":rem*31});
+		$("#banner9 .banner .bannerList li").css({"height":rem*23.5-42});
+		$("#CT10").css({"left":rem*102,"top":rem*49,"height":rem*25,"width":rem*32});
+		$("#banner10").css({"left":0,"top":82,"height":rem*25-82,"width":rem*32});
+		$("#banner10 .banner .bannerList li").css({"height":rem*25-82});
+		$(".echart10").css({"height":rem*25-60});
+		//$("#echart105 div canvas").css({"height":rem*25-80})
+		$("#CT11").css({"left":rem*35,"top":rem*5,"height":rem*44,"width":rem*65});
+		$("#CT11C").css({"left":rem*9,"top":rem*5,"height":rem*37,"width":rem*41.3274854});
+		
+		$("#CT11Ctit1").css({"left":rem*18,"top":rem*4.5});
+		$("#CT11Ctit2").css({"left":rem*21,"top":rem*9});
+		$("#CT11Ctit3").css({"left":rem*9.5,"top":rem*17.5});
+		$("#CT11Ctit4").css({"left":rem*10.2,"top":rem*20.8});
+		$("#CT11Ctit5").css({"left":rem*17.4,"top":rem*24.6});
+		$("#CT11Ctit6").css({"left":rem*35,"top":rem*5.3});
+		$("#CT11Ctit7").css({"left":rem*28.5,"top":rem*7.6});
+		$("#CT11Ctit8").css({"left":rem*24,"top":rem*13.2});
+		$("#CT11Ctit9").css({"left":rem*21.5,"top":rem*15.5});
+		$("#CT11Ctit10").css({"left":rem*19,"top":rem*18.5});
+		$("#CT11Ctit11").css({"left":rem*33,"top":rem*20.5});
+		$("#CT11Ctit12").css({"left":rem*17,"top":rem*2});
+		$("#CT11Ctit13").css({"left":rem*17.5,"top":rem*3});
+		$("#CT11Ctit14").css({"left":rem*25,"top":rem*6.3});
+		$("#CT11Ctit15").css({"left":rem*27,"top":rem*0.5});
+		$("#CT11Ctit16").css({"left":rem*23.5,"top":rem*4});
+		$("#CT11Ctit17").css({"left":rem*35,"top":rem*2.5});
+		$("#CT11Ctit18").css({"left":rem*35,"top":rem*4});
+		$("#CT11Ctit19").css({"left":rem*32.5,"top":rem*14.8});
+		$("#CT11Ctit20").css({"left":rem*29.5,"top":rem*16.7});
+		$("#CT11Ctit21").css({"left":rem*27.2,"top":rem*18});
+		$("#CT11Ctit22").css({"left":rem*27.7,"top":rem*19.8});
+		$("#CT11Ctit23").css({"left":rem*30,"top":rem*21.7});
+		$("#CT11Ctit24").css({"left":rem*16,"top":rem*26});
+		
+		$("#CT11Cinner1").css({"left":rem*18,"top":rem*6});
+		$("#CT11Cinner2").css({"left":rem*21,"top":rem*10.5});
+		$("#CT11Cinner3").css({"left":rem*9.5,"top":rem*19});
+		$("#CT11Cinner4").css({"left":rem*10.2,"top":rem*22.3});
+		$("#CT11Cinner5").css({"left":rem*17.4,"top":rem*26.4});
+		$("#CT11Cinner6").css({"left":rem*35,"top":rem*6.8});
+		$("#CT11Cinner7").css({"left":rem*28.5,"top":rem*9.1});
+		$("#CT11Cinner8").css({"left":rem*24,"top":rem*14.7});
+		$("#CT11Cinner9").css({"left":rem*21.5,"top":rem*17});
+		$("#CT11Cinner10").css({"left":rem*19,"top":rem*20});
+		$("#CT11Cinner11").css({"left":rem*33,"top":rem*22});
+		$("#CT11Cinner12").css({"left":rem*17,"top":rem*3.1});
+		$("#CT11Cinner13").css({"left":rem*17.5,"top":rem*4.1});
+		$("#CT11Cinner14").css({"left":rem*25,"top":rem*7.4});
+		$("#CT11Cinner15").css({"left":rem*27,"top":rem*1.6});
+		$("#CT11Cinner16").css({"left":rem*23.5,"top":rem*5.1});
+		$("#CT11Cinner17").css({"left":rem*35,"top":rem*3.6});
+		$("#CT11Cinner18").css({"left":rem*35,"top":rem*5.1});
+		$("#CT11Cinner19").css({"left":rem*32.5,"top":rem*15.9});
+		$("#CT11Cinner20").css({"left":rem*29.5,"top":rem*17.8});
+		$("#CT11Cinner21").css({"left":rem*27.2,"top":rem*19.1});
+		$("#CT11Cinner22").css({"left":rem*27.7,"top":rem*20.9});
+		$("#CT11Cinner23").css({"left":rem*30,"top":rem*22.8});
+		$("#CT11Cinner24").css({"left":rem*16,"top":rem*27.8});
+		
+		$(".circleChart#CT6_0").circleChart({
+            size: rem*6,
+            value: 50,
+            text: 0,
+            widthRatio: 0.15,
+            color: "#3ffff8",
+            backgroundColor: "#506175",
+            textWeight: "bolder",
+            textFamily: "MyFontName",
+            background: true, // 是否显示进度条之外颜色
+            onDraw: function(el, circle) {
+                circle.text(circle.value.toFixed(2) + "%");
+            }
+        });
+		$(".circleChart#CT6_1").circleChart({
+            size: rem*6,
+            value: 50,
+            text: 0,
+            widthRatio: 0.15,
+            color: "#3ffff8",
+            backgroundColor: "#506175",
+            textWeight: "bolder",
+            textFamily: "MyFontName",
+            background: true, // 是否显示进度条之外颜色
+            onDraw: function(el, circle) {
+                circle.text(circle.value.toFixed(2) + "%");
+            }
+        });
+		$(".circleChart#CT6_2").circleChart({
+            size: rem*6,
+            value: 50,
+            text: 0,
+            widthRatio: 0.15,
+            color: "#3ffff8",
+            backgroundColor: "#506175",
+            textWeight: "bolder",
+            textFamily: "MyFontName",
+            background: true, // 是否显示进度条之外颜色
+            onDraw: function(el, circle) {
+                //circle.text(Math.round(circle.value) + "%");
+                circle.text(circle.value.toFixed(2) + "%");
+            }
+        });
+		$(".circleChart#1").circleChart({
+            size: rem*6,
+            value: 50,
+            text: 0,
+            widthRatio: 0.15,
+            color: "#3ffff8",
+            backgroundColor: "#506175",
+            textWeight: "bold",
+            textFamily: "MyFontName",
+            background: true, // 是否显示进度条之外颜色
+            onDraw: function(el, circle) {
+                circle.text(circle.value.toFixed(2) + "%");
+            }
+        });
+		$(".circleChart#2").circleChart({
+            size: rem*6,
+            value: 50,
+            text: 0,
+            widthRatio: 0.15,
+            color: "#3ffff8",
+            backgroundColor: "#506175",
+            textWeight: "bolder",
+            textFamily: "MyFontName",
+            background: true, // 是否显示进度条之外颜色
+            onDraw: function(el, circle) {
+                //circle.text(Math.round(circle.value) + "%");
+                circle.text(circle.value.toFixed(2) + "%");
+            }
+        });
+
+        var option101 = echarts.init(document.getElementById('echart101'));
+        var option102 = echarts.init(document.getElementById('echart102'));
+        var option103 = echarts.init(document.getElementById('echart103'));
+        var option104 = echarts.init(document.getElementById('echart104'));
+        var option105 = echarts.init(document.getElementById('echart105'));
+        var option10inner1 = {
+        	    tooltip: {
+        	        trigger: 'axis'
+        	    },
+        	    color: ['#00ffff', '#fff000', '#11e425'],
+        	    legend: {
+        	        data: ['电耗', '药耗', '单耗'],
+        	        bottom: 10,
+					textStyle: {
+						color: '#fff',
+						fontSize:12,
+					}
+        	    },
+        	    xAxis: [
+        	        {
+        	            type: 'category',
+        	            axisTick: {show: false},
+        	            data: ['孝丰水厂', '赋石水厂', '梅溪水厂'],
+        				axisLabel: {
+        					textStyle: {
+        						color: '#fff',
+        						fontSize:12,
+        					}
+        				},
+        	        }
+        	    ],
+        	    yAxis: [
+        	        {
+        	            type: 'value',
+        	            max:0.3,
+        				minInterval: 0.15,
+        	            axisLabel: {
+        					textStyle: {
+        						color: '#fff',
+        						fontSize:12,
+        					}
+        				},
+        	        }
+        	    ],
+        	    series: [
+        	        {
+        	            name: '电耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.22, 0.21, 0.2]
+        	        },
+        	        {
+        	            name: '药耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.04, 0.02, 0.03]
+        	        },
+        	        {
+        	            name: '单耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.28, 0.32, 0.3],
+        	            barCateGoryGap:50,
+        	        }
+        	    ]
+        	};
+        var option10inner2 = {
+        	    tooltip: {
+        	        trigger: 'axis'
+        	    },
+        	    color: ['#00ffff', '#fff000', '#11e425'],
+        	    legend: {
+        	        data: ['电耗', '药耗', '单耗'],
+        	        bottom: 10,
+					textStyle: {
+						color: '#fff',
+						fontSize:12,
+					}
+        	    },
+        	    xAxis: [
+        	        {
+        	            type: 'category',
+        	            axisTick: {show: false},
+        	            data: ['孝丰水厂', '赋石水厂', '梅溪水厂'],
+        				axisLabel: {
+        					textStyle: {
+        						color: '#fff',
+        						fontSize:12,
+        					}
+        				},
+        	        }
+        	    ],
+        	    yAxis: [
+        	        {
+        	            type: 'value',
+        	            max:0.3,
+        				minInterval: 0.15,
+        	            axisLabel: {
+        					textStyle: {
+        						color: '#fff',
+        						fontSize:12,
+        					}
+        				},
+        	        }
+        	    ],
+        	    series: [
+        	        {
+        	            name: '电耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.22, 0.21, 0.2]
+        	        },
+        	        {
+        	            name: '药耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.04, 0.02, 0.03]
+        	        },
+        	        {
+        	            name: '单耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.28, 0.23, 0.3],
+        	            barCateGoryGap:50,
+        	        }
+        	    ]
+        	};
+
+        var option10inner3 = {
+        	    tooltip: {
+        	        trigger: 'axis'
+        	    },
+        	    color: ['#00ffff', '#fff000', '#11e425'],
+        	    legend: {
+        	        data: ['电耗', '药耗', '单耗'],
+        	        bottom: 10,
+					textStyle: {
+						color: '#fff',
+						fontSize:12,
+					}
+        	    },
+        	    xAxis: [
+        	        {
+        	            type: 'category',
+        	            axisTick: {show: false},
+        	            data: ['清源污水厂', '净源污水厂'],
+        				axisLabel: {
+        					textStyle: {
+        						color: '#fff',
+        						fontSize:12,
+        					}
+        				},
+        	        }
+        	    ],
+        	    yAxis: [
+        	        {
+        	            type: 'value',
+        	            max:1,
+        				minInterval: 0.5,
+        	            axisLabel: {
+        					textStyle: {
+        						color: '#fff',
+        						fontSize:12,
+        					}
+        				},
+        	        }
+        	    ],
+        	    series: [
+        	        {
+        	            name: '电耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.10, 0.39]
+        	        },
+        	        {
+        	            name: '药耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.28, 0.23]
+        	        },
+        	        {
+        	            name: '单耗',
+        	            type: 'bar',
+        	            barWidth:10,
+        	            data: [0.40, 0.99],
+        	            barCateGoryGap:50,
+        	        }
+        	    ]
+        	};
+        var option10inner4 = {
+        	    tooltip: {
+        	        trigger: 'axis'
+        	    },
+ 	       	    legend: {
+        	        data: [
+        	        	{name:'清源电耗',textStyle:{color:'#00ffff'}},
+        	        	{name:'清源药耗',textStyle:{color:'#fff000'}},
+        	        	{name:'清源单耗',textStyle:{color:'#11e425'}},
+        	        	{name:'净源电耗',textStyle:{color:'#1997eb'}},
+        	        	{name:'净源药耗',textStyle:{color:'#ff9000'}},
+        	        	{name:'净源单耗',textStyle:{color:'#ff0000'}},
+        	        	],
+        	        top:"20px",
+        	    }, 
+        	    color: ['#00ffff', '#fff000', '#11e425','#1997eb', '#ff9000', '#ff0000'],
+        	    grid: {
+        	        y:"3%",
+        	    	left: '5%',
+        	        right: '5%',
+        	        top:"30%",
+        	        bottom: '0',
+        	        containLabel: true,
+        	        width: "90%",
+        	        height: "66%",
+        	    },
+        	    xAxis: {
+        	        type: 'category',
+        	        boundaryGap: false,
+        	        data: ['一月', '二月', '三月'],
+    				axisLabel: {
+    					textStyle: {
+    						color: '#fff',
+    						fontSize:12,
+    					}
+    				},
+        	    },
+        	    yAxis: {
+        	        type: 'value',
+    	            max:1.4,
+        			minInterval: 0.7,
+    	            axisLabel: {
+    					textStyle: {
+    						color: '#fff',
+    						fontSize:12,
+    					}
+    				},
+        	    },
+        	    series: [
+        	        {
+        	            name: '清源电耗',
+        	            type: 'line',
+        	            data: [0.32, 0.24, 0.19]
+        	        },
+        	        {
+        	            name: '清源药耗',
+        	            type: 'line',
+        	            data: [0.27, 0.39, 0.45]
+        	        },
+        	        {
+        	            name: '清源单耗',
+        	            type: 'line',
+        	            data: [0.99, 1.23, 1.20]
+        	        },
+        	        {
+        	            name: '净源电耗',
+        	            type: 'line',
+        	            data: [0.36, 0.28, 0.30]
+        	        },
+        	        {
+        	            name: '净源药耗',
+        	            type: 'line',
+        	            data: [0.66, 0.74, 0.64]
+        	        },
+        	        {
+        	            name: '净源单耗',
+        	            type: 'line',
+        	            data: [1.05, 0.88, 1.21]
+        	        }
+        	    ]
+        	};
+        option101.setOption(option10inner1);
+        option102.setOption(option10inner1);
+        option103.setOption(option10inner2);
+        option104.setOption(option10inner3);
+        option105.setOption(option10inner4);
+
+		rexiangongdan();
+		huayanshixinxi();
+		shebeixinxi();
+		anquanyinhuan();
+		gongshoushuichanxiaochaxinxi();
+		chengbenfenxi();
+		gongshouxinxi();
+		send();
+/* 		
+//用户信息
+		yonghuxinxi();
+//污水信息
+		wushuixinxi();
+ */
+	})	
+
+//用户信息
+function yonghuxinxi(){
+	$.ajax({//用户信息
+	    type: "POST",
+	    url: "../../bigdata/user",
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+		async:true,
+	    success: function(r){
+	    	vm.totalUser=JSON.parse(r).totalnum;
+	    	$("#totalUser").html(JSON.parse(r).totalnum)
+			r=JSON.parse(r).list;
+			var userList=[];
+		    for(var i=0;i<r.length;i++){
+		    	var user={
+		    		value: r[i].num,
+		    		name: r[i].areaName
+		    	}
+		    	userList.push(user);
+		    }
+			var option6 = echarts.init(document.getElementById('echart6'));	
+			option66 = {
+			    tooltip: {
+			        trigger: 'item',
+			        formatter: '{a} <br/>{b}: {c} ({d}%)'
+			    },
+			    series: [
+			        {
+			            name: '用户信息',
+			            type: 'pie',
+			            radius: ['20%', '30%'],
+			            label: {
+			                formatter: '  {b|{b}：}{c}  {per|{d}%}  ',
+			                rich: {
+			                    b: {
+			                        fontSize: 12,
+			                        lineHeight: 33
+			                    },
+			                    per: {
+			                        color: '#1997eb',
+			                        fontSize: 12,
+			                        padding: [2, 4],
+			                    }
+			                }
+			            },
+			            data: userList
+			        }
+			    ],
+			    color:['#47de89','#ffca72','#ff8f83','#58d9d0','#9192ad','#7198e7','#44b3f4']
+			};
+		    //option6.setOption(option66,true)
+		    option6.setOption(option66);
+	    }
+	});
+}
+//热线工单
+function rexiangongdan(){
+	$.ajax({//热线工单
+	    type: "POST",
+	    url: "../../bigdata/order",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"月"}),
+		async:true,
+	    success: function(r){
+	    	var r = JSON.parse(r);
+	        $("#banner1Num").html(r.totalNum);
+	        $("#banner1Percent").html(r.mom+"%");
+	        $("#banner2Num").html(r.totalNum);
+	        $("#banner2Percent").html(r.mom+"%");
+	        if(r.tag=="up"){
+	        	$("#banner1Icon").removeClass("down");
+	        	$("#banner1Icon").addClass("up");	        	
+	        	$("#banner1Icon").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        	$("#banner2Icon").removeClass("down");
+	        	$("#banner2Icon").addClass("up");	        	
+	        	$("#banner2Icon").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.tag=="down"){
+	        	$("#banner1Icon").removeClass("up");
+	        	$("#banner1Icon").addClass("down");	        	
+	        	$("#banner1Icon").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        	$("#banner2Icon").removeClass("up");
+	        	$("#banner2Icon").addClass("down");	        	
+	        	$("#banner2Icon").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+		    for(var i=0;i<r.list.length;i++){
+		    	if(r.list[i].areaName=="上墅片区"){
+			        $("#shangshuNum").html(r.list[i].num);
+			        $("#shangshuPercent").html(r.list[i].value2+"%");		
+			        $("#shangshuNum2").html(r.list[i].num);
+			        $("#shangshuPercent2").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="孝源片区"){
+			        $("#xiaoyuanNum").html(r.list[i].num);
+			        $("#xiaoyuanPercent").html(r.list[i].value2+"%");	
+			        $("#xiaoyuanNum2").html(r.list[i].num);
+			        $("#xiaoyuanPercent2").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="天荒坪片区"){
+			        $("#tianhuangpingNum").html(r.list[i].num);
+			        $("#tianhuangpingPercent").html(r.list[i].value2+"%");
+			        $("#tianhuangpingNum2").html(r.list[i].num);
+			        $("#tianhuangpingPercent2").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="孝丰片区"){
+			        $("#xiaofengNum").html(r.list[i].num);
+			        $("#xiaofengPercent").html(r.list[i].value2+"%");
+			        $("#xiaofengNum2").html(r.list[i].num);
+			        $("#xiaofengPercent2").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="杭垓片区"){
+			        $("#hanggaiNum").html(r.list[i].num);
+			        $("#hanggaiPercent").html(r.list[i].value2+"%");	
+			        $("#hanggaiNum2").html(r.list[i].num);
+			        $("#hanggaiPercent2").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="梅溪片区"){
+			        $("#meixiNum").html(r.list[i].num);
+			        $("#meixiPercent").html(r.list[i].value2+"%");	
+			        $("#meixiNum2").html(r.list[i].num);
+			        $("#meixiPercent2").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="天子湖片区"){
+			        $("#tianzihuNum").html(r.list[i].num);
+			        $("#tianzihuPercent").html(r.list[i].value2+"%");
+			        $("#tianzihuNum2").html(r.list[i].num);
+			        $("#tianzihuPercent2").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].name=="合计"){
+			        $("#totalNum").html(r.list[i].num);
+			        $("#totalPercent").html(r.list[i].value2+"%");
+			        $("#totalNum2").html(r.list[i].num);
+			        $("#totalPercent2").html(r.list[i].value2+"%");			    		
+		    	}
+		    }
+	    }
+	});
+	$.ajax({//热线工单
+	    type: "POST",
+	    url: "../../bigdata/order",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"年"}),
+		async:true,
+	    success: function(r){
+	    	var r = JSON.parse(r);
+	        $("#banner3Num").html(r.totalNum);
+	        $("#banner3Percent").html(r.mom+"%");
+	        if(r.tag=="up"){
+	        	$("#banner3Icon").removeClass("down");
+	        	$("#banner3Icon").addClass("up");	        	
+	        	$("#banner3Icon").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.tag=="down"){
+	        	$("#banner3Icon").removeClass("up");
+	        	$("#banner3Icon").addClass("down");	        	
+	        	$("#banner3Icon").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+		    for(var i=0;i<r.list.length;i++){
+		    	if(r.list[i].areaName=="上墅片区"){
+			        $("#shangshuNum3").html(r.list[i].num);
+			        $("#shangshuPercent3").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="孝源片区"){
+			        $("#xiaoyuanNum3").html(r.list[i].num);
+			        $("#xiaoyuanPercent3").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="天荒坪片区"){
+			        $("#tianhuangpingNum3").html(r.list[i].num);
+			        $("#tianhuangpingPercent3").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="孝丰片区"){
+			        $("#xiaofengNum3").html(r.list[i].num);
+			        $("#xiaofengPercent3").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="杭垓片区"){
+			        $("#hanggaiNum3").html(r.list[i].num);
+			        $("#hanggaiPercent3").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="梅溪片区"){
+			        $("#meixiNum3").html(r.list[i].num);
+			        $("#meixiPercent3").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].areaName=="天子湖片区"){
+			        $("#tianzihuNum3").html(r.list[i].num);
+			        $("#tianzihuPercent3").html(r.list[i].value2+"%");			    		
+		    	}else if(r.list[i].name=="合计"){
+			        $("#totalNum3").html(r.list[i].num);
+			        $("#totalPercent3").html(r.list[i].value2+"%");		    		
+		    	}
+		    }
+	    }
+	});
+}
+function anquanyinhuan(){
+	$.ajax({//安全隐患信息
+	    type: "POST",
+	    url: "../../bigdata/safe",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"月"}),
+		async:true,
+	    success: function(r){
+	    	var r = JSON.parse(r);
+	    	$("#innerNum301").html(r.sum);
+	    	$("#innerNum302").html(r.cnum);
+	    	$("#innerNum321").html(r.sum);
+	    	$("#innerNum322").html(r.cnum);
+            $("#CT6_0").circleChart({
+                value: r.num?r.num:"0.00"
+            });
+            $("#CT6_2").circleChart({
+                value: r.num?r.num:"0.00"
+            });
+            for(var i=0;i<r.list1.length;i++){
+            	if(r.list1[i].name=="污水"){
+            		$("#WF0").html(r.list1[i].num);
+            		$("#WF2").html(r.list1[i].num);
+            	}else if(r.list1[i].name=="排水"){
+            		$("#PF0").html(r.list1[i].num);
+            		$("#PF2").html(r.list1[i].num);
+            	}else if(r.list1[i].name=="供水"){
+            		$("#GF0").html(r.list1[i].num);
+            		$("#GF2").html(r.list1[i].num);
+            	}else if(r.list1[i].name=="工程"){
+            		$("#CF0").html(r.list1[i].num);
+            		$("#CF2").html(r.list1[i].num);
+            	}
+            }
+            for(var i=0;i<r.list2.length;i++){
+            	if(r.list2[i].name=="污水"){
+            		$("#WZ0").html(r.list2[i].num);
+            		$("#WZ2").html(r.list2[i].num);
+            	}else if(r.list2[i].name=="排水"){
+            		$("#PZ0").html(r.list2[i].num);
+            		$("#PZ2").html(r.list2[i].num);
+            	}else if(r.list2[i].name=="供水"){
+            		$("#GZ0").html(r.list2[i].num);
+            		$("#GZ2").html(r.list2[i].num);
+            	}else if(r.list2[i].name=="工程"){
+            		$("#CZ0").html(r.list2[i].num);
+            		$("#CZ2").html(r.list2[i].num);
+            	}
+            }
+	    }
+	})
+	$.ajax({//安全隐患信息
+	    type: "POST",
+	    url: "../../bigdata/safe",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"年"}),
+		async:true,
+	    success: function(r){
+	    	var r = JSON.parse(r);
+	    	$("#innerNum311").html(r.sum);
+	    	$("#innerNum312").html(r.cnum);
+            $("#CT6_1").circleChart({
+                value: r.num?r.num:"0.00"
+            });
+            for(var i=0;i<r.list1.length;i++){
+            	if(r.list1[i].name=="污水"){
+            		$("#WF1").html(r.list1[i].num);
+            	}else if(r.list1[i].name=="排水"){
+            		$("#PF1").html(r.list1[i].num);
+            	}else if(r.list1[i].name=="供水"){
+            		$("#GF1").html(r.list1[i].num);
+            	}else if(r.list1[i].name=="工程"){
+            		$("#CF1").html(r.list1[i].num);
+            	}
+            }
+            for(var i=0;i<r.list2.length;i++){
+            	if(r.list2[i].name=="污水"){
+            		$("#WZ1").html(r.list2[i].num);
+            	}else if(r.list2[i].name=="排水"){
+            		$("#PZ1").html(r.list2[i].num);
+            	}else if(r.list2[i].name=="供水"){
+            		$("#GZ1").html(r.list2[i].num);
+            	}else if(r.list2[i].name=="工程"){
+            		$("#CZ1").html(r.list2[i].num);
+            	}
+            }
+	    }
+	});
+}
+//污水信息
+function wushuixinxi(){
+	$.ajax({//污水信息
+	    type: "POST",
+	    url: "../../bigdata/sewage",
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+        dataType:"json",
+	    success: function(r){
+	        //var r = JSON.parse(r);
+	        
+	        $("#mcll").html(r.mcll);
+	        $("#mcllIcon").html((r["mcll%"]?r["mcll%"].slice(0, 1):"")=="上"?("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>"):("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>"));
+	        $("#mcllPercent").html(r["mcll%"]?r(["mcll%"].slice(2)+"%"):"");
+	        $("#ycll").html(r.ycll);
+	        $("#ycllIcon").html((r["ycll%"]?r["ycll%"].slice(0, 1):"")=="上"?("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>"):("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>"));
+	        $("#ycllPercent").html(r["ycll%"]?(r["ycll%"].slice(2)+"%"):"");
+	        $("#mpsl").html(r.mpsl);
+	        $("#mpslIcon").html((r["mpsl%"]?r["mpsl%"].slice(0, 1):"")=="上"?("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>"):("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>"));
+	        $("#mpslPercent").html(r["mpsl%"]?(r["mpsl%"].slice(2)+"%"):"");
+	        $("#ypsl").html(r.ypsl);
+	        $("#ypslIcon").html((r["ypsl%"]?r["ypsl%"].slice(0, 1):"")=="上"?("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>"):("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>"));
+	        $("#ypslPercent").html(r["ypsl%"]?(r["ypsl%"].slice(2)+"%"):"");
+	        $("#wnczl").html(r.wnczl);
+	        $("#wnczlIcon").html((r["wnczl%"]?r["wnczl%"].slice(0, 1):"")=="上"?("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>"):("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>"));
+	        $("#wnczlPercent").html(r["wnczl%"]?(r["wnczl%"].slice(2)+"%"):"");         
+	    }
+	});
+}
+
+//化验室信息
+function huayanshixinxi(){
+	$.ajax({//化验室信息——供水
+	    type: "POST",
+	    url: "../../bigdata/waterQuality",
+	    contentType: "application/json",
+	    data: JSON.stringify({"siteId":"313-WC-TZH2CS,37-WC-CB1CS"}),
+		async:true,
+	    success: function(r){
+	        var r = JSON.parse(r);
+            $("#1").circleChart({
+                value: r.ccs?r.ccs:"0.00"
+            });
+            $("#2").circleChart({
+                value: r.gws?r.gws:"0.00"
+            });
+        	for(var j=0;j<r.list.length;j++){
+	        	if(r.list[j][0].areaId=="城北污水厂1期出水"){//净源
+	        		for(var i=0;i<r.list[j].length;i++){
+	        			if(r.list[j][i].areaName=="TP"){
+	        				$("#jyTP").html(r.list[j][i].value);
+	        				$("#TP").html(r.list[j][i].name);
+	        			}else if(r.list[j][i].areaName=="COD"){
+	        				$("#jyCOD").html(r.list[j][i].value);
+	        				$("#COD").html(r.list[j][i].name);
+	        			}else if(r.list[j][i].areaName=="TN"){
+	        				$("#jyTN").html(r.list[j][i].value);
+	        				$("#TN").html(r.list[j][i].name);
+	        			}else if(r.list[j][i].areaName=="氨氮"){
+	        				$("#jyAD").html(r.list[j][i].value);
+	        				$("#AD").html(r.list[j][i].name);
+	        			}
+	        		}
+	        	}else if(r.list[j][0].areaId=="天子湖污水厂2期出水"){//清源
+	        		for(var i=0;i<r.list[j].length;i++){
+	        			if(r.list[j][i].areaName=="TP"){
+	        				$("#qyTP").html(r.list[j][i].value);
+	        			}else if(r.list[j][i].areaName=="COD"){
+	        				$("#qyCOD").html(r.list[j][i].value);
+	        			}else if(r.list[j][i].areaName=="TN"){
+	        				$("#qyTN").html(r.list[j][i].value);
+	        			}else if(r.list[j][i].areaName=="氨氮"){
+	        				$("#qyAD").html(r.list[j][i].value);
+	        			}
+	        		}        		
+	        	}
+        	}
+	    }
+	});
+}
+//供售信息
+function gongshouxinxi(){
+	$.ajax({//供售信息
+	    type: "POST",
+	    url: "../../bigdata/supply",
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+        dataType:"json",
+		async:true,
+	    success: function(r){
+	    	$("#gsl").html(r.gsl);
+	    	$("#mom31").html(r.mom1+"%");
+	    	$("#ssl").html(r.ssl);
+	    	$("#mom32").html(r.mom2+"%");
+	    	$("#yeargsl").html(r.yeargsl);
+	    	$("#yearmom31").html(r.yearmom1+"%");
+	    	$("#yearssl").html(r.yearssl);
+	    	$("#yearmom32").html(r.yearmom2+"%");
+	        if(r.tag1=="up"){
+	        	$("#tag31").removeClass("down");
+	        	$("#tag31").addClass("up");  	
+	        	$("#tag31").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.tag1=="down"){
+	        	$("#tag31").removeClass("up");
+	        	$("#tag31").addClass("down");	        	
+	        	$("#tag31").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+	        if(r.tag2=="up"){
+	        	$("#tag32").removeClass("down");
+	        	$("#tag32").addClass("up");	        	
+	        	$("#tag32").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.tag2=="down"){
+	        	$("#tag32").removeClass("up");
+	        	$("#tag32").addClass("down");	        	
+	        	$("#tag32").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+	        if(r.yeartag1=="up"){
+	        	$("#yeartag31").removeClass("down");
+	        	$("#yeartag31").addClass("up");	        	
+	        	$("#yeartag31").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.yeartag1=="down"){
+	        	$("#yeartag31").removeClass("up");
+	        	$("#yeartag31").addClass("down");	        	
+	        	$("#yeartag31").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+	        if(r.yeartag2=="up"){
+	        	$("#yeartag32").removeClass("down");
+	        	$("#yeartag32").addClass("up");	        	
+	        	$("#yeartag32").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.yeartag2=="down"){
+	        	$("#yeartag32").removeClass("up");
+	        	$("#yeartag32").addClass("down");	        	
+	        	$("#yeartag32").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+	    }
+	});
+}
+//成本分析
+function chengbenfenxi(){
+	$.ajax({//成本分析——水厂，月
+	    type: "POST",
+	    url: "../../bigdata/cost",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"月","siteId":"水厂"}),
+        dataType:"json",
+		async:true,
+	    success: function(r){
+	    	console.log(r);
+	    	//var r = JSON.parse(r);
+	    }
+	});
+	$.ajax({//成本分析——水厂，年
+	    type: "POST",
+	    url: "../../bigdata/cost",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"年","siteId":"水厂"}),
+        dataType:"json",
+		async:true,
+	    success: function(r){
+	    	console.log(r);
+	    	//var r = JSON.parse(r);
+	    }
+	});
+}
+//设备信息
+function shebeixinxi(){
+		$.ajax({//设备信息
+		    type: "POST",
+		    url: "../../bigdata/equip",
+		    contentType: "application/json",
+		    data: JSON.stringify({"type":"供"}),
+			async:true,
+		    success: function(r){
+		    	var r = JSON.parse(r);	
+		    	$("#banner9Num1").html(r.whl?(r.whl+"%"):r.whl);
+		    	$("#banner9Percent1").html(r.mom?(r.mom+"%"):r.mom);
+		    	$("#banner9Num2").html(r.whl?(r.whl+"%"):r.whl);
+		    	$("#banner9Percent2").html(r.mom?(r.mom+"%"):r.mom);
+		        if(r.tag=="up"){
+		        	$("#banner9Icon1").removeClass("down");
+		        	$("#banner9Icon1").addClass("up");	        	
+		        	$("#banner9Icon1").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+		        	$("#banner9Icon2").removeClass("down");
+		        	$("#banner9Icon2").addClass("up");	        	
+		        	$("#banner9Icon2").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+		        }else if(r.tag=="down"){
+		        	$("#banner9Icon1").removeClass("up");
+		        	$("#banner9Icon1").addClass("down");	        	
+		        	$("#banner9Icon1").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+		        	$("#banner9Icon2").removeClass("up");
+		        	$("#banner9Icon2").addClass("down");	        	
+		        	$("#banner9Icon2").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+		        }
+		        $("#progress11").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.xjvalue+' aria-valuemin="0" aria-valuemax='+r.xj+' style="width: '+r.xjvalue/r.xj*100+'%"> <span class="sr-only">'+r.xjvalue/r.xj*100+'% 完成</span> </div>')
+		        $("#processNum11").html(r.xj);
+		        $("#progress21").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.byvalue+' aria-valuemin="0" aria-valuemax='+r.by+' style="width: '+r.byvalue/r.by*100+'%"> <span class="sr-only">'+r.byvalue/r.by*100+'% 完成</span> </div>')
+		        $("#processNum21").html(r.by);
+		        $("#progress31").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.wxvalue+' aria-valuemin="0" aria-valuemax='+r.wx+' style="width: '+r.xjvalue/r.wx*100+'%"> <span class="sr-only">'+r.wxvalue/r.wx*100+'% 完成</span> </div>')
+		        $("#processNum31").html(r.wx);
+		        $("#progress12").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.xjvalue+' aria-valuemin="0" aria-valuemax='+r.xj+' style="width: '+r.xjvalue/r.xj*100+'%"> <span class="sr-only">'+r.xjvalue/r.xj*100+'% 完成</span> </div>')
+		        $("#processNum12").html(r.xj);
+		        $("#progress22").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.byvalue+' aria-valuemin="0" aria-valuemax='+r.by+' style="width: '+r.byvalue/r.by*100+'%"> <span class="sr-only">'+r.byvalue/r.by*100+'% 完成</span> </div>')
+		        $("#processNum22").html(r.by);
+		        $("#progress32").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.wxvalue+' aria-valuemin="0" aria-valuemax='+r.wx+' style="width: '+r.xjvalue/r.wx*100+'%"> <span class="sr-only">'+r.wxvalue/r.wx*100+'% 完成</span> </div>')
+		        $("#processNum32").html(r.wx);
+		    }
+		});
+		$.ajax({//设备信息
+		    type: "POST",
+		    url: "../../bigdata/equip",
+		    contentType: "application/json",
+		    data: JSON.stringify({"type":"排"}),
+			async:true,
+		    success: function(r){
+		    	var r = JSON.parse(r);	
+		    	$("#banner9Num3").html(r.whl?(r.whl+"%"):r.whl);
+		    	$("#banner9Percent3").html(r.mom?(r.mom+"%"):r.mom);
+		        if(r.tag=="up"){
+		        	$("#banner9Icon3").removeClass("down");
+		        	$("#banner9Icon3").addClass("up");	        	
+		        	$("#banner9Icon3").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+		        }else if(r.tag=="down"){
+		        	$("#banner9Icon3").removeClass("up");
+		        	$("#banner9Icon3").addClass("down");    	
+		        	$("#banner9Icon3").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+		        }
+		        $("#progress13").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.xjvalue+' aria-valuemin="0" aria-valuemax='+r.xj+' style="width: '+r.xjvalue/r.xj*100+'%"> <span class="sr-only">'+r.xjvalue/r.xj*100+'% 完成</span> </div>')
+		        $("#processNum13").html(r.xj);
+		        $("#progress23").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.byvalue+' aria-valuemin="0" aria-valuemax='+r.by+' style="width: '+r.byvalue/r.by*100+'%"> <span class="sr-only">'+r.byvalue/r.by*100+'% 完成</span> </div>')
+		        $("#processNum23").html(r.by);
+		        $("#progress33").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.wxvalue+' aria-valuemin="0" aria-valuemax='+r.wx+' style="width: '+r.xjvalue/r.wx*100+'%"> <span class="sr-only">'+r.wxvalue/r.wx*100+'% 完成</span> </div>')
+		        $("#processNum33").html(r.wx);
+		    }
+		});
+		$.ajax({//设备信息
+		    type: "POST",
+		    url: "../../bigdata/equip",
+		    contentType: "application/json",
+		    data: JSON.stringify({"type":"污"}),
+			async:true,
+		    success: function(r){
+		    	var r = JSON.parse(r);	
+		    	$("#banner9Num4").html(r.whl?(r.whl+"%"):r.whl);
+		    	$("#banner9Percent4").html(r.mom?(r.mom+"%"):r.mom);
+		        if(r.tag=="up"){
+		        	$("#banner9Icon4").removeClass("down");
+		        	$("#banner9Icon4").addClass("up");	        	
+		        	$("#banner9Icon4").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+		        }else if(r.tag=="down"){
+		        	$("#banner9Icon4").removeClass("up");
+		        	$("#banner9Icon4").addClass("down");	        	
+		        	$("#banner9Icon4").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+		        }
+		        $("#progress14").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.xjvalue+' aria-valuemin="0" aria-valuemax='+r.xj+' style="width: '+r.xjvalue/r.xj*100+'%"> <span class="sr-only">'+r.xjvalue/r.xj*100+'% 完成</span> </div>')
+		        //$("#processNum11").html((r.xjvalue/r.xj*100).toFixed(2));
+		        $("#processNum14").html(r.xj);
+		        $("#progress24").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.byvalue+' aria-valuemin="0" aria-valuemax='+r.by+' style="width: '+r.byvalue/r.by*100+'%"> <span class="sr-only">'+r.byvalue/r.by*100+'% 完成</span> </div>')
+		        //$("#processNum21").html((r.byvalue/r.by*100).toFixed(2));
+		        $("#processNum24").html(r.by);
+		        $("#progress34").html('<div class="progress-bar" role="progressbar" aria-valuenow='+r.wxvalue+' aria-valuemin="0" aria-valuemax='+r.wx+' style="width: '+r.xjvalue/r.wx*100+'%"> <span class="sr-only">'+r.wxvalue/r.wx*100+'% 完成</span> </div>')
+		        //$("#processNum31").html((r.wxvalue/r.wx*100).toFixed(2));
+		        $("#processNum34").html(r.wx);
+		    }
+		});
+}
+//供售水产销差信息
+function gongshoushuichanxiaochaxinxi(){
+	$.ajax({//产销差、供水信息、售水信息
+	    type: "POST",
+	    url: "../../bigdata/water",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"月"}),
+		async:true,
+	    success: function(r){
+			r=JSON.parse(r);
+			$("#innerPercent41").html(r.mom+"%");
+			$("#innerNum41").html(parseInt(r.cxcl*100)+"%");
+			$("#innerPercent43").html(r.mom+"%");
+			$("#innerNum43").html(parseInt(r.cxcl*100)+"%");
+	        if(r.tag=="up"){
+	        	$("#innerIcon41").removeClass("down");
+	        	$("#innerIcon41").addClass("up");	        	
+	        	$("#innerIcon41").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        	$("#innerIcon43").removeClass("down");
+	        	$("#innerIcon43").addClass("up");	        	
+	        	$("#innerIcon43").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.tag=="down"){
+	        	$("#innerIcon41").removeClass("up");
+	        	$("#innerIcon41").addClass("down");	        	
+	        	$("#innerIcon41").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        	$("#innerIcon43").removeClass("up");
+	        	$("#innerIcon43").addClass("down");	        	
+	        	$("#innerIcon43").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+	        for(var i=0;i<r.list.length;i++){
+	        	if(r.list[i].areaName=="孝丰营业所"){
+	        		$("#XFG1").html(r.list[i].value);
+	        		$("#XFS1").html(r.list[i].value2);
+	        		$("#XFC1").html((r.list[i].value3*100).toFixed(2)+"%");
+	        		$("#XFG3").html(r.list[i].value);
+	        		$("#XFS3").html(r.list[i].value2);
+	        		$("#XFC3").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="梅溪营业所"){
+	        		$("#MXG1").html(r.list[i].value);
+	        		$("#MXS1").html(r.list[i].value2);
+	        		$("#MXC1").html((r.list[i].value3*100).toFixed(2)+"%");
+	        		$("#MXG3").html(r.list[i].value);
+	        		$("#MXS3").html(r.list[i].value2);
+	        		$("#MXC3").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="天子湖营业所"){
+	        		$("#TZHG1").html(r.list[i].value);
+	        		$("#TZHS1").html(r.list[i].value2);
+	        		$("#TZHC1").html((r.list[i].value3*100).toFixed(2)+"%");
+	        		$("#TZHG3").html(r.list[i].value);
+	        		$("#TZHS3").html(r.list[i].value2);
+	        		$("#TZHC3").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="孝源营业所"){
+	        		$("#XYG1").html(r.list[i].value);
+	        		$("#XYS1").html(r.list[i].value2);
+	        		$("#XYC1").html((r.list[i].value3*100).toFixed(2)+"%");
+	        		$("#XYG3").html(r.list[i].value);
+	        		$("#XYS3").html(r.list[i].value2);
+	        		$("#XYC3").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="上墅营业所"){
+	        		$("#SSG1").html(r.list[i].value);
+	        		$("#SSS1").html(r.list[i].value2);
+	        		$("#SSC1").html((r.list[i].value3*100).toFixed(2)+"%");
+	        		$("#SSG3").html(r.list[i].value);
+	        		$("#SSS3").html(r.list[i].value2);
+	        		$("#SSC3").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}
+	        }
+	    }
+	});
+	$.ajax({//产销差
+	    type: "POST",
+	    url: "../../bigdata/water",
+	    contentType: "application/json",
+	    data: JSON.stringify({"time":"年"}),
+		async:true,
+	    success: function(r){
+			r=JSON.parse(r);
+			$("#innerPercent42").html(r.mom+"%");
+			//console.log(parseInt(r.cxcl*100)+"%",(parseFloat(r.cxcl).toFixed(2))*100+"%");
+			$("#innerNum42").html(parseInt(r.cxcl*100)+"%");
+	        if(r.tag=="up"){
+	        	$("#innerIcon42").removeClass("down");
+	        	$("#innerIcon42").addClass("up");	        	
+	        	$("#innerIcon42").html("<span class='glyphicon glyphicon-arrow-up listIconUp'></span>");
+	        }else if(r.tag=="down"){
+	        	$("#innerIcon42").removeClass("up");
+	        	$("#innerIcon42").addClass("down");	        	
+	        	$("#innerIcon42").html("<span class='glyphicon glyphicon-arrow-down listIconDown'></span>");
+	        }
+	        for(var i=0;i<r.list.length;i++){
+	        	if(r.list[i].areaName=="孝丰营业所"){
+	        		$("#XFG2").html(r.list[i].value);
+	        		$("#XFS2").html(r.list[i].value2);
+	        		$("#XFC2").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="梅溪营业所"){
+	        		$("#MXG2").html(r.list[i].value);
+	        		$("#MXS2").html(r.list[i].value2);
+	        		$("#MXC2").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="天子湖营业所"){
+	        		$("#TZHG2").html(r.list[i].value);
+	        		$("#TZHS2").html(r.list[i].value2);
+	        		$("#TZHC2").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="孝源营业所"){
+	        		$("#XYG2").html(r.list[i].value);
+	        		$("#XYS2").html(r.list[i].value2);
+	        		$("#XYC2").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}else if(r.list[i].areaName=="上墅营业所"){
+	        		$("#SSG2").html(r.list[i].value);
+	        		$("#SSS2").html(r.list[i].value2);
+	        		$("#SSC2").html((r.list[i].value3*100).toFixed(2)+"%");
+	        	}
+	        }
+	    }
+	});
+}
+
+
+var websocket = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);	       
+	    }
+	}); 
+	//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+	websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}
+else {
+alert('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+//alert("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+//alert("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+	var infor=[];
+	infor=JSON.parse(event.data);
+	setMessageInnerHTML(infor);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+	closeWebSocket();
+//alert("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+	closeWebSocket();
+}
+
+	window.parent.onbeforeunload = function(){
+		closeWebSocket();
+    };
+//将消息显示在网页上
+function setMessageInnerHTML(obj) {
+	console.log(obj);
+	var meixiPtout = 0;//num
+	var meixiYl = 0;//value
+	var meixiFls = 0;//value
+	for(var i=0;i<obj.length;i++){
+		if(obj[i].siteName){
+			if(obj[i].siteName.substring(0,2)=="梅溪"){
+				if(obj[i].dataType=="PTOUT"){
+					meixiPtout++;
+					meixiYl+=obj[i].yl;
+					$("#meixiPtout").html((meixiYl/meixiPtout).toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					meixiFls+=obj[i].ins;
+					$("#meixiFls").html(meixiFls.toFixed(2))
+				}
+			}else if(obj[i].siteName.substring(0,2)=="孝丰"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#xiaofengPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#xiaofengFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="高禹水厂出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#gaoyuPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#gaoyuFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="鄣吴水厂出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#zhangwuPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#zhangwuFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName.substring(0,2)=="赋石"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#fushiPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#fushiFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName.substring(0,2)=="杭垓"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#hanggaiPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#hanggaiFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName.substring(0,2)=="城西"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#chengxiPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#chengxiFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName.substring(0,2)=="凤凰"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#fenghuangPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#fenghuangFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName.substring(0,4)=="新老石坎"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#xinlaoshikanPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#xinlaoshikanFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="金山污水厂出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#jinshanPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#jinshanFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="天子湖污水厂出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#tianzihuPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#tianzihuFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="城北污水厂出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#chengbeiPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#chengbeiFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="高禹污水泵站出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#gywsbzPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					console.log(i,obj[i].dataType,obj[i].ins,"****************");
+					$("#gywsbzFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="良朋污水泵站出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#lpwsbzPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#lpwsbzFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="天子湖一体化污水泵站出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#tzhythwsbzPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#tzhythwsbzFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="城北1号污水处理泵站出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#cb1wsbzPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#cb1wsbzFls").html(obj[i].ins.toFixed(2))
+				}
+			}else if(obj[i].siteName=="城北2号污水处理泵站出口"){
+				if(obj[i].dataType=="PTOUT"){
+					$("#cb2wsbzPtout").html(obj[i].yl.toFixed(2))
+				}else if(obj[i].dataType=="FLS"){
+					$("#cb2wsbzFls").html(obj[i].ins.toFixed(2))
+				}
+			}
+		}else if(obj[i].totalflow){
+			var wtotalflow = obj[i].wtotalflow;
+			var totalflow = obj[i].totalflow;
+			$("#wtotalflow").html(format_number(wtotalflow));
+			$("#totalflow").html(format_number(totalflow));
+			PrefixInteger(1,1);
+		}
+	}
+}
+//关闭WebSocket连接
+function closeWebSocket(){
+websocket.close();
+$.ajax({
+  type: "POST",
+  url: "../../fac/data/closeSession",
+  contentType: "application/json",
+  data: JSON.stringify(),
+	async:false,
+  success: function(r){
+      console.log(r)
+  }
+});
+}
+//发送消息
+function send(){
+var PSBZ="4-WC-CBCK,FLS;32-WC-TZHCK,FLS;21-WB-CB01CK,FLS;22-WB-CB02CK,FLS;23-WB-GYWBCK,FLS;24-WB-LPWBCK,FLS;03-1-WB-TZHCK,FLS;35-WC-JSCK,FLS;";
+var SC = "03-1-SC-GY2CC,FLS;03-1-SC-GY2CC,PTOUT;04-1-SC-XLSKCS,FLS;04-1-SC-XLSKCS,PTOUT;01-1-SC-XF,PTOUT;01-1-SC-XF,FLS;03-1-SC-ZWCC,PTOUT;03-1-SC-ZWCC,FLS;01-1-SC-FS,PTOUT;01-1-SC-FS,FLS;01-2-SC-HGCC,PTOUT;01-2-SC-HGCC,FLS;04-1-SC-LPMXC,PTOUT;04-1-SC-LPMXC,FLS;04-1-SC-LPXSC,PTOUT;04-1-SC-LPXSC,FLS;04-1-SC-LPXLC,PTOUT;04-1-SC-LPXLC,FLS;03-1-SC-ZWCC,PTOUT;03-1-SC-ZWCC,FLS;35-WC-JSCK,PTOUT;35-WC-JSCK,FLS;4-WC-CBCK,PTOUT;4-WC-CBCK,FLS;2-WC-TZHCK,PTOUT;2-WC-TZHCK,FLS;"
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/list",
+    contentType: "application/json",
+    data: JSON.stringify({"siteId":PSBZ+SC+"bigdata"}),
+    success: function(r){
+        console.log(r);
+    }
+}); 
+}
+</script>
+	
+<script type="text/javascript">
+
+$(document).ready(function () {
+		var wid6 = rem*31;
+		var i6 = 0;
+		var size6 = $("#banner6 .banner .bannerList li").size();         
+		/*自动轮播*/
+		var t6 = setInterval(function () { i6++; move6();},13000);
+		/*鼠标悬停事件*/
+		$("#banner6 .banner").hover(function () {
+		clearInterval(t6);//鼠标悬停时清除定时器
+		}, function () {
+		t6 = setInterval(function () { i6++; move6(); }, 10000); //鼠标移出时清除定时器
+		});
+		$("#CT6 .btn_1").click(function () {
+			i6=2;		
+			move6();
+		})
+		/*向右按钮*/
+		$("#CT6 .btn_2").click(function () {
+			i6=1;
+			move6();
+		})
+		/*移动事件*/
+
+		function move6() {
+			if(i6==1||i6==3){
+				$("#CT6 .btn").removeClass("btShow");
+				$("#CT6 .btn").addClass("btHide");	
+				$("#CT6 .btn_2").removeClass("btHide");
+				$("#CT6 .btn_2").addClass("btShow");			
+			}else if(i6==2){
+				$("#CT6 .btn").removeClass("btShow");
+				$("#CT6 .btn").addClass("btHide");
+				$("#CT6 .btn_1").removeClass("btHide");
+				$("#CT6 .btn_1").addClass("btShow");				
+			}
+			if (i6 == size6) {
+				$("#banner6 .banner .bannerList").css({ left: 0 });
+				i6 = 1;
+			}
+			if (i6 == -1) {
+				$("#banner6 .banner .bannerList").css({ left: -(size6 - 1) * wid6});
+				i6 = size6 - 2;
+			}
+			$("#banner6 .banner .bannerList").stop().animate({ left: -i6 * wid6}, 500);
+		}
+		var wid4 = rem*32;
+		var i4=0;
+		var size4 = $("#banner4 .banner .bannerList li").size();   
+		/*自动轮播*/
+		var t4 = setInterval(function () {i4++; move4();},8000);
+		/*鼠标悬停事件*/
+		$("#banner4 .banner").hover(function () {
+		clearInterval(t4);//鼠标悬停时清除定时器
+		}, function () {
+		t4 = setInterval(function () { i4++; move4(); }, 6000); //鼠标移出时清除定时器
+		});
+		$("#CT4 .btn_1").click(function () {
+			i4=2;		
+			move4();
+		})
+		/*向右按钮*/
+		$("#CT4 .btn_2").click(function () {
+			i4=1;
+			move4();
+		})
+		/*移动事件*/
+
+		function move4() {
+			if(i4==1||i4==3){
+				$("#CT4 .btn").removeClass("btShow");
+				$("#CT4 .btn").addClass("btHide");	
+				$("#CT4 .btn_2").removeClass("btHide");
+				$("#CT4 .btn_2").addClass("btShow");			
+			}else if(i4==2){
+				$("#CT4 .btn").removeClass("btShow");
+				$("#CT4 .btn").addClass("btHide");
+				$("#CT4 .btn_1").removeClass("btHide");
+				$("#CT4 .btn_1").addClass("btShow");				
+			}
+			if (i4 == size4) {
+				$("#banner4 .banner .bannerList").css({ left: 0 });
+				i4 = 1;
+			}
+			if (i4 == -1) {
+				$("#banner4 .banner .bannerList").css({ left: -(size4 - 1) * wid4});
+				i4 = size4 - 2;
+			}
+			$("#banner4 .banner .bannerList").stop().animate({ left: -i4 * wid4}, 500);
+		}
+		var wid5 = rem*32;
+		var i5=1;
+		var size5 = $("#banner5 .banner .bannerList li").size();   
+		/*自动轮播*/
+		var t5 = setInterval(function () {i5++; move5();},9000);
+		/*鼠标悬停事件*/
+		$("#banner5 .banner").hover(function () {
+		clearInterval(t5);//鼠标悬停时清除定时器
+		}, function () {
+		t5 = setInterval(function () { i5++; move5(); }, 9000); //鼠标移出时清除定时器
+		});
+		$("#CT5 .btn_1").click(function () {
+			if(i5==1||i5==2||i5==5){
+				i5=5;
+			}else if(i5==3||i5==4){
+				i5=3;
+			}		
+			move5();
+		})
+		/*向右按钮*/
+		$("#CT5 .btn_2").click(function () {
+			if(i5==1||i5==2||i5==5){
+				i5=2;
+			}else if(i5==3||i5==4){
+				i5=4;
+			}
+			move5();
+		})
+		$(".CTtitHD span").eq(0).click(function(){
+			i5=5;
+			move5();
+		})
+		$(".CTtitHD span").eq(1).click(function(){
+			i5=3;
+			move5();
+		})
+		/*移动事件*/
+
+		function move5() {
+			//1左月、2左年、3右月、4右年、5左月
+			if(i5==1||i5==3||i5==5){//月
+				$("#CT5 .btn").removeClass("btShow");
+				$("#CT5 .btn").addClass("btHide");	
+				$("#CT5 .btn_1").removeClass("btHide");
+				$("#CT5 .btn_1").addClass("btShow");
+				if(i5==1||i5==5){//左
+					$(".CTtitHD span").removeClass("CTtit");
+					$(".CTtitHD span").eq(0).addClass("CTtit");
+				}else if(i5==3){//右
+					$(".CTtitHD span").removeClass("CTtit");
+					$(".CTtitHD span").eq(1).addClass("CTtit");
+				}
+			}else if(i5==2||i5==4){//年
+				$("#CT5 .btn").removeClass("btShow");
+				$("#CT5 .btn").addClass("btHide");
+				$("#CT5 .btn_2").removeClass("btHide");
+				$("#CT5 .btn_2").addClass("btShow");
+				if(i5==2){//左
+					$(".CTtitHD span").removeClass("CTtit");
+					$(".CTtitHD span").eq(0).addClass("CTtit");
+				}else if(i5==4){//右
+					$(".CTtitHD span").removeClass("CTtit");
+					$(".CTtitHD span").eq(1).addClass("CTtit");
+				}				
+			}
+			if (i5 == size5) {
+				$("#banner5 .banner .bannerList").css({ left: 0 });
+				i5 = 1;
+			}
+			if (i5 == -1) {
+				$("#banner5 .banner .bannerList").css({ left: -(size5 - 1) * wid5});
+				i5 = size5 - 2;
+			}
+			$("#banner5 .banner .bannerList").stop().animate({ left: -i5 * wid5}, 500);
+		}
+		var wid10 = rem*32;
+		var i10=1;
+		var size10 = $("#banner10 .banner .bannerList li").size();   
+		/*自动轮播*/
+		var t10 = setInterval(function () {i10++; move10();},11000);
+		/*鼠标悬停事件*/
+		$("#banner10 .banner").hover(function () {
+		clearInterval(t10);//鼠标悬停时清除定时器
+		}, function () {
+		t10 = setInterval(function () { i10++; move10(); }, 11000); //鼠标移出时清除定时器
+		});
+		$("#CT10 .btn_1").click(function () {
+			if(i10==1||i10==7||i10==2){
+				i10=7;					
+			}else if(i10==3||i10==4){
+				i10=3;
+			}else if(i10==5||i10==6){
+				i10=5;
+			}	
+			move10();
+		})
+		/*向右按钮*/
+		$("#CT10 .btn_2").click(function () {
+			if(i10==1||i10==7||i10==2){
+				i10=2;					
+			}else if(i10==3||i10==4){
+				i10=4;
+			}else if(i10==5||i10==6){
+				i10=6;
+			}
+			move10();
+		})
+		$("#innerHead1").click(function () {
+			i10=1;		
+			move10();
+		})
+		$("#innerHead2").click(function () {
+			i10=3;		
+			move10();
+		})
+		/*移动事件*/
+
+		function move10() {
+			if(i10==1||i10==3||i10==5){//月
+				$("#CT10 .btn").removeClass("btShow");
+				$("#CT10 .btn").addClass("btHide");	
+				$("#CT10 .btn_1").removeClass("btHide");
+				$("#CT10 .btn_1").addClass("btShow");
+				if(i10==1||i10==5){//左
+					$(".innerHead span").removeClass("innerHeadShow");
+					$(".innerHead span").addClass("innerHeadHide");
+					$(".innerHead span").eq(0).removeClass("innerHeadHide");
+					$(".innerHead span").eq(0).addClass("innerHeadShow");
+				}else if(i10==3){//中
+					$(".innerHead span").removeClass("innerHeadShow");
+					$(".innerHead span").addClass("innerHeadHide");
+					$(".innerHead span").eq(1).removeClass("innerHeadHide");
+					$(".innerHead span").eq(1).addClass("innerHeadShow");
+				}	
+			}else if(i10==2||i10==4){//年
+				$("#CT10 .btn").removeClass("btShow");
+				$("#CT10 .btn").addClass("btHide");
+				$("#CT10 .btn_2").removeClass("btHide");
+				$("#CT10 .btn_2").addClass("btShow");
+				if(i10==2){//左
+					$(".innerHead span").removeClass("innerHeadShow");
+					$(".innerHead span").addClass("innerHeadHide");
+					$(".innerHead span").eq(0).removeClass("innerHeadHide");
+					$(".innerHead span").eq(0).addClass("innerHeadShow");
+				}else if(i10==4){//中
+					$(".innerHead span").removeClass("innerHeadShow");
+					$(".innerHead span").addClass("innerHeadHide");
+					$(".innerHead span").eq(1).removeClass("innerHeadHide");
+					$(".innerHead span").eq(1).addClass("innerHeadShow");
+				}				
+			}
+			if (i10 == size10) {
+				$("#banner10 .banner .bannerList").css({ left: 0 });
+				i10 = 1;
+			}
+			if (i10 == -1) {
+				$("#banner10 .banner .bannerList").css({ left: -(size10 - 1) * wid10});
+				i10 = size10 - 2;
+			}
+			$("#banner10 .banner .bannerList").stop().animate({ left: -i10 * wid10}, 500);
+		}
+		
+
+		var wid9 = rem*31;
+		var i9 = 1;
+		var size9 = $("#banner9 .banner .bannerList li").size();         
+		/*自动轮播*/
+		var t9 = setInterval(function () { i9++; move9();},10000);
+		/*鼠标悬停事件*/
+		$("#banner9 .banner").hover(function () {
+		clearInterval(t9);//鼠标悬停时清除定时器
+		}, function () {
+		t9 = setInterval(function () { i9++; move9(); }, 10000); //鼠标移出时清除定时器
+		});
+		$("#CT9 .btn_0").click(function () {
+			i9=4;		
+			move9();
+		})
+		$("#CT9 .btn_1").click(function () {
+			i9=2;		
+			move9();
+		})
+		/*向右按钮*/
+		$("#CT9 .btn_2").click(function () {
+			i9=3;
+			move9();
+		})
+		/*移动事件*/
+
+		function move9() {
+			if(i9==1||i9==4){
+				$("#CT9 .btn").removeClass("btShow");
+				$("#CT9 .btn").addClass("btHide");	
+				$("#CT9 .btn_0").removeClass("btHide");
+				$("#CT9 .btn_0").addClass("btShow");			
+			}else if(i9==2){
+				$("#CT9 .btn").removeClass("btShow");
+				$("#CT9 .btn").addClass("btHide");
+				$("#CT9 .btn_1").removeClass("btHide");
+				$("#CT9 .btn_1").addClass("btShow");				
+			}else if(i9==3){
+				$("#CT9 .btn").removeClass("btShow");
+				$("#CT9 .btn").addClass("btHide");
+				$("#CT9 .btn_2").removeClass("btHide");
+				$("#CT9 .btn_2").addClass("btShow");				
+			}
+			if (i9 == size9) {
+				$("#banner9 .banner .bannerList").css({ left: 0 });
+				i9 = 1;
+			}
+			if (i9 == -1) {
+				$("#banner9 .banner .bannerList").css({ left: -(size9 - 1) * wid9});
+				i9 = size9 - 2;
+			}
+			$("#banner9 .banner .bannerList").stop().animate({ left: -i9 * wid9}, 500);
+		}
+		
+		
+		var i11 = 0;
+		move11();
+		var size11 = $(".CT11Cinner").size();   
+		console.log(size11,"***********************");
+		/*自动轮播*/
+		var t11 = setInterval(function () { i11++; move11();},5000);
+		/*鼠标悬停事件*/
+		$(".CT11CtitG").hover(function () {
+		clearInterval(t11);//鼠标悬停时清除定时器
+		}, function () {
+		t11 = setInterval(function () { i11++; move11(); }, 5000); //鼠标移出时清除定时器
+		});
+		$(".CT11CtitW").hover(function () {
+			clearInterval(t11);//鼠标悬停时清除定时器
+			}, function () {
+			t11 = setInterval(function () { i11++; move11(); }, 5000); //鼠标移出时清除定时器
+		});
+		$(".CT11CtitWB").hover(function () {
+			clearInterval(t11);//鼠标悬停时清除定时器
+			}, function () {
+			t11 = setInterval(function () { i11++; move11(); }, 5000); //鼠标移出时清除定时器
+		});
+		$("#CT11Ctit1").mouseover(function () {
+			i11=0;		
+			move11();
+		})
+		$("#CT11Ctit2").mouseover(function () {
+			i11=1;		
+			move11();
+		})
+		$("#CT11Ctit3").mouseover(function () {
+			i11=2;		
+			move11();
+		})
+		$("#CT11Ctit4").mouseover(function () {
+			i11=3;		
+			move11();
+		})
+		$("#CT11Ctit5").mouseover(function () {
+			i11=4;		
+			move11();
+		})
+		$("#CT11Ctit6").mouseover(function () {
+			i11=5;		
+			move11();
+		})
+		$("#CT11Ctit7").mouseover(function () {
+			i11=6;		
+			move11();
+		})
+		$("#CT11Ctit8").mouseover(function () {
+			i11=7;		
+			move11();
+		})
+		$("#CT11Ctit9").mouseover(function () {
+			i11=8;		
+			move11();
+		})
+		$("#CT11Ctit10").mouseover(function () {
+			i11=9;		
+			move11();
+		})
+		$("#CT11Ctit11").mouseover(function () {
+			i11=10;		
+			move11();
+		})
+		$("#CT11Ctit12").mouseover(function () {
+			i11=11;		
+			move11();
+		})
+		$("#CT11Ctit13").mouseover(function () {
+			i11=12;		
+			move11();
+		})
+		$("#CT11Ctit14").mouseover(function () {
+			i11=13;		
+			move11();
+		})
+		$("#CT11Ctit15").mouseover(function () {
+			i11=14;		
+			move11();
+		})
+		$("#CT11Ctit16").mouseover(function () {
+			i11=15;		
+			move11();
+		})
+		$("#CT11Ctit17").mouseover(function () {
+			i11=16;		
+			move11();
+		})
+		$("#CT11Ctit18").mouseover(function () {
+			i11=17;		
+			move11();
+		})
+		$("#CT11Ctit19").mouseover(function () {
+			i11=18;		
+			move11();
+		})
+		$("#CT11Ctit20").mouseover(function () {
+			i11=19;		
+			move11();
+		})
+		$("#CT11Ctit21").mouseover(function () {
+			i11=20;		
+			move11();
+		})
+		$("#CT11Ctit22").mouseover(function () {
+			i11=21;		
+			move11();
+		})
+		$("#CT11Ctit23").mouseover(function () {
+			i11=22;		
+			move11();
+		})
+		$("#CT11Ctit24").mouseover(function () {
+			i11=23;		
+			move11();
+		})
+		/*移动事件*/
+
+		function move11() {
+			if (i11 == size11) {
+				i11 = 0;
+			}
+			$(".CT11Cinner").fadeOut("slow");
+			console.log($(".CT11Cinner").eq(i11),i11,"^^^^^^^^^^^");
+			$(".CT11Cinner").eq(i11).fadeIn("slow");
+		}
+	});	
+	function format_number(n) {//数字逗号间隔，每三位用逗号分开
+        var b = parseInt(n).toString();
+        var len = b.length;
+        //if (len <= 3) { b = ("000000" + b).substr( -6 ); len = b.length;}
+        var r = len % 3;
+    	var ii=r > 0 ? b.slice(0, r) + "," + b.slice(r, len).match(/\d{3}/g).join(",") : b.slice(r, len).match(/\d{3}/g).join(",");
+		var num = (ii.length>=7)?ii.length:7;
+		console.log(ii,num);
+    	//return ("0000000000000000" + ii).substr( -num );
+		return (ii);
+    }
+	
+	
+</script>
+</body>
+</html>

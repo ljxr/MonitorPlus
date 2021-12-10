@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>排水管网</title>
+<script type="text/javascript">
+	/* <![CDATA[ */
+	var host_url = 'http://192.168.101.2:8081/'
+	/* ]]> */
+</script>
+
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+
+<script type="text/javascript" src="../../statics/map/common/common.js"></script>
+<script type="text/javascript" src="../../statics/map/common/jquery.min.js"></script>
+<link rel="stylesheet" href="../../statics/map/css/switcher.css"></link>
+<link rel="stylesheet" href="../../statics/map/css/tools.css"></link>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css"></link>
+<script type="text/javascript" src="../../statics/js/echarts.js"></script>
+<link rel="stylesheet" href="../../statics/css/Tabstyle.css"></link>
+<script type="text/javascript" src="http://192.168.101.2:8081/statics/map/js/init.js"></script>
+
+	
+<style type="text/css">
+@charset "utf-8";
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+body{moz-user-select: -moz-none;
+-moz-user-select: none;
+-o-user-select:none;
+-khtml-user-select:none;
+-webkit-user-select:none;
+-ms-user-select:none;
+user-select:none;}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+a:link{text-decoration:none;}
+a:visited{text-decoration:none;}
+a:hover{text-decoration:none;}
+a:active{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+h1,h2,h3,h4,h5,h6{margin-bottom:1em;color:rgba(0,0,0,.85)}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:180px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar-wrapper.fixed{position:fixed;top:0px;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:36px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px; color:#3c8dbc; font-weight:bold;}
+.menu-item-1>ul{margin-top:12px}
+.menu-item-2{padding-top:8px;padding-bottom:8px;padding-left:25px;font-size:14px;line-height:28px; color:#363636; font-weight:normal;}
+.menu-item-2>ul{margin-top:12px}
+.main-container{position:relative;margin-left:180px; margin-right:240px; padding:0px;}
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+
+.menu-group{z-index:1;}
+.menu-group ul{z-index:2;}
+.list-group-item button{margin:0px 18px;}
+</style>
+<script type="text/javascript">
+	/* <![CDATA[ */
+
+	/* ]]> */
+</script>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+	<div class="sidebar-wrapper fixed">
+		<div class="gs_site" onClick="javascript:void(0)">排水管网</div>
+		<div class="sidebar">
+			<ul class="menu-group">
+ 				<li v-for="(item, index) in treeList" class="menu-item menu-item-1">
+					<a v-bind:id="item.siteId" href="javascript:;" v-on:click="getIndex2('3',item.siteId,item.name)"><span class="glyphicon glyphicon-th-large"></span>&nbsp;{{item.name}}</a>
+					<ul>
+						<li v-for="(citem, cindex) in item.treelist" class="menu-item menu-item-2">
+							<a v-bind:id="citem.siteId" href="javascript:;" v-on:click="getIndex(citem.siteId)">{{citem.name}}</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="main-container" style="overflow:hidden;">
+		<div id="mapcontent">
+			<noscript>地图加载失败！页面必须引入esri.css、global.js、map.js与init.js！
+			</noscript>
+		</div>
+	</div>
+	<div class="mapType-wrapper" style="margin-right:240px;">
+		<div class="mapType">
+			<div class="mapTypeCard">
+				<img src="../../statics/map/images/pic_2.jpg" alt="卫星" /> <span>卫星地图</span>
+			</div>
+		   <div class="mapTypeCard">
+				<img src="../../statics/map/images/pic_4.jpg" alt="地形" /> <span>地形地图</span>
+			</div>
+			<div class="mapTypeCard">
+				<img src="../../statics/map/images/pic_1.jpg" alt="矢量" /> <span>矢量地图</span>
+			</div>
+		</div>
+	</div>
+	<div id="tab" style="width:240px; height:100%;position:fixed; top:0px; right:0px; overflow-x: hidden; overflow-y: auto;">
+		<!-- <div class="setting" style="padding:10px">
+			<label>
+				<input type="checkbox" id="map_tip_sz" checked="checked" > 水质
+			</label>
+			<label>
+				<input type="checkbox" id="map_tip_ll" checked="checked" > 流量
+			</label>
+			<label>
+				<input type="checkbox" id="map_tip_yl" checked="checked" > 压力
+			</label>
+			<button type="button" class="btn btn-primary" onClick="window.location.href='gsc_kanban.html';">看板模式</button>
+		</div> -->
+		<div v-for="re in Site" class="list-group">
+			<a href="#" class="list-group-item" style="height:34px; background-color:rgba(60,141,188,0.8); text-align:center" v-on:click="setCenter(re.x,re.y)">
+				<h5 class="list-group-item-heading" style="color:#fff;">{{re.name}}</h5>
+				<span style="z-index:99; position:absolute; right:10px; bottom:5px; color:#fff;" v-on:click="psgw_detail(re.siteId,re.name,re.type)">>></span>
+			</a>
+			<a href="#" class="list-group-item">
+				<p class="list-group-item-text" style="margin-bottom:10px;">
+					<!-- 压力：{{re.yl}}<br>
+					瞬时流量：{{re.ss}}<br>
+					累计流量：{{re.lj}}<br> -->
+					瞬时流量：{{re.ss}}<br>
+					压力：{{re.yl}}<br>
+					COD：{{re.cod}}<br>
+				</p>
+				<!-- <button type="button" class="btn btn-success btn-xs" v-on:click="setCenter(re.x,re.y)">定位</button>
+				<button type="button" class="btn btn-primary btn-xs" v-on:click="psgw_detail(re.siteId,re.name)">更多</button> -->
+			</a>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var websocket = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);
+	       
+	    }
+	}); 
+
+	//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+	websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}
+else {
+//alert('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+//alert("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+//alert("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+	var infor=[];
+	console.log(event.data);
+	infor=JSON.parse(event.data);
+	setMessageInnerHTML(infor);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+	closeWebSocket();
+//alert("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+//将消息显示在网页上
+function setMessageInnerHTML(obj) {
+console.log(obj.length);
+console.log(obj);
+for(var i=0; i<obj.length;i++){
+	if(obj[i].dataType=="FLS"){//瞬时流量
+		vm.LF_ins=obj[i].ins.toFixed(1)+"m³/h";
+	}else if(obj[i].dataType=="PTOUT"){//压力
+		vm.LF_yl=obj[i].yl.toFixed(1)+"Mpa";
+	}else if(obj[i].dataType=="FLC"){//累计流量
+		vm.LF_ll=obj[i].jlj.toFixed(1)+"m³";
+	}else if(obj[i].dataType=="HOCL"){//余氯
+		vm.LF_hocl=obj[i].cho.toFixed(2)+"mg/L";
+	}else if(obj[i].dataType=="TUR"){//浊度
+		vm.LF_tur=obj[i].tur.toFixed(2)+"NTU";
+	}else if(obj[i].dataType=="PH"){//PH
+		vm.LF_ph=obj[i].ph.toFixed(2);
+	}
+}
+/* var site={
+		  areaId:"02-1",
+		  siteId:"02-1-SB-LFCK",
+		  name:"灵峰泵站出水口",
+		  x:119.6554102182769,
+		  y:30.57386661319248,
+		  type:"S03",
+		  ss:vm.LF_ins,
+		  lj:vm.LF_ll,
+		  yl:vm.LF_yl,
+		  hclo:vm.LF_hocl,
+		  tur:vm.tur,
+		  ph:vm.ph,
+}
+vm.Site.push(site);
+console.log(vm.Site); */
+map.creatInfoSymbol("lf_fls","<div class='"+"02-2"+" ll' style='width:60px; background-color:rgba(206,231,248,0.8); font-size:12px; color:#000;'>"+vm.LF_ins+"</div>",  {"x":119.6554102182769, "y": 30.57386661319248, "spatialReference": {"wkid": 4326 }},20,0);
+map.creatInfoSymbol("lf_yl","<div class='"+"02-2"+" yl' style='width:60px; background-color:rgba(238,241,246,0.8); font-size:12px; color:#000;'>"+vm.LF_yl+"</div>",  {"x":119.6554102182769, "y": 30.57386661319248, "spatialReference": {"wkid": 4326 }},20,-20);
+}
+//关闭WebSocket连接
+function closeWebSocket(){
+websocket.close();
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/closeSession",
+    contentType: "application/json",
+    data: JSON.stringify(),
+	async:false,
+    success: function(r){
+        console.log(r)
+    }
+});
+}
+//发送消息
+function send(){
+setTimeout(
+		function(){
+			var DT={"siteId":"02-1-SB-LFCK,PTOUT;02-1-SB-LFCK,FLS;PTOUT;02-1-SB-LFCK,FLC;02-1-SB-LFCK,HOCL;02-1-SB-LFCK,TUR;02-1-SB-LFCK,PH;"}
+			$.ajax({
+		    type: "POST",
+		    url: baseURL + "fac/data/listp",
+		    contentType: "application/json",
+		    data: JSON.stringify(DT),
+		    success: function(r){
+		        console.log(r);
+		    }
+		})
+},2000)}
+</script>
+	<script src="../../statics/plugins/layui/lay/all.js" type="text/javascript"></script>
+	<script src="${request.contextPath}/statics/js/modules/sys/psgwjc.js"></script> 
+	<script type="text/javascript" src="../../statics/map/js/switcher.js"></script>
+	<script type="text/javascript" src="../../statics/map/js/tools.js"></script>
+</body>
+</html>

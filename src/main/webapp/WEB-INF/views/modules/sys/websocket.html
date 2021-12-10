@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Java后端WebSocket的Tomcat实现</title>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+</style>
+</head>
+<body>
+<button type="button" class="btn btn-warning" style="position:fixed; top:20px; right:20px;" onClick="window.location.href='ztjc.html';">返回组态</button>
+Welcome<br/><input id="text" type="text"/>
+<button onclick="send()">发送消息</button><button onclick="send2()">发送消息</button><button onclick="send4()">关闭连接</button><button onclick="send3()">重新连接</button>
+<hr/>
+<button onclick="closeWebSocket()">关闭WebSocket连接</button>
+<hr/><iframe src="" id="area"></iframe>
+<div id="message"></div>
+</body>
+<script type="text/javascript">
+var websocket2 = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,//取消异步
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);
+	    }
+	}); 
+
+	websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket"+hs);
+	//websocket2 = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+}
+else {
+alert('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket2.onerror = function () {
+setMessageInnerHTML("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket2.onopen = function () {
+setMessageInnerHTML("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket2.onmessage = function (event) {
+setMessageInnerHTML(event.data);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+setMessageInnerHTML("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+//将消息显示在网页上
+function setMessageInnerHTML(innerHTML) {
+document.getElementById('message').innerHTML += innerHTML + '<br/>';
+console.log(innerHTML);
+}
+//关闭WebSocket连接
+function closeWebSocket() {
+websocket2.close();
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/closeSession",
+    contentType: "application/json",
+    data: JSON.stringify(),
+    success: function(r){
+        console.log(r)
+    }
+}); 
+}
+//发送消息
+function send() {
+var baseURL = "../../";
+//websocket.send(message);
+$.ajax({
+    type: "POST",
+    url: baseURL + "fac/data/list",
+    contentType: "application/json",
+    data: JSON.stringify({"siteId":"04-1-SB-HDC01,Fault;04-1-SB-HDC01,Run;04-1-SB-HDC01,Stop"}),
+    success: function(r){
+        console.log(r)
+    }
+}); 
+}
+function send2() {
+	var baseURL = "../../";
+	//websocket.send(message);
+	$.ajax({
+	    type: "POST",
+	    url: baseURL + "fac/data/list",
+	    contentType: "application/json",
+	    data: JSON.stringify({"siteId":"03-1-SB-YS,PTSET;05-1-SB-JKWCK,PTOUT;"}),
+	    success: function(r){
+	        console.log(r)
+	    }
+	}); 
+	}
+function send3(){
+	$("#area").attr("src","sssj.html?ID=03-1-SB-ZZ&siteParentId=03-1-SB-ZZ&siteId=''");
+}
+function send4(){
+	$("#area").attr("src","");
+}
+$(function(){
+	
+})
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+</script>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>统计分析</title>
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<style type="text/css">
+@charset "utf-8";
+*{margin:0;padding:0;box-sizing:border-box}
+body{color:rgba(0,0,0,.65);font-size:14px;line-height:1.8;font-family:"微软雅黑";background:#FAFAFA}
+a{text-decoration:none;color:#108EE9}
+a:hover{color:#108EE9!important;cursor:pointer}
+em{font-style:normal}
+ul{list-style:none}
+h1,h2,h3,h4,h5,h6{margin-bottom:1em;color:rgba(0,0,0,.85)}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:270px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar-wrapper.fixed{position:fixed;top:0px;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.menu-item .sub-title:after{content:'\ee4e';font-family:"iconfont";font-size:12px;line-height:1;color:#555;position:absolute;top:50%;right:44px;margin-top:-6px;transform:rotate(180deg);transition:all .15s ease}
+.menu-item.collapse .sub-title:after{margin-top:-5px;transform:rotate(0)}
+.menu-item .sub-title:hover:after{color:#108EE9}
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:36px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px}
+.menu-item-1>ul{display:none;margin-top:12px}
+.menu-item-1.active>ul{display:block}
+.menu-item-2{padding-top:8px;padding-bottom:8px;padding-left:15px;font-size:14px;line-height:28px}
+.menu-item-2>ul{display:none;margin-top:12px}
+.menu-item-2.active>ul{display:block}
+.main-container{position:relative;margin-left:280px;padding:0px}
+</style>
+<style type="text/css">
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+#analyse_header{height:40px; position:relative;margin:0px; padding:0px;  background-color:#f1f1f1;}
+#analyse_header p{line-height:40px;}
+#analyse_container{}
+#test10{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test5{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test6{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test7{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test8{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test{}
+.layui-table-body{height:500px; overflow-x:auto; overflow-y:auto;}
+#tableContainer{width:2805px;}
+#tableContainer table{margin:0;}
+#tableContainer div{margin:0;}
+#FlowReportForm2+div .layui-table-body{display:none;}
+#FlowReportForm+div .layui-table-header{display:none;}
+.layui-form-radio{margin-right:0px; padding-right:0px;}
+.menu-group{z-index:1;}
+.menu-group ul{z-index:2;}
+.menu-group ul ul{z-index:3;}
+.yjxllT{display:inline-block; line-height:30px; height:30px;}
+#TableLeader p{width:200px; padding:0 20px; display:inline-block; line-height:40px;}
+#TableLeader p span{color:#1997eb;}
+</style>
+</head>
+
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+<div class="sidebar-wrapper fixed">
+	<div class="sidebar">
+<!-- 	<form style="background-color:#f1f1f1">
+	<input type="radio" name="area" id="pianqu" onChange=setTreeList("1") checked="checked" />
+	<label for="pianqu">片区</label>&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="radio" name="area" id="dma" onChange=setTreeList("0") />
+	<label for="dma">DMA</label>
+	</form> -->
+		<ul class="menu-group">
+			<li v-for="(item, index) in treeList" class="menu-item menu-item-1 collapse">
+				<a v-bind:id="item.areaId" class="no-sub" href="javascript:;" v-on:click="getIndex2(item.areaId,1,item.areaName)">{{item.areaName}}</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<div class="main-container">
+	<div id="analyse_container">
+		<form class="layui-form" action="">
+			<div class="layui-form-item" style="margin-top:10px;">
+			    <div class="layui-inline" style="width:400px;">
+			      <label class="layui-form-label" style="width:100px;">时间:</label>
+			      <div class="layui-input-inline" style="width:280px;" id="dd">
+			        <input type="text" class="layui-input" id="test1">
+			      </div>
+			    </div>
+			    <div class="layui-inline" style="width:90px;" id="daochu2">
+			      <div class="layui-input-inline" style="width:90px;">
+			        <button type="button" class="layui-btn" data-type="reload" onClick="exportAnalysisFlow()" >导出</button>
+			      </div>
+			    </div>
+			</div>
+		</form>
+	    <div class="layui-col-xs12 layui-col-md12" id="TableLeader">
+	      <p><span>{{currentSiteName}}</span>调压记录表</p>
+	      <p>填写时间:<span>{{dt}}</span></p>
+	      <p>填写人:<span></span></p>
+	    </div>
+		<div class="layui-col-xs12 layui-col-md12" style="overflow-x:scroll">
+		<div id="tableContainer">
+			<table class="layui-table" id="FlowReportForm2" lay-data="{url:'../../pipe/data/queryFlowReportForm', page: false, where: {areaId:'04-1',areaName:'梅溪片区',time:'2020-01-05'}}">
+			  <thead>
+<!-- 			    <tr>
+			      <th lay-data="{field:'siteName',align:'center',width:160}" rowspan="3">点位</th>
+			      <th lay-data="{align:'center'}" colspan="19">梅溪片区调压记录表&nbsp;填写时间：2020-01-05      填写人：</th>
+				</tr> -->
+			    <tr>
+			      <th lay-data="{field:'siteName',align:'center',width:160}" rowspan="2" colspan="1">点位</th>
+			      <th lay-data="{align:'center',align:'center',width:600}" colspan="2">00：00</th>
+			      <th lay-data="{align:'center',align:'center',width:200}" colspan="2">03：00</th>
+			      <th lay-data="{align:'center',align:'center',width:200}" colspan="2">06：00</th>
+			      <th lay-data="{align:'center',align:'center',width:200}" colspan="2">09：00</th>
+			      <th lay-data="{align:'center',align:'center',width:200}" colspan="2">12：00</th>
+			      <th lay-data="{align:'center',align:'center',width:200}" colspan="2">15：00</th>
+			      <th lay-data="{align:'center',align:'center',width:200}" colspan="2">18：00</th>
+			      <th lay-data="{align:'center',align:'center',width:200}" colspan="2">21：00</th>
+			      <th lay-data="{field:'min',align:'center',width:160}" rowspan="2">最小夜间流量(m³/h)</th>
+			      <th lay-data="{field:'avgDay',align:'center',width:160}" rowspan="2">日平均流量(m³/h)</th>
+			      <th lay-data="{field:'avgNig',align:'center',width:160}" rowspan="2">夜平均流量(m³/h)</th>
+			      <th lay-data="{field:'daysavg',align:'center',width:180}" rowspan="2">七日日平均流量(m³/h)</th>
+			      <th lay-data="{field:'value2',align:'center',width:180}" rowspan="2">最小夜间流量/日平均流量</th>
+			      <th lay-data="{field:'nightsavg',align:'center',width:180}" rowspan="2">七日夜间平均流量(m³/h)</th>
+				</tr>
+			    <tr>
+			      <th lay-data="{field:'yl00',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss00',align:'center',width:100}">流量(m³/h)</th>
+			      <th lay-data="{field:'yl03',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss03',align:'center',width:100}">流量(m³/h)</th>
+			      <th lay-data="{field:'yl06',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss06',align:'center',width:100}">流量(m³/h)</th>
+			      <th lay-data="{field:'yl09',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss09',align:'center',width:100}">流量(m³/h)</th>
+			      <th lay-data="{field:'yl12',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss12',align:'center',width:100}">流量(m³/h)</th>
+			      <th lay-data="{field:'yl15',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss15',align:'center',width:100}">流量(m³/h)</th>
+			      <th lay-data="{field:'yl18',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss18',align:'center',width:100}">流量(m³/h)</th>
+			      <th lay-data="{field:'yl21',align:'center',width:100}">压力(Mpa)</th>
+			      <th lay-data="{field:'ss21',align:'center',width:100}">流量(m³/h)</th>
+			    </tr>
+			  </thead>
+			</table>
+			<table class="layui-table" id="FlowReportForm"></table>
+		</div>
+		</div>
+	</div>
+</div>
+</div>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/yjxll.js"></script>
+<script>
+layui.use(['form','table','layedit','laydate'], function(){
+  var form = layui.form
+  ,table = layui.table //表格
+  ,laydate = layui.laydate;
+	//日期
+  laydate.render({
+    elem: '#test1'
+    ,value: currenDate
+    ,done: function(value, date){
+    	console.log("123123");
+    	queryAnalysisFlowByArea(value);
+    	vm.dt = value;
+    }
+  });
+
+  table.render({
+    elem: '#FlowReportForm'
+    ,url: '../../pipe/data/queryFlowReportForm'
+    ,cols: [[
+      {field:'siteName', title: 'ID', width:160}
+      ,{field:'yl00', width:100}
+      ,{field:'ss00', width:100}
+      ,{field:'yl03', width:100}
+      ,{field:'ss03', width:100}
+      ,{field:'yl06', width:100}
+      ,{field:'ss06', width:100}
+      ,{field:'yl09', width:100}
+      ,{field:'ss09', width:100}
+      ,{field:'yl12', width:100}
+      ,{field:'ss12', width:100}
+      ,{field:'yl15', width:100}
+      ,{field:'ss15', width:100}
+      ,{field:'yl18', width:100}
+      ,{field:'ss18', width:100}
+      ,{field:'yl21', width:100}
+      ,{field:'ss21', width:100}
+      ,{field:'min', width:160}
+      ,{field:'avgDay', width:160}
+      ,{field:'avgNig', width:160}
+      ,{field: 'daysavg', width:180}
+      ,{field:'value2', width:180}
+      ,{field: 'nightsavg', width:180}
+    ]]
+    ,id: 'FlowReportFormTable'
+    ,page: false
+    ,height: 500
+    ,where:{
+		  areaId:vm.dareaId,
+		  areaName:vm.currentSiteName,
+		  time:$("#test1").val()
+	  }
+  });
+});
+</script>	
+</body>
+</html>

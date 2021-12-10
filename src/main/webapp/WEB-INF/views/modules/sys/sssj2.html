@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Java后端WebSocket的Tomcat实现</title>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<link rel="stylesheet" href="../../statics/css/jquery-ui.min.css">
+<script src="${request.contextPath}/statics/libs/jquery-ui.min.js"></script>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	background-color:#2b53a3;
+	z-index:-1;
+	moz-user-select: -moz-none;
+	-moz-user-select: none;
+	-o-user-select:none;
+	-khtml-user-select:none;
+	-webkit-user-select:none;
+	-ms-user-select:none;
+	user-select:none;
+}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+</style>
+<style type="text/css">
+.ztsz_container{position:relative; width:1152px; height:648px; margin-top:40px; margin-left:-576px; left:50%;}
+.ztsz_container div{couser:point; position:absolute;}
+.thumbnail:hover{border:solid 1px #337ab7; cursor:pointer}
+.gyt_container{width:100%; height:500px; overflow-y:scroll;}
+.gyt_name{width:100%; height:100%; line-height:100%; font-size:14px; color:#666; text-align:center; margin-top:5px;}
+#gyt_img{position:absolute; width:1152px; height:648px; display:inline-block; z-index:0}
+.point_bgn_container{width:100%; height:180px; overflow-y:scroll;}
+.point_name{width:100%; height:100%; line-height:100%; font-size:14px; color:#666; text-align:center; margin-top:5px;}
+#test1{width:40px; height:40px; position:relative;}
+#test1 div{width:100%; height:100%;}
+#test11 {width:40px; height:40px; position:relative;}
+#test11 div{width:100%; height:100%;}
+#test2{width:40px; height:40px; position:relative;}
+#test2 div{width:100%; height:100%;}
+#test22{width:40px; height:40px; position:relative;}
+#test22 div{width:100%; height:100%;}
+#layui-colorpicker1{width:280px!important}
+.layui-inline{width:100px;}
+#gyt_main{position:relative;}
+.move_div{position:absolute;cursor:pointer;}
+.point img{width:100%; height:100%;}
+#video{position:absolute;width:30px; height:30px; bottom:30px; left:30px; display:inline-block;couser:point;}
+</style>
+</head>
+<body>
+<button type="button" class="btn btn-warning" style="position:fixed; top:0px; right:0px;" onClick="window.location.href='ztjc.html';">返回组态</button>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+	<div class="ztsz_container" id="gyt_main">
+		<img id="gyt_img" :src="gytId" alt="gyt"/>
+		<!-- <img id="video"  src="../../statics/img/video.png"/> -->
+		<div id="hint" style="position: absolute; z-index:99;"></div>
+		<div class="tit move_div" v-for="re in tit" :id="re.divId">
+			<span>{{re.text}}</span>
+		</div>
+		<div class="information move_div" v-for="re in information" :id="re.divId">
+			<span class="discription">{{re.description.text}}</span><span class="data">{{re.data.description}}</span>
+		</div>
+		<div class="point move_div resizable" v-for="re in point" :id="re.divId">
+			<img :src="re.text" />
+		</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+var inlineData="";
+function GetRequest() {	  
+  var url = location.search; //获取url中"?"符后的字串
+   var theRequest = new Object();
+   if (url.indexOf("?") != -1) {
+      var str = url.substr(1);
+      strs = str.split("&");
+      for(var i = 0; i < strs.length; i ++) {
+         theRequest[strs[i].split("=")[0]]=(strs[i].split("=")[1]);
+      }
+   }
+   return theRequest;
+}
+//参数处理
+var Request = new Object();
+Request = GetRequest();
+var articleNum;
+var IDNUM = Request["ID"];
+var PARENTID = Request["siteParentId"];
+var SITEID = Request["siteId"];
+var baseURL = "../../";
+var vm = new Vue({
+	  el: '#app',
+	  data: {
+	    gytId: '${request.contextPath}/statics/img/gyt_.jpg',//bgn(.jpg/.png)
+	    tit:[],
+	    information:[],
+   		point:[],
+   		inlineData:""
+	  },
+	  methods:{
+	  }
+	})
+var gyt_src;
+var point_src;
+$(document).ready(function(){
+	vm.siteId = IDNUM;
+	$.ajax({//请求某点位下工艺图信息
+	    type: "POST",
+	    url: baseURL + "fac/data/queryGyt",
+	    contentType: "application/json",
+	    data:JSON.stringify(vm.siteId),
+	    dataType:"json",
+	    success: function(r){
+	    	if(r[0].gytbgn[0]){
+	    		vm.gytId = r[0].gytbgn[0].siteId;
+	    	}else{
+	    	vm.gytId = "${request.contextPath}/statics/img/gyt_.jpg";
+	    	}
+	    	vm.tit = r[0].title;
+	    	vm.information = r[0].information;
+	    	if(r[0].point){
+	    		point_l=true;
+		    	vm.point = r[0].point;
+	    	}
+	    	console.log(vm.tit);
+	    	console.log(vm.information);
+	    	console.log(vm.point);
+	    	setTimeout("base_style()",100);
+	    }
+	});
+});
+function base_style(){
+	for(var i=0;i<vm.tit.length;i++){
+		$("#"+vm.tit[i].divId+" span").css({"font-size":vm.tit[i].dsize,"font-weight":vm.tit[i].dweight,"color":vm.tit[i].dcolor});
+		$("#"+vm.tit[i].divId).css({"top":vm.tit[i].y,"left":vm.tit[i].x});
+	}
+	for(var i=0;i<vm.information.length;i++){
+		vm.information[i].data.description="00.00";
+		$("#"+vm.information[i].divId+" .discription").css({"font-size":vm.information[i].description.dsize,"font-weight":vm.information[i].description.dweight,"color":vm.information[i].description.dcolor});
+		$("#"+vm.information[i].divId+" .data").css({"font-size":vm.information[i].data.tsize,"font-weight":vm.information[i].data.tweight,"color":vm.information[i].data.tcolor});
+		$("#"+vm.information[i].divId).css({"top":vm.information[i].y,"left":vm.information[i].x});
+		var Data = vm.information[i].data.siteId+","+vm.information[i].data.type+";";
+		vm.inlineData+=Data;
+	}
+	for(var i=0;i<vm.point.length;i++){
+		$("#"+vm.point[i].divId).css({"top":vm.point[i].y,"left":vm.point[i].x,"width":vm.point[i].tweight,"height":vm.point[i].tsize});
+		var Data = vm.information[i].data.siteId+","+vm.information[i].data.type+";";
+		vm.inlineData+=Data;
+	}
+	console.log(vm.inlineData);
+	inlineData = vm.inlineData;
+}
+var websocket = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);
+	       
+	    }
+	}); 
+
+//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}
+else {
+//alert('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+//alert("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+console.log("WebSocket连接成功");
+send();
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+	var infor=[];
+	console.log(event.data);
+	infor=JSON.parse(event.data);
+	console.log(typeof(infor));
+	setMessageInnerHTML(infor);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+//alert("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+//将消息显示在网页上
+function setMessageInnerHTML(innerHTML) {
+	console.log(innerHTML);
+for(i=0;i<innerHTML.length;i++){
+/* 	console.log(innerHTML[i].siteId);
+	console.log(innerHTML[i].dataType);
+	console.log(Object.keys(innerHTML[i])[6]);
+	var data_num = Object.values(innerHTML[i]).length-1;
+	console.log(Object.values(innerHTML[i])[data_num]); */
+	console.log(Object.values(innerHTML[i])[Object.values(innerHTML[i]).length-1]);
+	for(m=0;m<vm.information.length;m++){
+		if((innerHTML[i].siteId==vm.information[m].data.siteId)&&(innerHTML[i].dataType==vm.information[m].data.type)){
+			var dataType = vm.information[m].data.type;
+			if(dataType=="FLS"){//瞬时流量0
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="ins"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(0)+"m³/h";
+						return;
+					}else{
+						vm.information[m].data.description="00.00m³/h";
+					}
+				}
+			}else if(dataType=="PTOUT"){
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="yl"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"Mpa";
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="FLC"){//累计流量1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="jlj"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(1)+"m³";
+						return;
+					}else{
+						vm.information[m].data.description="00.00m³";
+					}
+				}
+			}else if(dataType=="HOCL"){//余氯2
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="cho"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"mg/L";
+						return;
+					}else{
+						vm.information[m].data.description="00.00mg/L";
+					}
+				}
+			}else if(dataType=="PH"){//ph2
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="ph"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2);
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="TUR"){//浊度2
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="tur"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"NTU";
+						return;
+					}else{
+						vm.information[m].data.description="00.00NTU";
+					}
+				}
+			}else if(dataType=="COD"){//化学需氧量
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="cod"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"mg/L";
+						return;
+					}else{
+						vm.information[m].data.description="00.00mg/L";
+					}
+				}
+			}else if(dataType=="TN"){//总氮
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="tn"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"mg/L";
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="TP"){//总磷
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="tp"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"mg/L";
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="SS"){//悬浮物
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="ss"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"mg/L";
+						return;
+					}else{
+						vm.information[m].data.description="00.00mg/L";
+					}
+				}
+			}else if(dataType=="LEVEL"){//液位2
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="level"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"m";
+						return;
+					}else{
+						vm.information[m].data.description="00.00m";
+					}
+				}
+			}else if(dataType=="PTSET"){//压力设定
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="ylset"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"MPa";
+						return;
+					}else{
+						vm.information[m].data.description="00.00MPa";
+					}
+				}
+			}else if(dataType=="LTSET"){//液位设定
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="levelset"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"m";
+						return;
+					}else{
+						vm.information[m].data.description="00.00m";
+					}
+				}
+			}else if(dataType=="PV"){//调节阀开度反馈
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="acvpv"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2);
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="SV"){//调节阀开度设定
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="acvsv"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2);
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="EVOL"){//电动阀全开0，1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="evol"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="EVCL"){//电动阀全关
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="evcl"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="EVOS"){//电动阀开命令
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="evos"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="EVCS"){//电动阀关命令
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="evcs"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="AUTO"){//水泵远程
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="auto"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="FAULT"){//水泵运行
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="fault"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="START"){//水泵启动
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="start"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="STOP"){//水泵停止
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="stop"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="RUN"){//水泵运行
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="run"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="RESET"){//水泵复位
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="reset"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="Fs"){//水泵设定频率1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="fs"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(1)+"Hz";
+						return;
+					}else{
+						vm.information[m].data.description="00.0Hz";
+					}
+				}
+			}else if(dataType=="Fr"){//水泵运行频率1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="fr"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(1)+"Hz";
+						return;
+					}else{
+						vm.information[m].data.description="00.0Hz";
+					}
+				}
+			}else if(dataType=="Ar"){//水泵运行电流1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="ar"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(1)+"A";
+					}else{
+						vm.information[m].data.description="00.0A";
+					}
+				}
+			}else if(dataType=="VDFAr"){//变频器运行电流1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="vdfar"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(1)+"A";
+					}else{
+						vm.information[m].data.description="00.0A";
+					}
+				}
+			}else if(dataType=="VDFFr"){//变频器运行频率1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="vdffr"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(1)+"Hz";
+					}else{
+						vm.information[m].data.description="00.0Hz";
+					}
+				}
+			}else if(dataType=="ETA"){//水泵运行状态
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="eta"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="Mode"){//水泵运行模式
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="mode"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n];
+						return;
+					}else{
+						vm.information[m].data.description="0";
+					}
+				}
+			}else if(dataType=="Outf"){//其他变频器运行频率1
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="outf"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(1)+"Hz";
+						return;
+					}else{
+						vm.information[m].data.description="00.0Hz";
+					}
+				}
+			}else if(dataType=="Fcr"){//水泵变频运动
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="fcr"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2);
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="Pfr"){//水泵工频运动
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="pfr"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2);
+						return;
+					}else{
+						vm.information[m].data.description="00.00";
+					}
+				}
+			}else if(dataType=="PTOUT"){//出口压力2
+				for(n=0;n<Object.values(innerHTML[i]).length;n++){
+					if(Object.keys(innerHTML[i])[n]=="ylout"){
+						vm.information[m].data.description=Object.values(innerHTML[i])[n].toFixed(2)+"MPa";
+						return;
+					}else{
+						vm.information[m].data.description="00.00MPa";
+					}
+				}
+			}
+			console.log(vm.information[m].data.description);
+		}
+		
+	}
+}
+console.log(vm.information);
+}
+//关闭WebSocket连接
+function closeWebSocket() {
+websocket.close();
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/closeSession",
+    contentType: "application/json",
+    data: JSON.stringify(),
+	  async:false,
+    success: function(r){
+        console.log(r)
+    }
+});
+}
+//发送消息
+function send() {
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/list",
+    contentType: "application/json",
+    //data: JSON.stringify({"siteId":"03-1-SB-YS,PTSET;05-1-SB-JKWCK,PTOUT;"}),
+    data: JSON.stringify({"siteId":inlineData}),
+    success: function(r){
+        console.log(r)
+    }
+}); 
+}
+
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+</script>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>DMA用户界面</title>
+
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<style type="text/css">
+@charset "utf-8";
+*{margin:0;padding:0;box-sizing:border-box}
+body{color:rgba(0,0,0,.65);font-size:14px;line-height:1.8;font-family:"微软雅黑";background:#FAFAFA}
+a{text-decoration:none;color:#108EE9}
+a:hover{color:#108EE9!important;cursor:pointer}
+em{font-style:normal}
+ul{list-style:none}
+h1,h2,h3,h4,h5,h6{margin-bottom:1em;color:rgba(0,0,0,.85)}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:270px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar-wrapper.fixed{position:fixed;top:0px;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.menu-item .sub-title:after{content:'\ee4e';font-family:"iconfont";font-size:12px;line-height:1;color:#555;position:absolute;top:50%;right:44px;margin-top:-6px;transform:rotate(180deg);transition:all .15s ease}
+.menu-item.collapse .sub-title:after{margin-top:-5px;transform:rotate(0)}
+.menu-item .sub-title:hover:after{color:#108EE9}
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:36px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px}
+.menu-item-1>ul{display:none;margin-top:12px}
+.menu-item-1.active>ul{display:block}
+.menu-item-2{padding-top:8px;padding-bottom:8px;padding-left:15px;font-size:14px;line-height:28px}
+.menu-item-2>ul{display:none;margin-top:12px}
+.menu-item-2.active>ul{display:block}
+.main-container{position:relative;margin-left:280px;padding:0px}
+</style>
+<style type="text/css">
+.site_name{font-size:14px; color:#363636;}
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+#analyse_header{height:40px; position:relative;margin:0px; padding:0px;  background-color:#f1f1f1;}
+#analyse_header p{line-height:40px;}
+#analyse_container{}
+#test10{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test6{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test7{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test8{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test{}
+.layui-table-body{overflow-x:auto; overflow-y:auto;}
+.layui-form-radio{margin-right:0px; padding-right:0px;}
+.menu-group{z-index:1;}
+.menu-group ul{z-index:2;}
+.menu-group ul ul{z-index:3;}
+</style>
+</head>
+
+<body>
+<div id = "app">
+<div class="layui-form-item">
+ 	<label class="layui-form-label" style="width:100px;">用户名称:</label>
+	<div class="layui-input-inline" style="width:280px;">
+		<input type="text" class="layui-input" id="queryParamUserName" placeholder="">
+	</div>
+	<label class="layui-form-label" style="width:100px;">所属区域:</label>
+	<div class="layui-input-inline" style="width:280px;">
+		<select class="form-control" id="areaName4query" style="height:38px;">
+			<option value=""></option>  
+			<option v-for="re in allSysAreaList" :value="re.areaId"><span class="site_name">{{re.areaName}}</span></option> 
+		</select>
+	</div>
+	<!-- <div class="layui-input-inline" style="width:280px; margin-right:50px">
+		<input type="text" class="layui-input" id="queryParamAreaName" placeholder="">
+	</div> -->
+ 	<button class="layui-btn" onClick="query_user()">查找</button>					   
+	<button class="layui-btn"  data-toggle="modal" data-target="#new_User" onClick="clickNew()">新增</button>
+</div>
+
+<table class="layui-hide" id="user_table" lay-filter="user_table"></table>
+
+	<div class="modal fade" id="new_User" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							新增用户
+						</h4>
+					</div>
+					<div class="modal-body gyt_container"> 
+		               <form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label for="firstname" class="col-sm-3 control-label">用户ID</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control" id="userId4save" placeholder="用户ID">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="lastname" class="col-sm-3 control-label">用户名称</label>
+								<div class="col-sm-9">
+									 <input type="text" class="form-control" id="userName4save" placeholder="用户名称"> 
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="lastname" class="col-sm-3 control-label">用户类型</label>
+								<div class="col-sm-9">
+								  <select class="form-control" id="userType4save" onChange="changeArea()">
+									  <option value="">无</option>  
+					                  <option v-for="re in dicList4UserType" :value="re.dicValue"><span class="site_name">{{re.name}}</span></option> 
+					               </select>
+								</div>					
+							</div>
+							<div class="form-group">
+								<label for="lastname" class="col-sm-3 control-label">所属区域</label>
+								<div class="col-sm-9">
+								  <select class="form-control" id="areaName4save" onChange="changeArea()">
+									  <option value="">无</option>  
+					                  <option v-for="re in allSysAreaList" :value="re.areaId"><span class="site_name">{{re.areaName}}</span></option> 
+					               </select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="lastname" class="col-sm-3 control-label">所属DMA分区</label>
+								<div class="col-sm-9">
+									<select class="form-control" id="dareaName4save">
+									   <option value="">无</option>  
+					                   <option v-for="re in allAreaList" :value="re.dareaId"><span class="site_name">{{re.dareaName}}</span></option> 
+					                </select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="lastname" class="col-sm-3 control-label">抄表周期</label>
+								<div class="col-sm-9">
+									 <input type="text" class="form-control" id="recordPeriod4save" placeholder="抄表周期"> 
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" onClick="newUser()">添加</button>
+					</div>
+				</div>
+			</div>
+	</div>
+	<div class="modal fade" id="modify_User" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel4update">
+							修改用户
+						</h4>
+					</div>
+					<div class="modal-body gyt_container"> 
+		               <form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label for="firstname" class="col-sm-3 control-label">用户名称</label>
+								<div class="col-sm-9">
+									<input type="text" disabled="disabled" class="form-control" id="userName4update" placeholder="">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="lastname" class="col-sm-3 control-label">所属区域</label>
+								<div class="col-sm-9">
+								  <select class="form-control" id="areaName4update" onChange="changeArea()">
+									  <option value="">无</option>  
+					                  <option v-for="re in allSysAreaList" :value="re.areaId"><span class="site_name">{{re.areaName}}</span></option> 
+					               </select>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" onClick="modifyUser()">修改</button>
+					</div>
+				</div>
+			</div>
+	</div>
+</div>
+
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/DMA_User.js"></script>
+
+<script type="text/html" id="barDemo">	
+	<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit" data-toggle="modal" data-target="#modify_User"  onClick="queryAllArea()">修改</a>
+	<a class="layui-btn layui-btn-xs" lay-event="save">保存</a>
+	<a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script>
+layui.use('table', function(){
+  var table = layui.table;
+  //监听工具条
+  table.on('tool(user_table)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'edit'){
+    	console.log(data);
+    	$("#areaName4update").val(data.areaName);
+    	$("#userName4update").val(data.userName);
+    	vm.updateUser.id = data.id;	
+    } else if(obj.event === 'del'){
+    	var r = confirm("确认删除用户：" + data.userName + " ?");
+    	if (r == true)
+    	  {
+    		vm.deleteUser.id = data.id;
+    		deleteUser();
+    	  }
+    }
+  });
+  
+  var $ = layui.$, active = {
+    getCheckData: function(){ //获取选中数据
+      var checkStatus = table.checkStatus('idTest')
+      ,data = checkStatus.data;
+      layer.alert(JSON.stringify(data));
+    }
+  };
+  
+  $('.demoTable .layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+  });
+});
+</script>
+
+</body>
+</html>

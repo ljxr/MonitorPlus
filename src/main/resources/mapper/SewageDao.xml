@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.enjoyor.modules.monitor.dao.SewageDao">
+  <resultMap id="BaseResultMap" type="com.enjoyor.modules.monitor.entity.ReportWsEntity">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="SITE_ID" jdbcType="VARCHAR" property="siteId" />
+    <result column="TIME" jdbcType="DATE" property="time" />
+    <result column="WATER_IN" jdbcType="VARCHAR" property="waterIn" />
+    <result column="WATER_OUT" jdbcType="VARCHAR" property="waterOut" />
+    <result column="MUD_HANDLE" jdbcType="VARCHAR" property="mudHandle" />
+    <result column="MUD_DRY" jdbcType="VARCHAR" property="mudDry" />
+    <result column="MUD_YIELD" jdbcType="VARCHAR" property="mudYield" />
+    <result column="MUD_BFO_DWATER" jdbcType="VARCHAR" property="mudBfoDwater" />
+    <result column="MUD_COST" jdbcType="VARCHAR" property="mudCost" />
+    <result column="MED_COST" jdbcType="VARCHAR" property="medCost" />
+    <result column="MED_COST_PER_T" jdbcType="VARCHAR" property="medCostPerT" />
+    <result column="CLSN_NUM" jdbcType="VARCHAR" property="clsnNum" />
+    <result column="CLSN_COST" jdbcType="VARCHAR" property="clsnCost" />
+    <result column="CLSN_QDHL" jdbcType="VARCHAR" property="clsnQdhl" />
+    <result column="CLSN_UNIT_COST" jdbcType="VARCHAR" property="clsnUnitCost" />
+    <result column="PAC_NUM" jdbcType="VARCHAR" property="pacNum" />
+    <result column="PAC_COST" jdbcType="VARCHAR" property="pacCost" />
+    <result column="PAC_QDHL" jdbcType="VARCHAR" property="pacQdhl" />
+    <result column="PAC_UNIT_COST" jdbcType="VARCHAR" property="pacUnitCost" />
+    <result column="C_NUM" jdbcType="VARCHAR" property="cNum" />
+    <result column="C_COST" jdbcType="VARCHAR" property="cCost" />
+    <result column="C_QDHL" jdbcType="VARCHAR" property="cQdhl" />
+    <result column="C_UNIT_COST" jdbcType="VARCHAR" property="cUnitCost" />
+    <result column="PAM_NUM" jdbcType="VARCHAR" property="pamNum" />
+    <result column="PAM_COST" jdbcType="VARCHAR" property="pamCost" />
+    <result column="PAM_QDHL" jdbcType="VARCHAR" property="pamQdhl" />
+    <result column="PAM_UNIT_COST" jdbcType="VARCHAR" property="pamUnitCost" />
+    <result column="LIME_NUM" jdbcType="VARCHAR" property="limeNum" />
+    <result column="LIME_COST" jdbcType="VARCHAR" property="limeCost" />
+    <result column="LIME_QDHL" jdbcType="VARCHAR" property="limeQdhl" />
+    <result column="LIME_UNIT_COST" jdbcType="VARCHAR" property="limeUnitCost" />
+    <result column="TEST_MED_COST" jdbcType="VARCHAR" property="testMedCost" />
+    <result column="ELE_NUM" jdbcType="VARCHAR" property="eleNum" />
+    <result column="ELE_PRICE" jdbcType="VARCHAR" property="elePrice" />
+    <result column="ELE_FEE" jdbcType="VARCHAR" property="eleFee" />
+    <result column="ELE_PER_T" jdbcType="VARCHAR" property="elePerT" />
+    <result column="ELE_YDDH" jdbcType="VARCHAR" property="eleYddh" />
+    <result column="WATER_USAGE" jdbcType="VARCHAR" property="waterUsage" />
+    <result column="WATER_COST" jdbcType="VARCHAR" property="waterCost" />
+    <result column="TECH_PRJCT_TOTAL" jdbcType="VARCHAR" property="techPrjctTotal" />
+    <result column="TECH_PRJCT1" jdbcType="VARCHAR" property="techPrjct1" />
+    <result column="TECH_PRJCT2" jdbcType="VARCHAR" property="techPrjct2" />
+    <result column="TECH_PRJCT3" jdbcType="VARCHAR" property="techPrjct3" />
+    <result column="PIPE_RPR_FEE" jdbcType="VARCHAR" property="pipeRprFee" />
+    <result column="MATERIAL_FEE" jdbcType="VARCHAR" property="materialFee" />
+    <result column="LABOR_FEE" jdbcType="VARCHAR" property="laborFee" />
+    <result column="OTHER_FEE" jdbcType="VARCHAR" property="otherFee" />
+    <result column="SC_RPR_FEE" jdbcType="VARCHAR" property="scRprFee" />
+    <result column="EQUIP_OL_RPR_FEE" jdbcType="VARCHAR" property="equipOlRprFee" />
+    <result column="DEPRECIATION_FEE" jdbcType="VARCHAR" property="depreciationFee" />
+    <result column="SC_OPERATE_FEE" jdbcType="VARCHAR" property="scOperateFee" />
+    <result column="OPRT_PER_T" jdbcType="VARCHAR" property="oprtPerT" />
+    <result column="LASTYEAR_OPRT_PER_T" jdbcType="VARCHAR" property="lastyearOprtPerT" />
+    <result column="YSN_NUM" jdbcType="VARCHAR" property="ysnNum" />
+    <result column="YSN_COST" jdbcType="VARCHAR" property="ysnCost" />
+    <result column="YSN_QDHL" jdbcType="VARCHAR" property="ysnQdhl" />
+    <result column="YSN_UNIT_COST" jdbcType="VARCHAR" property="ysnUnitCost" />
+    <result column="SAFE_REFORM" jdbcType="VARCHAR" property="safeReform" />
+    <result column="MATERIAL_FEE2" jdbcType="VARCHAR" property="materialFee2" />
+    <result column="LABOR_FEE2" jdbcType="VARCHAR" property="laborFee2" />
+    <result column="OTHER_FEE2" jdbcType="VARCHAR" property="otherFee2" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    ID, SITE_ID, TIME, WATER_IN, WATER_OUT, MUD_HANDLE, MUD_DRY, MUD_YIELD, MUD_BFO_DWATER,
+    MUD_COST, MED_COST, MED_COST_PER_T, CLSN_NUM, CLSN_COST, CLSN_QDHL, CLSN_UNIT_COST, 
+    PAC_NUM, PAC_COST, PAC_QDHL, PAC_UNIT_COST, C_NUM, C_COST, C_QDHL, C_UNIT_COST, PAM_NUM, 
+    PAM_COST, PAM_QDHL, PAM_UNIT_COST, LIME_NUM, LIME_COST, LIME_QDHL, LIME_UNIT_COST, 
+    TEST_MED_COST, ELE_NUM, ELE_PRICE, ELE_FEE, ELE_PER_T, ELE_YDDH, WATER_USAGE, WATER_COST, 
+    TECH_PRJCT_TOTAL, TECH_PRJCT1, TECH_PRJCT2, TECH_PRJCT3, PIPE_RPR_FEE, MATERIAL_FEE, LABOR_FEE, OTHER_FEE,
+    SC_RPR_FEE, EQUIP_OL_RPR_FEE, DEPRECIATION_FEE, SC_OPERATE_FEE, OPRT_PER_T, LASTYEAR_OPRT_PER_T,
+    YSN_NUM, YSN_COST, YSN_QDHL, YSN_UNIT_COST, SAFE_REFORM, MATERIAL_FEE2, LABOR_FEE2, OTHER_FEE2
+  </sql>
+
+  <select id="select" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from REPORT.WS_REPORT
+    <where>
+      <if test="siteId != null">
+        and SITE_ID = #{siteId,jdbcType=VARCHAR}
+      </if>
+      <if test="beginTime != null">
+        and TIME &gt;= TO_DATE(#{beginTime},'YYYY-MM-DD')
+      </if>
+      <if test="endTime != null">
+        and TIME &lt;= TO_DATE(#{endTime},'YYYY-MM-DD')
+      </if>
+      order by time asc
+    </where>
+  </select>
+
+</mapper>

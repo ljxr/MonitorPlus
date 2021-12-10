@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.monitor.dao.BigDataDao">
+<resultMap id="bigUserMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="areaId" column="AREA_ID" />
+	<result property="areaName" column="AREA_NAME" />
+	<result property="num" column="NUM" />
+</resultMap>
+<resultMap id="ccsMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="num" column="NUM" />
+	<result property="name" column="QUALIFIED" />
+</resultMap>
+<resultMap id="wsMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="areaId" column="SITE_NAME" />
+	<result property="name" column="WQ_LIMITVALUE" />
+	<result property="value" column="RECORD_VALUE" />
+	<result property="areaName" column="WQ_NAME" />
+</resultMap>
+<resultMap id="wqMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="num" column="ID" />
+	<result property="areaName" column="WQ_LIMITVALUE" />
+</resultMap>
+<resultMap id="pipeMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="name" column="NAME" />
+	<result property="num" column="NUM" />
+	<result property="areaName" column="AREA_NAME" />
+</resultMap>
+<resultMap id="waterMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+    <result property="areaName" column="AREA_NAME" />
+	<result property="value" column="GSL" />
+	<result property="value2" column="SSL" />
+	<result property="value3" column="CXCL" />
+</resultMap>
+<resultMap id="costMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="value" column="ELE_QD" />
+	<result property="areaName" column="SITE_NAME" />
+	<result property="value2" column="VALUE" />
+	<result property="value3" column="QY" />
+</resultMap>
+<resultMap id="orderMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="areaName" column="ORDER_AREA" />
+	<result property="num" column="NUM" />
+	<result property="name" column="AREA_NAME" />
+</resultMap>
+<resultMap id="safeMap" type="com.enjoyor.modules.monitor.entity.BigDataDTO">
+	<result property="name" column="DIC_SUBITEM" />
+	<result property="num" column="NUM" />
+</resultMap>
+
+	<select id="queryBigUser" resultMap="bigUserMap">
+		select b.*,a.area_name from (select area_id,count(area_id) as num from
+		"BIGUSER".user_info
+		where area_id is not null GROUP BY area_id) b,"BASESYS".SYS_AREA a where
+		b.AREA_ID = a.AREA_ID
+	</select>
+
+	<select id="queryCCS_test" resultMap="ccsMap">
+		select WATER_ID,qualified from WATERUALITY_CHECK where WQ_TIME =
+		to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss') and
+		(water_id like '%YSSZ' or water_id like '%CCSZ')
+	</select>
+	
+	<select id="queryYS" resultMap="ccsMap">
+		select WATER_ID,qualified from WATERUALITY_CHECK where WQ_TIME =
+		to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss') and
+		(water_id not like '%YSSZ' and water_id not like '%CCSZ')
+	</select>
+	
+	<select id="queryWS_test" resultMap="wsMap">
+		select site_id ,RECORD_ID,RECORD_VALUE from WATERUALITY_CHECK_WS 
+		where WQ_TIME = to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+	</select>
+	
+	<select id="queryWQ" resultMap="wqMap">
+		select id,WQ_LIMITVALUE from WATERQUALITY_BASIC_WS where WQ_LIMITVALUE is not null
+	</select>
+
+	<select id="queryDiameter" resultMap="pipeMap">
+		select diameter as name,count(*) as num from "PIPESYS".pipe_line where diameter is not
+		null and diameter !='700*700' GROUP BY diameter order by
+		to_number(diameter) asc
+	</select>
+	
+	<select id="queryMaterial" resultMap="pipeMap">
+		select material as name,count(*) as num from "PIPESYS".pipe_line where material is not
+		null GROUP BY material
+	</select>
+
+	<select id="queryPArea" resultMap="pipeMap">
+		select p.*,a.area_name from (select area_id as name,count(*) as num from
+		"PIPESYS".pipe_line where area_id is not null GROUP BY area_id)
+		p,"BASESYS".SYS_AREA a where p.name=a.area_id
+	</select>
+	
+	<select id="queryTotalLength" resultType="Integer">
+		select sum(LENGTH) as num from "PIPESYS".pipe_line where LENGTH is not null
+	</select>
+
+	<select id="queryPipeInsCounts" resultType="Integer">
+		select count(*) as num from
+		"PIPESYS".pipe_line where inserttime > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd
+		HH24:mi:ss')
+	</select>
+
+	<select id="queryOrderNum_test" resultType="Integer">
+		select count(*) from
+		"WORKORDER".WORKORDER_INFO where 
+		ORDER_CREATEDATE > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+	</select>
+
+	<select id="queryTodayOrderNum" resultMap="pipeMap">
+		select o.num,d.dic_subitem as name from (select count(order_status) as
+		num,order_status from "WORKORDER".WORKORDER_INFO where ORDER_CREATEDATE >
+		to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss') GROUP by
+		order_status) o,
+		(select * from "BASESYS".SYS_DICTIONARY where dic_parentid =15) d where
+		o.ORDER_STATUS = d.dic_value
+	</select>
+	
+	<select id="querySafeInfo_test" resultType="Integer">
+		select count(*) from
+		"URGENT".SAFE_INFO where time > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+	</select>
+	
+	<select id="queryChanged_test" resultType="Integer">
+		select count(*) from
+		"URGENT".SAFE_CHANGED where time > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+	</select>	
+
+	<select id="querySWater_test" resultMap="waterMap">
+		select site_id,nvl(gsl,0) as gsl,nvl(ssl,0) as ssl,nvl(ss,0) as ss,nvl(cxcl,0) as cxcl from
+		"REPORT".CXC_MONTH
+		<where>
+			<if test="year != null and year != 0">
+				year = #{year}
+				<if test="month != null and month != 0">
+					and month = #{month}
+				</if>
+			</if>
+			<if test="areaId != null and areaId.trim() !=''">
+				and site_id = #{areaId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="querySewage" resultMap="waterMap">
+		select nvl(sewagenum,0) as flow from
+		"REPORT".SEWAGE_DAY where time like concat('%',concat(#{time},'%'))
+	</select>
+	
+	<select id="queryPSewage" resultMap="waterMap">
+		select nvl(totalout,0) as flow,nvl(sludgenum,0) as sale from
+		"REPORT".SEWAGE_COST where MONTH = #{time,jdbcType=VARCHAR} and YEAR = #{time2,jdbcType=VARCHAR} 
+	</select>
+	
+	<select id="queryYPSewage" resultMap="waterMap">
+		select nvl(totalout,0) as flow,nvl(sludgenum,0) as sale from
+		"REPORT".SEWAGE_COST where YEAR like concat('%',concat(#{time},'%'))
+	</select>
+
+	<select id="querySCost_test" resultMap="costMap">
+		select a.*,s.site_name from
+		(select site_id,RUNNINGUNIT as value from "REPORT".SUPPLYFACTORY_COST where
+		month = #{time,jdbcType=VARCHAR} and year = #{time2,jdbcType=VARCHAR}) a,
+		"BASESYS".SYS_SITE s where a.site_id = s.site_id
+	</select>	
+	
+	<select id="queryWCost" resultMap="costMap">
+		select a.*,s.site_name from
+		(select site_id,RUNNINGUNIT as value from "REPORT".SEWAGE_COST where
+		month = #{time,jdbcType=VARCHAR} and year = #{time2,jdbcType=VARCHAR}) a,
+		"BASESYS".SYS_SITE s where a.site_id = s.site_id
+	</select>
+	
+	<select id="queryYearSCost" resultMap="costMap">
+		select a.*,s.site_name from
+		(select site_id,sum(RUNNINGUNIT) as value from "REPORT".SUPPLYFACTORY_COST where
+		year = #{time2,jdbcType=VARCHAR} GROUP BY SITE_ID) a,
+		"BASESYS".SYS_SITE s where a.site_id = s.site_id
+	</select>	
+	
+	<select id="queryYearWCost" resultMap="costMap">
+		select a.*,s.site_name from
+		(select site_id,sum(RUNNINGUNIT) as value from "REPORT".SEWAGE_COST where
+	    year = #{time2,jdbcType=VARCHAR} GROUP BY SITE_ID) a,
+		"BASESYS".SYS_SITE s where a.site_id = s.site_id
+	</select>
+	
+	<!-- ****************分割线***************** -->
+	<select id="queryOrderNum" resultType="Integer">
+		select count(*) from "WORKORDER".WORKORDER_INFO where 
+		ORDER_CREATEDATE between to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+		and to_date(#{time2,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+	</select>
+
+	<select id="queryBusinessOrderNum" resultMap="orderMap">
+		select b.order_area,b.num,e.area_name from
+		(select s.ORDER_AREA,s.num,a.area_parentid
+		from
+		(select ORDER_AREA,count(*) as num from "WORKORDER".WORKORDER_INFO
+		<where>
+			ORDER_CREATEDATE > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd
+			HH24:mi:ss')
+			<if test="type != null and type.trim() !=''">
+				and ORDER_ISOVERTIME = #{type,jdbcType=VARCHAR}
+			</if>
+		</where>
+		GROUP BY ORDER_AREA) s,"BASESYS".sys_area a where s.ORDER_AREA =
+		a.area_name) b,"BASESYS".sys_area e
+		where b.area_parentid = e.area_id
+	</select>
+
+	<select id="querySafeInfo" resultMap="safeMap">
+		select s.num,d.dic_subitem
+		FROM
+		(select SYSTEM_ID,count(*) as num from "URGENT".SAFE_INFO where
+		time > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+		GROUP BY SYSTEM_ID) s,"BASESYS".SYS_DICTIONARY d
+		where s.system_id = d.dic_value and d.dic_parentid =26
+	</select>
+
+	<select id="queryChanged" resultMap="safeMap">
+		select b.num,d.dic_subitem
+		from
+		(select f.SYSTEM_ID,count(*) as num
+		from
+		(select safe_id from "URGENT".SAFE_CHANGED where
+		time > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')) s,
+		(select safe_id,max(SYSTEM_ID) as SYSTEM_ID  from "URGENT".safe_info GROUP BY safe_id)
+		 f where s.safe_id = f.safe_id GROUP BY f.SYSTEM_ID) b,
+		"BASESYS".SYS_DICTIONARY d where b.system_id = d.dic_value
+		and d.dic_parentid =26
+	</select>
+
+	<select id="queryCCS" resultMap="ccsMap">
+		select QUALIFIED,count(*) as num
+		from WATERUALITY_CHECK where
+		WQ_TIME = to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss') and
+		WATER_ID like '%CCSZ'
+		GROUP BY QUALIFIED
+	</select>
+
+	<select id="queryQWS" resultMap="ccsMap">
+		select QUALIFIED,count(*) as num
+		from WATERUALITY_CHECK where
+		WQ_TIME = to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss') and
+		WATER_ID not like '%CCSZ' and WATER_ID not like '%YSSZ'
+		GROUP BY QUALIFIED
+	</select>
+
+	<select id="queryWS" resultMap="wsMap">
+		select b.RECORD_VALUE,b.WQ_LIMITVALUE,b.WQ_NAME,n.site_name
+		from
+		(
+		select
+		w.site_id,w.RECORD_VALUE,s.WQ_LIMITVALUE,s.WQ_NAME
+		from WATERUALITY_CHECK_WS w,WATERQUALITY_BASIC_WS s
+		where w.RECORD_ID = s.id and
+		w.WQ_TIME = to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+		and site_id = #{siteId,jdbcType=VARCHAR}
+		) b,"BASESYS".sys_site n
+		where b.site_id = n.site_id
+	</select>
+	
+	<select id="queryEquipBer" resultType="Integer">
+		select count(*) from
+		"EQUIPSYS".SYS_EQUIP 
+      <where>
+        create_time &lt; to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')         
+        <if test="ownsys != null and ownsys.trim() != ''">
+		   and equip_ownsys = #{ownsys}
+		</if>
+        <if test="id != null and id.trim() != ''">
+		   and equip_status = #{id}
+		</if>
+      </where>
+	</select>
+
+	<select id="queryEquipWork" resultType="Integer">
+		select count(*)
+		from "EQUIPSYS".EQUIPSYS_WORKORDER
+		<where>
+			CREATE_TIME > to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd
+			HH24:mi:ss')
+			<if test="type != null and type.trim() != ''">
+				and TYPE = #{type}
+			</if>
+			<if test="status != null and status.trim() != ''">
+				and STATUS = #{status}
+			</if>
+			<if test="name != null and name.trim() != ''">
+				and SYSTEM_NAME = #{name}
+			</if>
+		</where>
+	</select>
+
+	<select id="querySWater" resultMap="waterMap">
+		select AREA_NAME,GSL,SSL,CXCL from "REPORT".cxc_month
+		<where>
+		to_char(time,'yyyy-MM-dd HH24:mi:ss') like concat(#{time},'%')
+		<if test="areaId != null and areaId.trim() != ''">
+		and AREA_NAME = #{areaId}
+		</if>
+		</where> 
+	</select>
+	
+	<select id="querySWater2" resultMap="waterMap">
+		select AREA_NAME,GSL,SSL,CXCL from "REPORT".cxc_month
+		<where>
+		to_char(time,'yyyy-MM-dd HH24:mi:ss') between #{stime,jdbcType=VARCHAR} and #{etime,jdbcType=VARCHAR}
+		<if test="areaId != null and areaId.trim() != ''">
+		and AREA_NAME = #{areaId}
+		</if>
+		</where> 
+	</select>
+
+	<select id="querySCost" resultMap="costMap">
+		select SITE_NAME,ELE_QD,(NC_QD+ac_qd+NO_QD+c_qd+co_qd+ko_qd+PAM_QD) as
+		value,QY
+		from "REPORT".cb_month where
+		time = to_date(#{time,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+	</select>
+
+	<select id="querySCostYear" resultMap="costMap">
+		select SITE_NAME,sum(ELE_QD)
+		ELE_QD,sum(NC_QD+ac_qd+NO_QD+c_qd+co_qd+ko_qd+PAM_QD) as value,sum(qy)
+		qy
+		from "REPORT".cb_month where
+		time between to_date(#{stime,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss') and
+		to_date(#{etime,jdbcType=VARCHAR},'yyyy-MM-dd HH24:mi:ss')
+		GROUP BY SITE_NAME
+	</select>
+
+</mapper>

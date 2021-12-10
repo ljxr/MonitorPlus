@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">    
+<mapper namespace="com.enjoyor.modules.monitor.dao.PipeDataDao">
+    <resultMap id="pipeDataResultMap" type="com.enjoyor.modules.monitor.entity.PipeData">
+      <result property="id" column="ID"/>
+      <result property="ybNuber" column="YB_NUBER"/>
+      <result property="time" column="TIME"/>
+      <result property="ss" column="SS"/>
+      <result property="lj1" column="LJ1"/>
+      <result property="lj2" column="LJ2"/>
+      <result property="yl" column="YL"/>
+      <result property="wd1" column="WD1"/>
+      <result property="wd2" column="WD2"/>
+      <result property="wd3" column="WD3"/>
+      <result property="bj" column="BJ"/>
+      <result property="values1" column="VALUES1"/>
+      <result property="values2" column="VALUES2"/>
+      <result property="values3" column="VALUES3"/>
+      <result property="values4" column="VALUES4"/>
+      <result property="jlj" column="JLJ"/>
+      <result property="dateNow" column="DATENOW"/>
+      <result property="pointNum" column="POINTNUM"/>
+      <result property="status" column="STATUS"/>
+      <result property="inserDate" column="INSERDATE"/>
+      <result property="type" column="TYPE"/>
+      <result property="eid" column="EID"/>
+      <result property="chlorine" column="CHLORINE"/>
+      <result property="turbidity" column="TURBIDITY"/>
+      <result property="ph" column="PH"/>
+      <result property="alarmType" column="alarmtype"/>
+      <result property="ltValue" column="LT_VALUE"/>
+    </resultMap>
+    
+    <resultMap id="pipeDataDTOResultMap" type="com.enjoyor.modules.monitor.entity.PipeDataDTO">
+      <result property="siteId" column="SITE_ID"/>
+      <result property="siteName" column="SITE_NAME"/>      
+      <result property="yl" column="YL"/>
+      <result property="ss" column="SS"/>
+      <result property="jlj" column="JLJ"/>
+      <result property="chlorine" column="CHLORINE"/>
+      <result property="turbidity" column="TURBIDITY"/>
+      <result property="ph" column="PH"/>
+      <result property="time2" column="time"/>
+    </resultMap>
+    
+    <select id="findAll" resultMap="pipeDataResultMap">
+		select 
+		*
+		from PIPE_DATA
+	</select>
+	
+	<select id = "findByArea" resultMap="pipeDataDTOResultMap">
+		select 
+		a.SITE_ID, a.SITE_NAME, b.YL, b.SS, b.JLJ, b.CHLORINE, b.TURBIDITY, b.PH, b.time
+	from 
+		"BASESYS".sys_site a 
+	right join
+		"PIPESYS".PIPE_DATA b
+		on a.SITE_ID = b.POINTNUM
+	where 
+		a.dic_value in ('S06','S05','S04') 
+		<if test="areaId != null and areaId != ''">
+		    and a.area_id = #{areaId,jdbcType=VARCHAR} 
+		</if>
+		ORDER BY a.dic_value ASC
+	</select>
+	
+	<select id = "findBzByArea" resultMap="pipeDataDTOResultMap">
+		select 
+		a.SITE_ID, a.SITE_NAME, b.PRESSURE_OUTVALUE as YL, b.FLOW_VALUE as SS, b.TOTALFLOW_VALUE as JLJ, b.CHLORINE_VALUE as CHLORINE, b.TURBIDITY_VALUE as TURBIDITY, b.PH_VALUE as PH, b.time
+	from 
+		"BASESYS".sys_site a 
+	right join
+		"MONITOR".MONITORINS b
+		on a.SITE_ID = b.SITE_ID
+	where 
+		a.dic_value = 'S03' 
+		<if test="areaId != null and areaId != ''">
+		    and a.area_id = #{areaId,jdbcType=VARCHAR} 
+		</if>
+		ORDER BY a.dic_value ASC
+	</select>
+	
+	<select id = "findPsByArea" resultMap="pipeDataDTOResultMap">
+		select 
+		a.SITE_ID, a.SITE_NAME, b.YL, b.SS, b.JLJ, b.CHLORINE, b.TURBIDITY, b.PH, b.tn, b.tp, b.nh4, b.cod, b.hzd, b.LT_VALUE, b.time
+	from 
+		"BASESYS".sys_site a 
+	right join
+		"PIPESYS".PIPE_DATA b
+		on a.SITE_ID = b.POINTNUM
+	where 
+		a.dic_value in ('P02','P03','P04') 
+		<if test="areaId != null and areaId != ''">
+		    and a.area_id = #{areaId,jdbcType=VARCHAR} 
+		</if>
+		ORDER BY a.dic_value ASC
+	</select>
+	
+    <select id="queryPipeIns" resultMap="pipeDataResultMap">
+		select 
+		*
+		from "PIPESYS".PIPE_DATA where pointnum = #{pointNum,jdbcType=VARCHAR} 
+	</select>
+    
+</mapper>

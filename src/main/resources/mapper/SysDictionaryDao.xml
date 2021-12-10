@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.sys.dao.SysDictionaryDao">
+    <resultMap id="sysDictionaryResultMap" type="com.enjoyor.modules.sys.entity.SysDictionaryEntity">
+      <result property="dicId" column="DIC_ID"/>
+      <result property="dicNum" column="DIC_CODENUM"/>
+      <result property="type" column="DIC_TYPE"/>
+      <result property="item" column="DIC_ITEM"/> 
+      <result property="name" column="DIC_SUBITEM"/> 
+      <result property="dicValue" column="DIC_VALUE"/> 
+      <result property="memo" column="DIC_MEMO"/> 
+      <result property="parentId" column="DIC_PARENTID"/> 
+    </resultMap>
+    
+    <select id="queryDicList" resultMap="sysDictionaryResultMap">
+	    select *
+	    from "BASESYS".SYS_DICTIONARY
+	    <where>
+	    	<if test="parentId != null and parentId.trim() != ''">
+			 and DIC_PARENTID = #{parentId}
+			</if>
+	    </where>
+    </select>
+	
+</mapper>

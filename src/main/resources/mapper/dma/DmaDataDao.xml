@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.dma.dao.DmaDataDao">
+    <resultMap id="dataResultMap" type="com.enjoyor.modules.dma.entity.DmaDataEntity">
+      <result property="dareaId" column="darea_id"/>
+      <result property="dareaName" column="darea_name"/>
+      <result property="dareaFlowIn" column="darea_flowin"/>
+      <result property="dareaFlowOut" column="darea_flowout"/> 
+      <result property="lsv" column="lsv"/>
+      <result property="coeIn" column="coe_in"/> 
+      <result property="coeOut" column="coe_out"/> 
+      <result property="time" column="time"/>
+    </resultMap>
+    
+    <resultMap id="monthDataResultMap" type="com.enjoyor.modules.dma.entity.DmaMonthCjlDTO">
+      <result property="dareaId" column="DAREA_ID"/>	
+      <result property="dareaName" column="DAREA_NAME"/>
+      <result property="time" column="TIME"/>
+      <result property="users" column="USERS"/> 
+      <result property="cjl" column="CJL"/>
+    </resultMap>
+    
+        <resultMap id="dma111Map" type="com.enjoyor.modules.dma.entity.Dma111DTO">
+      <result property="qybh" column="qybh"/>	
+      <result property="jdlx" column="jdlx"/>
+      <result property="qymc" column="qymc"/>
+      <result property="sjqy" column="sjqy"/> 
+      <result property="hhnum" column="hhnum"/>
+      <result property="zbsl" column="zbsl"/>
+      <result property="sssl" column="sssl"/>
+    </resultMap>
+    
+
+    <!-- 查询日流量列表 -->
+	<select id="queryDayList" resultMap="dataResultMap">
+		select * from (select id,darea_id,darea_name,darea_flowin,darea_flowout,lsv,
+		coe_in,coe_out,to_char(time,'yyyy-MM-dd') as time,rownum rn from waterday) b	
+		<where>
+		 1=1
+		  <if test="dareaId != null and dareaId.trim() != ''">
+		    and b.darea_id = #{dareaId}
+		  </if>
+		  <if test="stime != null and etime != null">
+		    and (b.time between #{stime} and #{etime})
+		  </if>	  
+		</where>
+			order by b.time asc
+	</select>
+	
+	<!-- 查询周流量列表 -->
+	<select id="queryWeekList" resultMap="dataResultMap">
+		select * from (select id,darea_id,darea_name,darea_flowin,darea_flowout,lsv,
+		coe_in,coe_out,time,rownum rn from waterweek) b	
+		<where>
+		 1=1
+		  <if test="dareaId != null and dareaId.trim() != ''">
+		    and b.darea_id = #{dareaId}
+		  </if>
+		  <if test="stime != null and etime != null">
+		    and (b.time between to_date(#{stime},'yyyy-MM-dd hh24:mi:ss') 
+		    and to_date(#{etime},'yyyy-MM-dd hh24:mi:ss'))
+		  </if>	  
+		</where>
+		order by b.time asc
+	</select>
+	
+	<!-- 查询月流量列表 -->
+	<select id="queryMonthList" resultMap="dataResultMap">
+		select * from (select id,darea_id,darea_name,darea_flowin,darea_flowout,lsv,
+		coe_in,coe_out,time,rownum rn from watermonth) b	
+		<where>
+		 1=1
+		  <if test="dareaId != null and dareaId.trim() != ''">
+		    and b.darea_id = #{dareaId}
+		  </if>
+		  <if test="stime != null and etime != null">
+		    and (b.time between to_date(#{stime},'yyyy-MM-dd hh24:mi:ss') 
+		    and to_date(#{etime},'yyyy-MM-dd hh24:mi:ss'))
+		  </if>	  
+		</where>
+		order by b.time asc
+	</select>
+	
+	<!-- 查询年流量列表 -->
+	<select id="queryYearList" resultMap="dataResultMap">
+		select * from (select id,darea_id,darea_name,darea_flowin,darea_flowout,lsv,
+		coe_in,coe_out,time,rownum rn from wateryear) b	
+		<where>
+		 1=1
+		  <if test="dareaId != null and dareaId.trim() != ''">
+		    and b.darea_id = #{dareaId}
+		  </if>
+		  <if test="stime != null and etime != null">
+		    and (b.time between to_date(#{stime},'yyyy-MM-dd hh24:mi:ss') 
+		    and to_date(#{etime},'yyyy-MM-dd hh24:mi:ss'))
+		  </if>	  
+		</where>
+		order by b.time asc
+	</select>
+	
+	<!-- 查询月抄见量 -->
+	<select id="queryCjlByBook" resultMap="monthDataResultMap">
+		select a.DAREA_ID, a.DAREA_NAME, SUM(c.USERS) as USERS, SUM(c.CJL) as CJL, c.TIME
+		from "MONITOR".WATERAREA a
+		left join "MONITOR".WATERBOOK b
+		on a.DAREA_ID = b.DMA_AREA_ID
+		left join "MONITOR".WATERMONTHDATA c
+		on b.BOOK_ID = c.BOOK_ID
+		where b.BOOK_ID is not null
+		and time BETWEEN #{beginTime} and #{endTime}
+		GROUP BY a.DAREA_ID, a.DAREA_NAME, c.TIME
+		ORDER BY c.TIME
+	</select>
+	
+	<!-- 查询月供水总量 -->
+	<select id="queryMonthSumFlow" resultType="java.util.Map">
+		select DAREA_ID, sum(DAREA_FLOWIN) as SUMIN, sum(DAREA_FLOWOUT) as SUMOUT
+		from MONITOR.WATERDAY
+		where time between TO_DATE(#{bTime}, 'yyyy-MM-DD') and TO_DATE(#{eTime}, 'yyyy-MM-DD') 
+		GROUP BY DAREA_ID
+	</select>
+	
+	<!-- 查询101.12中分表水量 -->
+	<select id="query111" resultMap="dma111Map">
+		select 
+		j.qybh, j.jdlx, j.qymc, j.sjqy, count(h.hh) as hhnum, SUM(u.sssl) as sssl
+		from V_JLGLJD j
+		left join V_HH h
+		on h.QYBH = j.QYBH
+		left join V_USERS_FYXX u
+		on u.HH = h.HH
+		<if test="beginTime != null and endTime != null">
+			and u.SFYF between to_date(#{beginTime},'yyyy-mm-dd hh24:mi:ss') and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss')
+		</if>
+		<where>
+		  <if test="areaName != null and areaName.trim() != ''">
+		  	and j.jdlx = #{areaName}
+		  </if>
+		</where>
+		group by j.qybh, j.jdlx, j.qymc, j.sjqy
+		order by j.qybh
+	</select>
+	
+	<!-- 查询dma供水总量 -->
+	<select id="queryZbsl" resultMap="dma111Map">
+		select DAREA_ID as qybh, sum(DAREA_FLOWIN) as zbsl
+		from MONITOR.WATERDAY
+		<where>
+		<if test="beginTime != null and endTime != null">
+			and time between to_date(#{beginTime},'yyyy-mm-dd hh24:mi:ss') and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss')
+		</if>
+		</where>
+		GROUP BY DAREA_ID
+	</select>
+</mapper>

@@ -1,0 +1,61 @@
+.mapType-wrapper{
+	position:absolute;
+	bottom: 0;
+	right:0;
+}
+
+.mapType{
+	height:82px;
+	/* width:110px; */
+	background-color: rgba(255,255,255,0);
+	cursor: pointer;
+	transition-property:width,background-color;
+	-webkit-transition-property:width,background-color;
+	transition-duration:.4s;
+	-webkit-transition-duration:.4s;
+}
+
+.expand .mapType{
+	/* width:298px; */
+	background-color:#fff;
+}
+
+.mapType .mapTypeCard{
+	position: absolute;
+	top: 10px;
+	height: 62px;
+	width: 88px;
+	border-radius: 2px;
+	box-sizing: border-box;
+	border: 1px solid rgba(153,153,153,.42);
+	transition-property:right,background-color;
+	-webkit-transition-property:right,background-color;
+	transition-duration:.4s;
+	-webkit-transition-duration:.4s;
+}
+
+.expand .mapType .mapTypeCard.active,.expand .mapType .mapTypeCard:hover{
+	border:1px solid #3385FF;
+}
+
+.expand .mapType .mapTypeCard{
+	border:1px solid rgba(255,255,255,0);
+}
+
+.mapType .mapTypeCard span{
+	position:absolute;
+	bottom:8px;
+	right:0;
+	display: inline-block;
+	padding: 3px 3px 2px 4px;
+	font-size: 12px;
+	height:12px;
+	line-height: 12px;
+	color:#fff;
+	border-top-left-radius: 2px;
+}
+
+.expand .mapType .mapTypeCard.active span,.expand .mapType .mapTypeCard:hover span{
+	background-color:#3385FF;
+}
+

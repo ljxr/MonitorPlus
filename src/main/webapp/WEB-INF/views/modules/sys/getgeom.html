@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<script type="text/javascript"  src="../../statics/map/common/jquery.min.js"></script>
+<script type="text/javascript" src="../../statics/map/js/init.js"></script>
+
+<link rel="stylesheet" href="../../statics/css/colorpicker.css" type="text/css" />
+<script type="text/javascript" src="../../statics/js/colorpicker.js"></script>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	font-size:14px;
+}
+#colorSelector_area{position:relative;width:60px;height:20px;background:url(images/select.png); display: inline-block;}
+#colorSelector_area_div{position:absolute;top:3px;left:3px;width:60px;height:20px;background:url(images/select.png) center; padding:2px;}
+#colorSelector_border{position:relative;width:60px;height:20px;background:url(images/select.png); display: inline-block;}
+#colorSelector_border_div{position:absolute;top:3px;left:3px;width:60px;height:20px;background:url(images/select.png) center; padding:2px;}
+#Map-buttons {
+	width: 200px;
+	position: fixed;
+	background-color: #ffffff;
+	top: 0px;
+	padding:10px;
+	margin:20px;
+	box-shadow: 5px 5px 3px #aaa;
+	border:solid 1px #aaa;
+	border-radius:5px;
+}
+
+#drawArea{width:80px;}
+#drawPoint{width:80px;}
+#drawReturn{width:51px;}
+#drawConfirm{width:51px;}
+.easyui-linkbutton {
+ float:left;
+ margin-right:4px;
+	border:solid 1px #666;
+	text-align:center;
+	height:30px;
+	border-radius:5px;
+	background-color:#337ab7;
+	color:#fff;
+	text-decoration:none;
+	line-height:30px;
+}
+input[type="text"]{width:60px; height:18px; line-height:20px; outline:none;} 
+.set{width:100%; height:30px; margin-top:10px;}
+.ls_set{margin-bottom:20px;}
+#片区_layer{ display: none!important}
+#管线_layer{ display: none!important}
+</style>
+<script>
+	var map;
+	var geom;
+	var newgeom;
+	var detype = 'point';
+	var host_url = 'http://192.168.101.2:8081/';
+	var areaRGBA = [0,153,255,128];
+	var borderRGBA = [30,0,255,256];
+	var areaRGB;
+	var borderRGB;
+	var borderWidth;
+	var area_a=0.5;
+	var area_hex="#1e00ff";
+	var border_a=0.5;
+	var border_hex="#0099ff";
+	var border_width=1;
+	var pa={};
+	var x,y;
+	$(document).ready(function() {
+		//参数处理
+		var Request = new Object();
+		Request = GetRequest();
+		var articleNum;
+		regionId = Request["regionId"];
+		detype = getQueryString('type');
+		initMap();
+        pa.regionId=regionId;
+        
+
+        var area_rgb = window.opener.vm.currentEdit.intra?window.opener.vm.currentEdit.intra.split(","):[0,153,255,128]; 
+        var area_r = parseInt(area_rgb[0]);
+        var area_g = parseInt(area_rgb[1]);
+        var area_b = parseInt(area_rgb[2]);
+        console.log(area_rgb[3]);
+        area_a = parseInt(area_rgb[3])/256;
+        area_a = area_a.toFixed(1);
+        area_hex = "#" + ((1 << 24) + (area_r << 16) + (area_g << 8) + area_b).toString(16).slice(1);
+        console.log(area_rgb,area_r,area_g,area_b,area_a,area_hex);
+        $("#areaOrigion").attr("value",area_a);
+        $("#colorSelector_area_div").css({"background-color":area_hex});
+        areaRGB = area_hex;
+        areaRGBA = colorRgba (areaRGB,parseInt(area_rgb[3]));
+        var border_rgb = window.opener.vm.currentEdit.border?window.opener.vm.currentEdit.border.split(","):[30,0,255,256];
+        var border_r = parseInt(border_rgb[0]);
+        var border_g = parseInt(border_rgb[1]);
+        var border_b = parseInt(border_rgb[2]);
+        border_a = parseInt(border_rgb[3])/256;
+        border_a = border_a.toFixed(1);
+        border_hex = "#" + ((1 << 24) + (border_r << 16) + (border_g << 8) + border_b).toString(16).slice(1); 
+        $("#borderColor").attr("value",border_hex); 
+        $("#borderOrigion").attr("value",border_a);
+        if(window.opener.vm.currentEdit.borderwidth){
+            $("#borderWidth").attr("value",window.opener.vm.currentEdit.borderwidth);
+        }else{
+        	$("#borderWidth").attr("value",1);
+        	}
+        $("#colorSelector_border_div").css({"background-color":border_hex});
+        borderRGB = border_hex;
+		borderRGBA = colorRgba (borderRGB,parseInt(border_rgb[3]));
+        window.opener.vm.currentEdit.border = borderRGBA;
+        window.opener.vm.currentEdit.intra = areaRGBA;
+       
+    	$('#colorSelector_area').ColorPicker({
+
+    		color: '#0000ff',
+
+    		onShow: function (colpkr) {
+
+    			$(colpkr).fadeIn(500);
+
+    			return false;
+
+    		},
+
+    		onHide: function (colpkr) {
+
+    			$(colpkr).fadeOut(500);
+
+    			return false;
+
+    		},
+
+    		onSubmit: function (hsb, hex, rgb) {
+
+    			$('#colorSelector_area_div').css('backgroundColor', '#' + hex);
+    			var aa = Math.floor($('#areaOrigion').val()*256);
+    			areaRGB = '#' + hex,aa;
+    			areaRGBA = colorRgba (areaRGB,aa);
+    			window.opener.vm.currentEdit.intra = eval("("+"["+areaRGBA+"]"+")");
+    			addGisInfo2();
+
+    		}
+
+    	});
+    	$('#colorSelector_border').ColorPicker({
+
+    		color: '#0000ff',
+
+    		onShow: function (colpkr) {
+
+    			$(colpkr).fadeIn(500);
+
+    			return false;
+
+    		},
+
+    		onHide: function (colpkr) {
+
+    			$(colpkr).fadeOut(500);
+
+    			return false;
+
+    		},
+
+    		onSubmit: function (hsb, hex, rgb) {
+
+    			$('#colorSelector_border_div').css('backgroundColor', '#' + hex);
+    			
+    			var bb = Math.floor($('#borderOrigion').val()*256);
+    			borderRGB = '#' + hex;
+    			borderRGBA = colorRgba (borderRGB,bb);
+    			window.opener.vm.currentEdit.border = eval("("+"["+borderRGBA+"]"+")");
+    			addGisInfo2();
+
+    		}
+
+    	});
+		$('#areaOrigion').change(function(){
+			var aa = Math.floor($('#areaOrigion').val()*256);
+			areaRGBA = colorRgba (areaRGB,aa);
+			window.opener.vm.currentEdit.intra = eval("("+"["+areaRGBA+"]"+")");
+			addGisInfo2();
+		});
+		$('#borderOrigion').change(function(){
+			var bb = Math.floor($('#borderOrigion').val()*256);
+			borderRGBA = colorRgba (borderRGB,bb);
+			window.opener.vm.currentEdit.border = eval("("+"["+borderRGBA+"]"+")");
+			addGisInfo2();
+		});
+		$('#borderWidth').change(function(){
+			borderWidth = $('#borderWidth').val();
+			window.opener.vm.currentEdit.borderwidth = eval("("+"["+borderWidth+"]"+")");
+			addGisInfo2();
+		});
+	});
+    function colorRgba (str,n){
+    	//十六进制颜色值的正则表达式
+    	var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+    	var sColor = str.toLowerCase();
+    	//十六进制颜色转换为RGB格式  
+        if(sColor && reg.test(sColor)){  
+            if(sColor.length === 4){
+                var sColorNew = "#";  
+                for(var i=1; i<4; i+=1){  //例如：#eee,#fff等
+                    sColorNew += sColor.slice(i,i+1).concat(sColor.slice(i,i+1));     
+                }  
+                sColor = sColorNew;  
+            }  
+            //处理六位颜色值  
+            var sColorChange = [];  
+            for(var i=1; i<7; i+=2){  
+                sColorChange.push(parseInt("0x"+sColor.slice(i,i+2)));    
+            }
+    		//return "[" + sColorChange.join(",") + ","+n+"]";
+    		sColorChange.push(n);
+    		return sColorChange;
+        }else{  
+            return sColor;    
+        }
+    }
+    function NumberCheckInt(t){
+        var num = t.value;
+        var re=/^\d*$/;
+        if(!re.test(num)){
+            isNaN(parseInt(num))?t.value=1:t.value=parseInt(num);
+        }
+    }
+    function NumberCheck(t){
+        var num = t.value;
+        var re=/^\d*$/;
+        if(!re.test(num)){
+            isNaN(num)?t.value=1:t.value(num);
+        }
+    }
+	function getType(geom) {//no
+		if (!!!geom) {
+			return detype;
+		}
+		if (!!geom.x && !!geom.y) {
+			return "point";
+		} else if (!!geom.rings) {
+			return "polygon";
+		} else if (!!geom.paths) {
+			return "polyline";
+		} else {
+			return detype;
+		}
+	}
+	//获取页面传递参数
+	function GetRequest() {
+		  
+		  var url = location.search; //获取url中"?"符后的字串
+		   var theRequest = new Object();
+		   if (url.indexOf("?") != -1) {
+		      var str = url.substr(1);
+		      strs = str.split("&");
+		      for(var i = 0; i < strs.length; i ++) {
+		         theRequest[strs[i].split("=")[0]]=(strs[i].split("=")[1]);
+		      }
+		   }
+		   return theRequest;
+		}
+	//获取url参数
+	function getQueryString(name) {//no
+		var reg = new RegExp("(^|\\?|&)" + name + "=([^&]*)(\\s|&|$)", "i");
+		if (reg.test(location.href))
+			return unescape(RegExp.$2.replace(/\+/g, " "));
+		return "";
+	}
+	function initMap() {
+		map = new EJMap("mapcontent", {layers:[{id:"管线",display:false,visible:false },{id:"分区",display:false,visible:false}]});
+		map.addEventListener(EJMap.Event.ondeactivate, function(e) {//图层编辑完成事件
+			newgeom = e.geometry.toJson();
+		console.log(e.geometry,"^^^^^^^^^^^^^^^^^6");
+			var type = getType(newgeom);
+			geomDraw(type)
+		});
+		map.addEventListener(EJMap.Event.onMapLoaded, function(e) {//地图加载完成事件
+			console.log(e,"^^^^^^^^^^^^^^^^^6");
+			addGisInfo();
+		});
+	}
+	function addGisInfo() {
+		if (window.opener) {
+			console.log(window.opener.vm.currentEdit);
+			var type = getType(newgeom);
+			if (type == 'point') {//设置中心点
+				$(".set").hide();
+				$("#drawPoint").show();
+				$("#drawReturn").show();
+				$("#drawConfirm").show();
+				if(!!window.opener.vm.currentEdit.x&&!!window.opener.vm.currentEdit.y){
+					geom = newgeom = {
+							x : window.opener.vm.currentEdit.x?window.opener.vm.currentEdit.x:119.68,
+							y : window.opener.vm.currentEdit.y?window.opener.vm.currentEdit.y:30.63,
+							spatialReference : {
+								wkid : 4326
+							}
+					}			
+				};
+			} else if (type = 'polygon') {//设置分区
+				$("#drawArea").show();
+				$("#drawReturn").show();
+				$("#drawConfirm").show();
+				if(!!window.opener.vm.currentEdit.geomString){
+					geom = newgeom = eval('('+window.opener.vm.currentEdit.geomString+')');
+					console.log(window.opener,window.opener.vm.currentEdit,window.opener.vm.currentEdit.geomString)
+				}			
+			}
+			if(!!newgeom){
+				console.log(newgeom);
+				geomDraw(type);
+			}
+		}
+	}
+	
+	function addGisInfo2() {
+		if (window.opener) {
+			var type = getType(newgeom);
+			if(!!newgeom){
+				geomDraw(type);
+			}
+		}
+	}
+	
+	
+	function geomDraw(type) {
+		switch (type) {
+		//画点	
+		case "point":
+			$(".set").hide();
+			if (!!newgeom) {
+				funCallbackPoint(newgeom);
+			}
+			;
+		
+			break;
+		case "polygon":
+			if (!!newgeom) {//!!把这个数据转化为布尔类型
+				funCallbackPolygon(newgeom);
+			}
+		
+			break;
+		}
+	}
+	function funCallbackPoint(e) {
+		newgeom = {
+			x : e.x,
+			y : e.y,
+			spatialReference : {
+				wkid : 4326
+			}
+		};
+		x = e.x;
+		y = e.y;
+		map.addPoint2GraphicsLayer({
+			geom : newgeom,
+			symbol : {
+				"url" : host_url + "userConfig/symbols/pic_blue.png",
+				"height" : 15,
+				"width" : 15,
+				"type" : "esriPMS"
+			},
+			edit : true,
+			center:true
+		}, "layer_", true);
+		
+	}
+
+	function funCallbackPolygon(e) {//初始化分区的时候用到此方法，绘制多边形也有用到此方法
+		newgeom = e;
+		console.log(e);
+		map.addPolygon2GraphicsLayer({
+			geom : e,
+			edit : true,
+			symbol : {
+                      "type": "esriSFS",
+                      "style": "esriSFSSolid",
+                      "color": areaRGBA,
+                      "outline": {
+                      "type": "esriSLS",
+                      "style": "esriSLSSolid",
+                      "color": borderRGBA,
+                      "width": window.opener.vm.currentEdit.borderwidth
+                       }
+                     },  
+			center:true
+		}, "分区", true);
+	}
+	
+	function getCoordPolygon() {
+		//参数说明
+		//e.map:地图对象
+		map.drawPolygon({
+			display : false,
+			clean : true
+		}, funCallbackPolygon);
+	}
+	//点
+	function getCoordPoint() {
+		map.getPoint(funCallbackPoint);
+	}
+
+	//编辑重绘
+	function funReDrawPolygon(json) {
+		newgeom = "";
+		map.clearLayerById("layer_");
+	}
+	function returnArea() {
+		addGisInfo();
+	}
+	function confirmArea() {
+		console.log(newgeom);
+		var type = getType(newgeom);
+		if (window.opener && window.opener.vm != null) {
+			if(type == "polygon"){
+				console.log("polygon");
+				window.opener.vm.currentEdit.intra = ""+areaRGBA+"";
+				window.opener.vm.currentEdit.border = ""+borderRGBA+"";
+	            window.opener.vm.currentEdit.borderwidth = Number($('#borderWidth').val());	
+	            if(newgeom){	
+					window.opener.vm.geomName="区域已绘制点击编辑";
+					window.opener.vm.setGeomString(newgeom);		
+				}else{
+					window.opener.vm.geomName="区域未绘制点击绘制";
+					alert("未设置分区");	
+				}
+			}else if(type == "point"){
+				window.opener.vm.currentEdit.x = x;
+				window.opener.vm.currentEdit.y = y;
+				if(newgeom){	
+					window.opener.vm.geomName2=x;
+					window.opener.vm.geomName3=y;
+					window.opener.vm.setGeomString(newgeom);		
+				}else{
+					window.opener.vm.geomName="区域未绘制点击绘制";
+					alert("未设置分区");	
+				}
+			}
+			console.log("ok",window.opener.vm.currentEdit);
+			
+			var RINGS=JSON.parse(window.opener.vm.currentEdit.geomString).rings[0];
+			var RingsString = '{"rings":[[';
+			for(var i=0;i<RINGS.length;i++){
+				RINGS[i][0]=RINGS[i][0].toFixed(6);
+				RINGS[i][1]=RINGS[i][1].toFixed(6);
+				console.log(RINGS[i]);
+				RingsString+="[";
+				RingsString+=RINGS[i][0];
+				RingsString+=",";
+				RingsString+=RINGS[i][1];
+				RingsString+="],";
+			}
+			RingsString=RingsString.substr(0, RingsString.length - 1);
+			RingsString+=']],"spatialReference":{"wkid":4326}}';
+			console.log(RingsString);
+			window.opener.vm.currentEdit.geomString = RingsString;
+			console.log(window.opener.vm.currentEdit.geomString,RINGS,JSON.parse(window.opener.vm.currentEdit.geomString).rings);//rings
+			window.close();
+		}
+	}
+	window.onbeforeunload = function(event) {
+		confirmArea();
+	};
+</script>
+</head>
+<body>
+	<div id="mapcontent" style="width: 100%; height: 100%">
+		<noscript>加载地图失败</noscript>
+	</div>
+	<div id="Map-buttons">
+		<div class="set">分区颜色：&nbsp&nbsp&nbsp<div id="colorSelector_area"><div id="colorSelector_area_div" style="background-color: #0099ff"></div></div></div>
+		<div class="set">分区透明度：<input type="text" onkeyup="NumberCheck(this)" value="0.5" id="areaOrigion"></div>
+		<div class="set">边框颜色：&nbsp&nbsp&nbsp<div id="colorSelector_border"><div id="colorSelector_border_div" style="background-color: #1e00ff"></div></div></div>
+		<div class="set">边框透明度：<input type="text" onkeyup="NumberCheck(this)" id="borderOrigion" value="1"></div>
+		<div class="set ls_set">边框宽度：　<input type="text" placehoder="单位：像素"  value="1" onkeyup="NumberCheckInt(this)" id="borderWidth"></div>
+		<a href="#"	class="easyui-linkbutton" style="display: none" id="drawArea" onclick="getCoordPolygon()">设置分区</a> 
+		<a href="#" class="easyui-linkbutton" style="display: none" id="drawPoint" onclick="getCoordPoint()">设置点</a>
+		<a href="#" class="easyui-linkbutton" style="display: block" id="drawReturn" onclick="returnArea()">还原</a>
+		<a href="#"	class="easyui-linkbutton" style="display: block" id="drawConfirm" onclick="confirmArea()">确认</a>
+	</div>
+</body>
+
+</html>

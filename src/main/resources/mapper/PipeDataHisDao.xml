@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">    
+<mapper namespace="com.enjoyor.modules.monitor.dao.PipeDataHisDao">
+    <resultMap id="pipeDataHisResultMap" type="com.enjoyor.modules.monitor.entity.PipeDataHis">
+      <result property="id" column="ID"/>
+      <result property="ybNuber" column="YB_NUBER"/>
+      <result property="time" column="TIME"/>
+      <result property="ss" column="SS"/>
+      <result property="lj1" column="LJ1"/>
+      <result property="lj2" column="LJ2"/>
+      <result property="yl" column="YL"/>
+      <result property="wd1" column="WD1"/>
+      <result property="wd2" column="WD2"/>
+      <result property="wd3" column="WD3"/>
+      <result property="bj" column="BJ"/>
+      <result property="values1" column="VALUES1"/>
+      <result property="values2" column="VALUES2"/>
+      <result property="values3" column="VALUES3"/>
+      <result property="values4" column="VALUES4"/>
+      <result property="jlj" column="JLJ"/>
+      <result property="dateNow" column="DATENOW"/>
+      <result property="pointNum" column="POINTNUM"/>
+      <result property="status" column="STATUS"/>
+      <result property="inserDate" column="INSERDATE"/>
+      <result property="type" column="TYPE"/>
+      <result property="eid" column="EID"/>
+      <result property="chlorine" column="CHLORINE"/>
+      <result property="turbidity" column="TURBIDITY"/>
+      <result property="ph" column="PH"/>
+      <result property="nh4" column="NH4"/>
+      <result property="tn" column="TN"/>
+      <result property="tp" column="TP"/>
+      <result property="hzd" column="HZD"/>
+      <result property="cod" column="COD"/>
+      <result property="alarmType" column="alarmtype"/>
+      <result property="lt" column="LT_VALUE"/>
+    </resultMap>
+    
+    <select id="findAll" resultMap="pipeDataHisResultMap">
+		select 
+		*
+		from PIPE_DATA_HIS
+		<where>
+		
+		</where>
+	</select>
+	
+	<select id = "queryHisData" resultMap="pipeDataHisResultMap">
+		${sql} 
+	</select>
+    
+    <select id = "exportExcel" resultMap="pipeDataHisResultMap">
+    	select POINTNUM, ss, yl, time
+		from "PIPESYS".PIPE_DATA_HIS 
+		where POINTNUM in (select site_id from "BASESYS".SYS_SITE c where c.area_id = #{areaId})
+		and time between to_date(#{beginTime},'yyyy-MM-dd HH24:mi:ss') and to_date(#{endTime},'yyyy-MM-dd HH24:mi:ss')
+		and (to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%00:00:__' or to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%03:00:__'
+		or to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%06:00:__' or to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%09:00:__' 
+	    or to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%12:00:__' or to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%15:00:__'
+	    or to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%18:00:__' or to_char(time,'yyyy/mm/dd HH24:MI:SS') like '%21:00:__')
+		ORDER BY POINTNUM, time
+    </select>
+   
+    
+</mapper>

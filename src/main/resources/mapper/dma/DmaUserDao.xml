@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.dma.dao.DmaUserDao">
+    <resultMap id="userResultMap" type="com.enjoyor.modules.dma.entity.DmaUserEntity">
+      <result property="userId" column="user_id"/>
+      <result property="userName" column="user_name"/>
+      <result property="userType" column="user_type"/>
+      <result property="areaId" column="area_id"/> 
+      <result property="areaName" column="area_name"/>
+      <result property="dareaId" column="darea_id"/> 
+      <result property="dareaName" column="darea_name"/> 
+      <result property="recordPeriod" column="record_period"/>
+      <result property="userTypeName" column="dic_subitem"/>
+      
+    </resultMap>
+
+    <!-- 分页查询用户列表 -->
+	<select id="queryUserList" resultMap="userResultMap">
+		SELECT * 
+		FROM (SELECT c.*, ROWNUM ROW_ID
+          FROM (
+          		select a.id, a.user_id, a.user_name, a.user_type, a.area_id, a.area_name,
+				 a.darea_id, a.darea_name, a.record_period, b.dic_subitem 
+				from "MONITOR".wateruser a
+				left join
+				"BASESYS".sys_dictionary b
+				on a.user_type = b.dic_value
+				<where> 
+				1=1
+				and b.dic_parentId = '20' <!-- 20为字典表中用户类别编号 -->
+				  <if test="userId != null and userId.trim() != ''">
+				    and a.user_id like concat('%',concat(#{userId},'%'))
+				  </if>
+				  <if test="userName != null and userName.trim() != ''">
+				    and a.user_name like concat('%',concat(#{userName},'%'))
+				  </if>
+				  <if test="userType != null and userType.trim() != ''">
+				    and a.user_type like concat('%',concat(#{userType},'%'))
+				  </if>
+				  <if test="areaId != null and areaId.trim() != ''">
+				    and a.area_id like concat('%',concat(#{areaId},'%'))
+				  </if>
+				  <if test="areaName != null and areaName.trim() != ''">
+				    and a.area_Name like concat('%',concat(#{areaName},'%'))
+				  </if>
+				  <if test="dareaId != null and dareaId.trim() != ''">
+				    and a.darea_id like concat('%',concat(#{dareaId},'%'))
+				  </if>  
+				</where> 							
+          ) c
+         	WHERE ROWNUM &lt;= #{limit})
+ 		WHERE ROW_ID &gt;= #{offset}
+	</select>
+	
+	<!-- 用户总条数 -->
+	<select id="queryUserCount" resultType="Integer">
+		select count(*) from (select id,user_id,user_name,user_type,area_id,area_name,
+		darea_id,darea_name,record_period,rownum rn from wateruser) b	
+		<where>
+		 1=1
+		  <if test="userId != null and userId.trim() != ''">
+		    and b.user_id like concat('%',concat(#{userId},'%'))
+		  </if>
+		  <if test="userName != null and userName.trim() != ''">
+		    and b.user_name like concat('%',concat(#{userName},'%'))
+		  </if>
+		  <if test="userType != null and userType.trim() != ''">
+		    and b.user_type like concat('%',concat(#{userType},'%'))
+		  </if>
+		  <if test="areaId != null and areaId.trim() != ''">
+		    and b.area_id like concat('%',concat(#{areaId},'%'))
+		  </if>
+		  <if test="areaName != null and areaName.trim() != ''">
+		    and area_Name like concat('%',concat(#{areaName},'%'))
+		  </if>
+		  <if test="dareaId != null and dareaId.trim() != ''">
+		    and b.darea_id like concat('%',concat(#{dareaId},'%'))
+		  </if>	  
+		</where>
+	</select>
+	
+	<!-- 保存用户信息 --> 
+	<insert id="save" parameterType="com.enjoyor.modules.dma.entity.DmaUserEntity">
+		insert into wateruser
+		( 
+		    user_id, 
+			user_name, 
+            user_type,			
+			area_id,
+		    area_name,
+		    darea_id,
+		    darea_name,
+		    record_period
+		)
+		values
+		(
+			#{userId,jdbcType=VARCHAR}, 
+			#{userName,jdbcType=VARCHAR}, 
+			#{userType,jdbcType=VARCHAR},  
+			#{areaId,jdbcType=VARCHAR},
+		    #{areaName,jdbcType=VARCHAR},
+		    #{dareaId,jdbcType=VARCHAR},
+		    #{dareaName,jdbcType=VARCHAR},
+		    #{recordPeriod,jdbcType=NUMERIC}
+		)
+	</insert>
+
+    <!-- 更新用户信息 -->
+    <update id="update" parameterType="com.enjoyor.modules.dma.entity.DmaUserEntity">
+       update wateruser 
+		<set> 
+			<if test="userId != null">user_id = #{userId}, </if>
+			<if test="userName != null">user_name = #{userName}, </if>
+			<if test="userType != null">user_type = #{userType}, </if>
+			<if test="areaId != null">area_id = #{areaId},</if>
+			<if test="areaName != null">area_name = #{areaName},</if>
+			<if test="dareaId != null">darea_id = #{dareaId},</if>
+			<if test="dareaName != null">darea_name = #{dareaName}</if>
+			<if test="recordPeriod != null">record_period = #{recordPeriod}</if>
+		</set>
+		where id = #{id,jdbcType=NUMERIC}
+    </update>
+    
+    <!-- 删除用户信息 -->
+    <delete id="delete">
+      delete from wateruser where id = #{id}
+    </delete>
+</mapper>

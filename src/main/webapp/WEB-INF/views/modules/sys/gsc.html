@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>供水厂地图模式</title>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/map/css/switcher.css"></link>
+<link rel="stylesheet" href="../../statics/map/css/tools.css"></link>
+<script type="text/javascript" src="http://192.168.101.2:8081/statics/map/js/init.js"></script>
+<!-- 引入组件库 -->
+<script src="${request.contextPath}/statics/libs/element.js"></script>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+a{text-decoration:none}
+a:hover{text-decoration:none}
+#tab::-webkit-scrollbar { width: 0 !important }
+#tab { -ms-overflow-style: none; }
+#tab { overflow: -moz-scrollbars-none;}
+#tab p {line-height:160%;}
+.pop{background-image: url("${request.contextPath}/statics/img/pop.png"); background-repeat: cover; width:245px; height:142px; margin-left:-70px; margin-bottom:20px; padding:20px 20px 60px 20px;}
+.pop a{position:absolute; right:30px; top:50px;}
+.setting{padding:10px;}
+.setting label{font-size:14px;}
+.setting button{float:right;}
+.sc_name{font-size:12px; font-weight:bold;}
+</style>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+	<div style="width:80%; height:100%; float:left; overflow:hidden; position:relative;">
+		<div id="mapcontent">
+			<noscript>地图加载失败！页面必须引入esri.css、global.js、map.js与init.js！
+			</noscript>
+		</div>
+		<div class="mapType-wrapper" style="position:absolute; bottom:20px; right:30px;">
+			<div class="mapType">
+				<div class="mapTypeCard">
+					<img src="${request.contextPath}/statics/img/pic_2.jpg" alt="卫星" /> <span>卫星地图</span>
+				</div>
+			   <div class="mapTypeCard">
+					<img src="${request.contextPath}/statics/img/pic_4.jpg" alt="地形" /> <span>地形地图</span>
+				</div>
+				<div class="mapTypeCard">
+					<img src="${request.contextPath}/statics/img/pic_1.jpg" alt="矢量" /> <span>矢量地图</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="tab" style="width:20%; height:100%; float:right; overflow-x: hidden; overflow-y: scroll;">
+		<div class="setting">
+			<label>
+				<input type="checkbox" id="map_tip" checked="checked" > 地图数据
+			</label>
+			<!-- <button type="button" class="btn btn-primary" onClick="window.location.href='gsc_kanban.html';">看板模式</button> -->
+		</div>
+		<div v-for="re in gsc2" class="list-group">
+			<a href="#" class="list-group-item active" style="height:34px; background-color:rgba(60,141,188,0.8); text-align:center">
+				<h5 class="list-group-item-heading">{{re.name}}</h5>
+				<span style="z-index:99; position:absolute; right:10px; bottom:5px; color:#fff;" @click="detail(re)">>></span>
+			</a>
+			<a v-for="res in re.childSite" href="#" class="list-group-item">
+				<p class="list-group-item-text">
+					{{res.name}}今日累计：{{res.jlj}}<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{res.name}}流量：{{res.ins}}<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{res.name}}浊度：{{res.tur}}<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{res.name}}pH：{{res.ph}}<br>
+					<span :style="{'display':isDisplay(res.name)}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{res.name}}余氯：{{res.cho}}</span>
+				</p>
+			</a>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/gsc.js"></script>
+<script type="text/javascript" src="../../statics/map/js/switcher.js"></script>
+<script type="text/javascript" src="../../statics/map/js/tools.js"></script>
+<script type="text/javascript">
+
+var websocket = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);
+	       
+	    }
+	}); 
+
+	//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+	websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}
+else {
+console.log('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+console.log("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+console.log("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+	var infor=[];
+	console.log(event.data);
+	infor=JSON.parse(event.data);
+	setMessageInnerHTML(infor);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+	closeWebSocket();
+console.log("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+//将消息显示在网页上
+function setMessageInnerHTML(obj) {
+console.log(obj);
+var gsc_data;
+console.log(vm.gsc3);
+for(var i=0; i<obj.length;i++){
+	for(var j=0;j<vm.gsc2.length;j++){
+		for(var m=0;m<vm.gsc2[j].childSite.length;m++){
+			if(vm.gsc2[j].childSite[m].siteId==obj[i].siteId){
+				if(obj[i].dataType=="FLS"){//瞬时流量
+					vm.gsc2[j].childSite[m].ins=obj[i].ins.toFixed(1)+"m³/h";
+				}else if(obj[i].dataType=="FLC"){//累计流量
+					vm.gsc2[j].childSite[m].jlj=obj[i].jlj.toFixed(1)+"m³";
+				}else if(obj[i].dataType=="TUR"){
+					vm.gsc2[j].childSite[m].tur=obj[i].tur.toFixed(2)+"NTU";
+				}else if(obj[i].dataType=="PH"){
+					vm.gsc2[j].childSite[m].ph=obj[i].ph.toFixed(2);
+				}else if(obj[i].dataType=="HOCL"){
+					vm.gsc2[j].childSite[m].cho=obj[i].cho.toFixed(2)+"mg/L";
+				}			
+			}
+		}
+	}
+}
+console.log(vm.gsc3);
+}
+//关闭WebSocket连接
+function closeWebSocket(){
+websocket.close();
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/closeSession",
+    contentType: "application/json",
+    data: JSON.stringify(),
+    success: function(r){
+        console.log(r)
+    }
+});
+}
+//发送消息
+function send(){
+$.ajax({
+    type: "POST",
+    url: baseURL + "fac/data/list",
+    contentType: "application/json",
+    data: JSON.stringify({"siteId":inlineData}),
+    success: function(r){
+        console.log(r);
+    }
+}); 
+}
+
+function isDisplay(obj){
+	if(obj.indexOf("源水") != -1){
+		return "none";
+	}else if(obj.indexOf("进水") != -1){
+		return "none";
+	}else if(obj.indexOf("原水") != -1){
+		return "none";
+	}else if(obj.indexOf("进口") != -1){
+		return "none";
+	}else{
+		return "block";
+	}
+}
+</script>
+</body>
+</html>

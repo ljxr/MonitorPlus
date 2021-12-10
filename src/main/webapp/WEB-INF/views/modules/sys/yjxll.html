@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>统计分析</title>
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<style type="text/css">
+@charset "utf-8";
+*{margin:0;padding:0;box-sizing:border-box}
+body{color:rgba(0,0,0,.65);font-size:14px;line-height:1.8;font-family:"微软雅黑";background:#FAFAFA}
+a{text-decoration:none;color:#108EE9}
+a:hover{color:#108EE9!important;cursor:pointer}
+em{font-style:normal}
+ul{list-style:none}
+h1,h2,h3,h4,h5,h6{margin-bottom:1em;color:rgba(0,0,0,.85)}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:270px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar-wrapper.fixed{position:fixed;top:0px;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.menu-item .sub-title:after{content:'\ee4e';font-family:"iconfont";font-size:12px;line-height:1;color:#555;position:absolute;top:50%;right:44px;margin-top:-6px;transform:rotate(180deg);transition:all .15s ease}
+.menu-item.collapse .sub-title:after{margin-top:-5px;transform:rotate(0)}
+.menu-item .sub-title:hover:after{color:#108EE9}
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:36px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px}
+.menu-item-1>ul{display:none;margin-top:12px}
+.menu-item-1.active>ul{display:block}
+.menu-item-2{padding-top:8px;padding-bottom:8px;padding-left:15px;font-size:14px;line-height:28px}
+.menu-item-2>ul{display:none;margin-top:12px}
+.menu-item-2.active>ul{display:block}
+.main-container{position:relative;margin-left:280px;padding:0px}
+</style>
+<style type="text/css">
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+#analyse_header{height:40px; position:relative;margin:0px; padding:0px;  background-color:#f1f1f1;}
+#analyse_header p{line-height:40px;}
+#analyse_container{}
+#test10{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test5{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test6{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test7{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test8{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test{}
+.layui-table-body{height:234px; overflow-x:auto; overflow-y:auto;}
+.layui-form-radio{margin-right:0px; padding-right:0px;}
+.menu-group{z-index:1;}
+.menu-group ul{z-index:2;}
+.menu-group ul ul{z-index:3;}
+.yjxllT{display:inline-block; line-height:30px; height:30px;}
+</style>
+</head>
+
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+<div class="sidebar-wrapper fixed">
+	<div class="sidebar">
+	<form style="background-color:#f1f1f1">
+	<input type="radio" name="area" id="pianqu" onChange=setTreeList("1") checked="checked" />
+	<label for="pianqu">片区</label>&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="radio" name="area" id="dma" onChange=setTreeList("0") />
+	<label for="dma">DMA</label>
+	</form>
+		<ul class="menu-group">
+			<li v-for="(item, index) in treeList" class="menu-item menu-item-1 collapse">
+				<a v-bind:id="item.areaId" class="sub-title" href="javascript:;" v-on:click="getIndex(item.areaId,0,item.areaName)">{{item.areaName}}</a>
+				<ul>
+					<li v-for="(citem, cindex) in item.sonList" class="menu-item menu-item-2 collapse">
+						<a v-bind:id="citem.siteId" v-bind:class="[citem.sonList? 'sub-title' : 'no-sub']" href="javascript:;" v-on:click="getIndex(citem.siteId,1,citem.siteName)">{{citem.siteName}}</a>
+						<!-- <ul>
+                            <li v-for="(ccitem, ccindex) in citem.sonList" class="menu-item menu-item-3 menu-item-check collapse">
+                            	<a v-bind:id="ccitem.siteId" v-bind:class="[ccitem.sonList.length? 'sub-title' : 'no-sub']" href="javascript:;" v-on:click="getIndex(ccitem.siteId,1,ccitem.siteName)">{{ccitem.siteName}}</a>
+	                           	<ul>
+		                            <li v-for="(cccitem, cccindex) in ccitem.sonList" class="menu-item menu-item-3 menu-item-check collapse">
+		                            	<a v-bind:id="cccitem.siteId" class="no-sub" href="javascript:;" v-on:click="getIndex(cccitem.siteId,1,cccitem.siteName)">{{cccitem.siteName}}</a>
+		                            </li>
+		                        </ul>
+                            </li>
+                        </ul> -->
+					</li>
+				</ul>
+			</li>
+		</ul>
+<!-- 		<ul class="menu-group">
+			<li v-for="(item, index) in treeList" class="menu-item menu-item-1 collapse">
+				<a class="sub-title" v-on:click="getIndex(item.dareaId)"><input v-if="item.flag" name="site" type="checkbox" v-bind:value="item.dareaId" />{{item.dareaName}}</a>
+ 				<ul>
+					<li v-for="(citem, cindex) in item.children" class="menu-item menu-item-2 collapse">
+						<a class="sub-title" v-on:click="getIndex(citem.dareaId)"><input v-if="citem.flag" name="site" type="checkbox" v-bind:value="citem.dareaId" />{{citem.dareaName}}</a>
+						<ul>
+                            <li v-for="(ccitem, ccindex) in citem.children" class="menu-item menu-item-3 menu-item-check collapse">
+                            	<a v-bind:id="ccitem.siteId" class="no-sub" href="javascript:;" v-on:click="searchSiteId(ccitem.dareaId)"><input v-if="ccitem.flag" name="site" type="checkbox" v-bind:siteName="ccitem.name" v-bind:value="ccitem.dareaId" />{{ccitem.dareaName}}</a>
+                            </li>
+                        </ul>
+					</li>
+				</ul>
+			</li>
+		</ul> -->
+	</div>
+</div>
+<div class="main-container">
+	<div id="analyse_container">
+		<form class="layui-form" action="">
+			<div class="layui-form-item" style="margin-top:10px;">
+			    <div class="layui-inline" style="width:330px;">
+			      <label class="layui-form-label" style="width:100px;">点位名称:</label>
+			      <div class="layui-input-inline" style="width:200px;">
+			        <p style="line-height:40px; color:#3c8dbc">{{currentSiteName}}</p>
+			      </div>
+			    </div>
+			    <div class="layui-inline" style="width:400px;">
+			      <label class="layui-form-label" style="width:100px;">时间范围:</label>
+			      <div class="layui-input-inline" style="width:280px;" id="dd">
+			        <input type="text" class="layui-input" id="test5" placeholder="日范围">
+			      </div>
+			    </div>
+ 			    <div class="layui-inline" style="width:90px;" id="daochu">
+			      <div class="layui-input-inline" style="width:90px;">
+			        <button type="button" class="layui-btn" data-type="reload" onClick="download()" >导出</button>
+			      </div>
+			    </div> 
+			</div>
+		</form>
+		<p style="background-color:#f1f1f1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;说明：X值=夜间平均流量/日平均流量，Y值=最小夜间流量/日平均流量。</p>
+	    <p></p>
+	    <div class="layui-col-xs12 layui-col-md12" style="height:340px; margin:auto; padding:0px;" id="echart1"></div>
+		<div class="layui-col-xs12 layui-col-md12">
+			<table class="layui-hide" id="demo"></table>
+		</div>
+	</div>
+</div>
+</div>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/yjxll.js"></script>
+<script>
+layui.use(['form','table','layedit','laydate'], function(){
+  var form = layui.form
+  ,table = layui.table //表格
+  ,laydate = layui.laydate;
+	//日范围
+  laydate.render({
+    elem: '#test5'
+    ,range: true
+    ,value: Stime_D+' - '+Etime_D
+    ,done: function(value, date, endDate){
+    	console.log("123123");
+    	queryAnalysisFlow(value);
+    }
+  });
+//展示已知数据
+  table.render({
+    elem: '#demo'
+    ,cols: []
+    ,data: vm.siteValue
+    ,even: true
+    ,limit:1000
+  });
+  
+});
+
+function download(){//统计流量查询
+	window.location.href = "../../monitor/flowNight/download?siteId="+vm.sendMessage.siteId+"&beginTime="+vm.sendMessage.beginTime+"&endTime="+vm.sendMessage.endTime;	
+}
+</script>	
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>排水泵站监测</title>
+<script type="text/javascript">
+	/* <![CDATA[ */
+	var host_url = 'http://192.168.101.2:8081/'
+	/* ]]> */
+</script>
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+
+<script type="text/javascript" src="../../statics/map/common/common.js"></script>
+<script type="text/javascript" src="../../statics/map/common/jquery.min.js"></script>
+<link rel="stylesheet" href="../../statics/map/css/switcher.css"></link>
+<link rel="stylesheet" href="../../statics/map/css/tools.css"></link>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css"></link>
+<script type="text/javascript" src="../../statics/js/echarts.js"></script>
+<link rel="stylesheet" href="../../statics/css/Tabstyle.css"></link>
+<script type="text/javascript" src="http://192.168.101.2:8081/statics/map/js/init.js"></script>
+<style type="text/css">
+@charset "utf-8";
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+body{moz-user-select: -moz-none;
+-moz-user-select: none;
+-o-user-select:none;
+-khtml-user-select:none;
+-webkit-user-select:none;
+-ms-user-select:none;
+user-select:none;}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+a:link{text-decoration:none;}
+a:visited{text-decoration:none;}
+a:hover{text-decoration:none;}
+a:active{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+h1,h2,h3,h4,h5,h6{margin-bottom:1em;color:rgba(0,0,0,.85)}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:200px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px; color:#3c8dbc; font-weight:bold;}
+.menu-item-1>ul{margin-top:12px}
+.menu-item-1.active>ul{display:block}
+.menu-item-2{padding-left:5px;font-size:14px;line-height:20px; color:#363636; font-weight:normal;}
+.menu-item-2>ul{margin-top:12px}
+.menu-item-2.active>ul{display:block}
+.main-container{position:relative; margin-top:0px; border-top:solid 1px #f1f1f1; margin-left:260px; padding:0px; background-color:#fff;}
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+
+.beng_state{position:relative; margin-left:0px; height:100%; overflow-x:hide; overflow-y:auto; background-color:#fff;}
+.beng_state table{height:160px; overflow-x:hide; overflow-y:auto;}
+.beng_state table tbody tr td img{width:16px; height:16px; display:inline-block; margin:0px 5px;}
+.no-sub{margin-right:0px!important;}
+
+
+/* .beng_state table tr:nth-child(even){
+	background: #f1f1f1;
+} */
+</style>
+<script type="text/javascript">
+	/* <![CDATA[ */
+	/* ]]> */
+</script>
+</head>
+<body class="nihilo">
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+	<!-- <div class="sidebar-wrapper">
+		<div class="gs_site" onClick="javascript:location.reload()">排水泵站</div>
+		<div class="sidebar">
+			<ul class="menu-group">
+				<li v-for="(item, index) in treeList" class="menu-item menu-item-1">
+					<a v-bind:id="item.siteId" href="javascript:;"><span class="glyphicon glyphicon-th-large"></span>&nbsp;{{item.name}}</a>
+					<ul>
+						<li v-for="(citem, cindex) in item.treelist" class="menu-item menu-item-2">
+							<a v-bind:id="citem.siteId" href="javascript:;" v-on:click="getIndex(citem.siteId)"><span v-bind:id="citem.siteId+'span1'" class="glyphicon glyphicon-chevron-right"></span><span v-bind:id="citem.siteId+'span2'" style="display:none;" class="glyphicon glyphicon-chevron-down"></span>&nbsp;&nbsp;{{citem.name}}</a>
+							<ul v-bind:id="citem.siteId+'ul'" style="display:none;">
+	                            <li v-for="(ccitem, ccindex) in citem.treelist" class="menu-item menu-item-3 menu-item-check">
+	                            	<a v-bind:id="ccitem.siteId" class="no-sub" href="javascript:;" v-on:click="getIndex2(ccitem.siteId,ccitem.x,ccitem.y)"><input v-if="ccitem.flag" name="site" type="checkbox" v-bind:siteName="ccitem.name" v-bind:value="ccitem.siteId" />{{ccitem.name}}</a>
+	                            </li>
+	                        </ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div> -->
+	<div class="beng_state">
+	<table class="table">
+		<thead>
+			<tr style="height:40px;">
+				<th>泵站</th>
+				<th style="text-align:center;">状态</th>
+				<!-- <th style="text-align:center;">累计流量(m³)</th> -->
+				<th style="text-align:center;">出水流量(m³/h)</th>
+				<th style="text-align:center;">COD(mg/L)</th>
+				<th style="text-align:center;">PH</th>
+				<th style="text-align:center;">氨氮(mg/L)</th>
+				<th style="text-align:center;">总磷(mg/L)</th>
+				<th style="text-align:center;">SS</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="(item, index) in bengs"  v-on:click="psbzjc_detail(item.siteId,item.name,ID)">
+				<td>{{item.name}}</td>
+				<td>
+					<span v-for="(citem, cindex) in item.beng">
+						<img v-if="citem.state == '0'" v-bind:title="citem.name" src="../../statics/img/gray.png"/>
+						<img v-if="citem.state == '1'" v-bind:title="citem.name" src="../../statics/img/red.png"/>
+						<img v-if="citem.state == '2'" v-bind:title="citem.name" src="../../statics/img/orange.png"/>
+						<img v-if="citem.state == '3'" v-bind:title="citem.name" src="../../statics/img/blue.gif"/>				
+					</span>
+				</td>
+				<!-- <td align="center">{{item.jlj}}</td> -->
+				<td align="center">{{item.ins}}</td>
+				<td align="center">{{item.cod}}</td>
+				<td align="center">{{item.ph}}</td>
+				<td align="center">{{item.nh4}}</td>
+				<td align="center">{{item.tp}}</td>
+				<td align="center">{{item.ss}}</td>
+<!-- 				<td :style='(parseFloat(item.tur)>1)?RedStyle:BlackStyle'>{{item.tur}}</td>
+				<td>{{item.ph}}</td>
+				<td :style='(parseFloat(item.cho)<0.3)?RedStyle:BlackStyle'>{{item.cho}}</td> -->
+			</tr>
+		</tbody>
+	</table>
+	</div>
+</div>
+<script type="text/javascript">
+var RedStyle={color:"#f00"}
+var BlackStyle={color:"#363636"}
+var websocket = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);
+	       
+	    }
+	}); 
+	//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+	websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}
+else {
+//alert('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+//alert("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+//alert("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+	var infor=[];
+	console.log(event.data);
+	infor=JSON.parse(event.data);
+	setMessageInnerHTML(infor);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+	closeWebSocket();
+//alert("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+//将消息显示在网页上
+function setMessageInnerHTML(obj) {
+console.log(obj.length);
+console.log(obj);
+console.log(vm.bengs);
+// 遍历websocket回传数据
+for(var i=0; i<obj.length;i++){
+	for(var m=0;m<vm.bengs.length;m++){
+		if(vm.bengs[m].siteId==obj[i].parentId){
+			if(obj[i].dataType=="FLC"){//累计流量
+				vm.bengs[m].jlj=obj[i].jlj.toFixed(1);
+			}else if(obj[i].dataType=="FLS"){//瞬时流量
+				vm.bengs[m].ins=obj[i].ins.toFixed(1);
+			}else if(obj[i].dataType=="COD"){//出口压力
+				vm.bengs[m].cod=obj[i].cod.toFixed(1);
+			}else if(obj[i].dataType=="PH"){
+				vm.bengs[m].ph=obj[i].ph.toFixed(2);
+			}else if(obj[i].dataType=="TN"){
+				vm.bengs[m].tn=obj[i].tn.toFixed(2);
+			}else if(obj[i].dataType=="TP"){
+				vm.bengs[m].tp=obj[i].tp.toFixed(2);
+			}else if(obj[i].dataType=="SS"){
+				vm.bengs[m].ss=obj[i].ss.toFixed(2);
+			}else if(obj[i].dataType=="NH4"){
+				vm.bengs[m].nh4=obj[i].nh4.toFixed(2);
+			}	
+			for(var n=0;n<vm.bengs[m].beng.length;n++){
+				if(vm.bengs[m].beng[n].siteId==obj[i].siteId){
+					console.log(vm.bengs[m].beng[n]);
+					console.log(obj[i]);
+					if(obj[i].dataType=="Fault"){//错误   红
+						console.log(vm.bengs[m].beng[n].name+vm.bengs[m].beng[n].state);
+						if(obj[i].fault){
+							vm.bengs[m].beng[n].state="1";
+						}
+					}
+					if(obj[i].dataType=="STOP"){//停止  黄
+						console.log(vm.bengs[m].beng[n].name+vm.bengs[m].beng[n].state);
+						if(obj[i].stop){
+							if(vm.bengs[m].beng[n].state!="1"){
+								vm.bengs[m].beng[n].state="2";								
+							}
+						}else{
+							vm.bengs[m].beng[n].state="3";						
+						}
+					}
+					if(obj[i].dataType=="RUN"){//运行  蓝
+						console.log(vm.bengs[m].beng[n].name+vm.bengs[m].beng[n].state);
+						if(obj[i].run){
+							if(vm.bengs[m].beng[n].state!="1"&&vm.bengs[m].beng[n].state!="2"){
+								vm.bengs[m].beng[n].state="3";			
+								console.log(vm.bengs[m].beng[n].name+vm.bengs[m].beng[n].state);					
+							}
+						}else{
+							vm.bengs[m].beng[n].state="0";						
+						}
+					}
+					if(obj[i].dataType=="Mode"){//运行  绿
+						console.log(vm.bengs[m].beng[n].name+vm.bengs[m].beng[n].state);
+						if(obj[i].mode=="0"){//停止   黄
+							vm.bengs[m].beng[n].state="2";
+						}else if(obj[i].mode=="1"){//运行   黄
+							vm.bengs[m].beng[n].state="3";
+						}else if(obj[i].mode=="2"){//故障   红
+							vm.bengs[m].beng[n].state="1";
+						}
+					}
+					console.log(vm.bengs[m].beng[n].name+vm.bengs[m].beng[n].state);
+				}
+			}
+		}
+	}
+}
+console.log(vm.bengs);
+}
+//关闭WebSocket连接
+function closeWebSocket(){
+websocket.close();
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/closeSession",
+    contentType: "application/json",
+    data: JSON.stringify(),
+	async:false,
+    success: function(r){
+        console.log(r)
+    }
+});
+}
+//发送消息
+function send(DT){
+setTimeout(
+		function(){
+			$.ajax({
+		    type: "POST",
+		    url: baseURL + "fac/data/listp",
+		    contentType: "application/json",
+		    data: JSON.stringify({"siteId":DT}),
+		    success: function(r){
+		        console.log(r);
+		    }
+		})
+},2000)}
+</script>
+	<script src="../../statics/plugins/layui/lay/all.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../statics/map/js/switcher.js"></script>
+	<script type="text/javascript" src="../../statics/map/js/tools.js"></script>
+	<script src="${request.contextPath}/statics/js/modules/sys/psbzjc.js"></script>
+</body>
+</html>

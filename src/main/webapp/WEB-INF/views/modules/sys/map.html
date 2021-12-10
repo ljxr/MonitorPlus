@@ -1,0 +1,633 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<style type="text/css">
+	body{background-color:#154e90; overflow:hidden;}
+	#EC{position:relative; margin:-50px auto;}
+	.tip{width:320px; height:150px; background-color:rgba(13,38,94,0.3); border:solid 1px rgba(7,166,255,1); border-radius:5px;}	
+	.tipTit{width:320px; color:#fff; height:36px; line-height:36px; font-size:14px; text-align:center; border-bottom:solid 2px rgba(7,166,255,1);}
+	.tipBody{width:320px; color:#fff; font-size:12px;}
+	.th1{width:70px; height:24px; line-height:24px; text-align:left;}
+	.th2{width:50px; height:24px; line-height:24px; text-align:left;}
+	.tip2{width:250px; height:95px; background-color:rgba(13,38,94,0.3); border:solid 1px rgba(7,166,255,1); border-radius:5px;}	
+	.tipTit2{width:250px; color:#fff; height:36px; line-height:36px; font-size:14px; text-align:center; border-bottom:solid 2px rgba(7,166,255,1);}
+	.tipBody2{width:250px; color:#fff; font-size:12px;}
+	.tip22{width:243px; height:227.4px; background-color:#1997eb; background:url(../../statics/img/maptip.png); background-repeat: norepeat; background-size: cover;}	
+	.tipTit22{width:250px; color:#fff; height:36px; line-height:36px; font-size:14px; text-align:center;}
+	.tipBody22{width:250px; color:#fff; font-size:12px;}
+	.tip3{width:200px; height:65px; background-color:rgba(13,38,94,0.3); border:solid 1px rgba(7,166,255,1); border-radius:5px;}	
+	.tipTit3{width:200px; color:#fff; height:36px; line-height:36px; font-size:14px; text-align:center; border-bottom:solid 2px rgba(7,166,255,1);}
+	.tipBody3{width:200px; color:#fff; font-size:12px;}
+	.TP{ z-index:99; width:243px; height:227.4px; background:url(../../statics/img/maptip.png); background-repeat: norepeat; background-size: cover;}
+	#TIP1{position:absolute; top:5px; left:20px; display:none;}	
+	#TIP2{position:absolute; top:230px; left:20px; display:none;}
+	#TIP3{position:absolute; top:455px; left:20px; display:none;}
+	#TIP4{position:absolute; top:5px; right:20px; display:none;}
+	#TIP5{position:absolute; top:230px; right:20px; display:none;}
+	#TIP6{position:absolute; top:455px; right:20px; display:none;}
+	#TIP7{position:absolute; top:455px; right:263px; display:none;}
+	#TIP8{position:absolute; top:5px; left:263px; display:none;}
+	.TPtit{position:absolute; width:200px; height:30px; line-height:30px; top:32px; left:30px; text-align:center; color:#fff; font-size:14px;}
+	.TPnum{position:absolute; width:100px; height:20px; ling-height:20px; font-size:12px; color:#fff;}
+	.TPnum1{top:90px; left:120px;}
+	.TPnum2{top:115px; left:120px;}
+	.TPnum3{top:140px; left:120px;}
+	.TPnum4{top:165px; left:120px;}
+	.TPnum5{top:190px; left:120px;}
+</style>
+</head>
+
+<body id="app">
+<div id="TIP1" class="TP"></div>
+<div id="TIP2" class="TP"></div>
+<div id="TIP3" class="TP"></div>
+<div id="TIP4" class="TP"></div>
+<div id="TIP5" class="TP"></div>
+<div id="TIP6" class="TP"></div>
+<div id="TIP7" class="TP"></div>
+<div id="TIP8" class="TP"></div>
+<div id="EC"></div>
+<script type="text/javascript">
+const rem=document.body.clientWidth*1080/1920/76;
+$("#EC").css({"width":rem*120,"height":rem*70});
+//$("#TIP1").css({"top":rem*10,"left":rem*10,"width":rem*50,"height":rem*50});
+console.log(rem*120,"######################");
+var vm = new Vue({
+	  el: '#app',
+	  data: {
+	    message: 'Hello Vue.js!',
+	    gsc:[],
+	    gscMap:{},
+	    dt:[],
+	  },
+	  methods:{
+	  }
+	})
+
+var baseURL = "../../";
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);	       
+	    }
+	}); 
+
+	//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}else {
+console.log('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+console.log("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+console.log("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+	var infor=[];
+	console.log(event.data);
+	infor=JSON.parse(event.data);
+	console.log(typeof(infor));
+	console.log(infor);
+	vm.dt = infor;
+	setMessageInnerHTML(infor);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+	closeWebSocket();
+console.log("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+
+  //关闭WebSocket连接
+  function closeWebSocket(){
+  websocket.close();
+  $.ajax({
+      type: "POST",
+      url: "../../fac/data/closeSession",
+      contentType: "application/json",
+      data: JSON.stringify(),
+  	async:false,
+      success: function(r){
+          console.log(r)
+      }
+  });
+  }
+  //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML) {
+    	console.log(innerHTML);
+    	var ls={};
+    	var ls2 = [];
+    for(i=0;i<innerHTML.length;i++){
+    	if(innerHTML[i].parentId=="04-1-SC-LP"||innerHTML[i].parentId=="03-1-SC-GY"||innerHTML[i].parentId=="01-2-SC-HG"){
+    		if(innerHTML[i].dataType=="FLS"){
+        		$("#"+innerHTML[i].siteId+"-FLS").html(innerHTML[i].ins.toFixed(3));
+			}else if(innerHTML[i].dataType=="PTOUT"){
+        		$("#"+innerHTML[i].siteId+"-PTOUT").html(innerHTML[i].yl.toFixed(3));
+			}else if(innerHTML[i].dataType=="HOCL"){
+        		$("#"+innerHTML[i].siteId+"-HOCL").html(innerHTML[i].cho.toFixed(3));
+			}else if(innerHTML[i].dataType=="PH"){
+        		$("#"+innerHTML[i].siteId+"-pH").html(innerHTML[i].ph.toFixed(3));
+			}else if(innerHTML[i].dataType=="TUR"){
+        		$("#"+innerHTML[i].siteId+"-TUR").html(innerHTML[i].tur.toFixed(3));
+			}
+    	}else{
+    		if(innerHTML[i].dataType=="FLS"){
+        		$("#"+innerHTML[i].parentId+"-FLS").html(innerHTML[i].ins.toFixed(3));
+        		console.log("#"+innerHTML[i].parentId+"-"+innerHTML[i].dataType);
+        		console.log(innerHTML[i].ins);
+        		console.log($("#"+innerHTML[i].parentId+"-"+innerHTML[i].dataType));
+			}else if(innerHTML[i].dataType=="PTOUT"){
+        		$("#"+innerHTML[i].parentId+"-PTOUT").html(innerHTML[i].yl.toFixed(3));
+			}else if(innerHTML[i].dataType=="HOCL"){
+        		$("#"+innerHTML[i].parentId+"-HOCL").html(innerHTML[i].cho.toFixed(3));
+			}else if(innerHTML[i].dataType=="PH"){
+        		$("#"+innerHTML[i].parentId+"-pH").html(innerHTML[i].ph.toFixed(3));
+			}else if(innerHTML[i].dataType=="TUR"){
+        		$("#"+innerHTML[i].parentId+"-TUR").html(innerHTML[i].tur.toFixed(3));
+			}
+    	}
+    	if(innerHTML[i].siteName.indexOf("泵站") == -1){//水厂
+    		var ls22={};
+    		if(innerHTML[i].dataType=="FLS"){
+    			ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"]=""; 
+        		ls22={siteId:innerHTML[i].parentId,type:innerHTML[i].dataType,value:innerHTML[i].ins};
+    			console.log(ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"],"CCCCCCCCCCCCCCCCCCCCCCCC")
+        		//ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"].push(innerHTML[i].ins);
+			}else if(innerHTML[i].dataType=="PTOUT"){
+        		ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"]=""; 
+        		ls22={siteId:innerHTML[i].parentId,type:innerHTML[i].dataType,value:innerHTML[i].yl};
+        		//ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"].push(innerHTML[i].yl);
+			}else if(innerHTML[i].dataType=="HOCL"){
+        		ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"]=""; 
+        		ls22={siteId:innerHTML[i].parentId,type:innerHTML[i].dataType,value:innerHTML[i].cho};
+        		//ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"].push(innerHTML[i].cho);
+			}else if(innerHTML[i].dataType=="PH"){
+        		ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"]=""; 
+        		ls22={siteId:innerHTML[i].parentId,type:innerHTML[i].dataType,value:innerHTML[i].ph};
+        		//ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"].push(innerHTML[i].ph);
+			}else if(innerHTML[i].dataType=="TUR"){
+        		ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"]=""; 
+        		ls22={siteId:innerHTML[i].parentId,type:innerHTML[i].dataType,value:innerHTML[i].tur};
+        		//ls[innerHTML[i].parentId+"-"+innerHTML[i].dataType+"2"].push(innerHTML[i].tur);
+			}	
+    		ls2.push(ls22);
+    	}
+    	}
+    for(var a in ls){
+    	  console.log(a);
+    	  console.log(ls[a]);
+    	  var ll=0;
+    	  var llNum=0;
+	   	  for(var j=0;j<ls2.length;j++){
+    		  if((a.indexOf(ls2[j].siteId)!=-1)&&(a.indexOf(ls2[j].type)!=-1)){
+    			  llNum+=1;
+    			  ll+=ls2[j].value; 
+    		  }
+    	  }
+	   	if(a.indexOf("FLS")!=-1){
+	   		ls[a] = ll.toFixed(3);   				  
+		  }else{
+			  ls[a] = (ll/llNum).toFixed(3);    				  
+		  }
+    	} 
+    for(var a in ls){
+  	  console.log(a);
+  	  console.log(ls[a]);
+  	  $("#"+a).html(ls[a]);
+    }
+  }   
+$(function(){
+	
+})
+</script>
+<script type="text/javascript">
+var anji = "${request.contextPath}/statics/js/map.geojson";
+echarts.extendsMap = function(id, opt){
+    // 实例
+    var chart = this.init(document.getElementById(id));
+    var geoCoordMap = {};
+	var DT = [];
+	var Data = [];
+	var LSP = "";
+	$.ajax({//查询水厂点位“S02”
+	    type: "POST",
+	    url: baseURL + "sys/site/queryfpSite",
+	    contentType: "application/json",
+	    async:false,
+	    data:JSON.stringify("S02"),//JSON解析不了单引号，只能解析双引号
+	    dataType:"json",
+	    success: function(r){
+	    	gscNum = r.length;
+	    	vm.gsc=[];
+	    	vm.gscMap={};
+	    	var index=1;
+	    	for(var i=0; i<r.length; i++){//for闭包
+	    		if(r[i].x){
+		    		var gsc={
+							name:r[i].name,
+							siteId:r[i].siteId,
+							value:[r[i].x,r[i].y],
+							parentSite:[],
+							childSite:[],
+							level: 2,
+							type:"水厂",
+			    		};
+		    		DT.push(gsc);
+		    		geoCoordMap[r[i].name] = [r[i].x,r[i].y];	
+		    		var value={
+		    				name:r[i].name,
+							value:r[i].x+","+r[i].y,
+		    		}
+		    		Data.push(value); 
+	    		$("#TIP"+index).html(
+		    		'<div class="TPtit">'+r[i].name+'</div>'
+					+'<div class="TPnum TPnum1" id="'+r[i].siteId+'-FLS2"></div>'
+					+'<div class="TPnum TPnum2" id="'+r[i].siteId+'-PTOUT2"></div>'
+					+'<div class="TPnum TPnum3" id="'+r[i].siteId+'-HOCL2"></div>'
+					+'<div class="TPnum TPnum4" id="'+r[i].siteId+'-TUR2"></div>'
+					+'<div class="TPnum TPnum5" id="'+r[i].siteId+'-PH2"></div>'
+		    		)
+		    		$("#TIP"+index).show();
+		    		index++;
+		    		
+	    		}
+	    	}
+	    }
+	});
+	  $.ajax({//获取树形结构
+		  type: "POST",
+		  url: "../../sys/area/findAllArea",//获取营业所->sonList片区
+		  async:false,
+		  contentType: "application/json",
+		  data: JSON.stringify(),
+		  success: function(r){
+			  r=JSON.parse(r);
+			  for(var i=0;i<r.length;i++){//营业所
+				  for(var m=0; m<r[i].sonList.length; m++){//片区
+					  var beng={'type':'S03','areaId':r[i].sonList[m].areaId};
+					  $.ajax({//获取片区下的泵站
+						  type: "POST",
+						  url: "../../sys/site/queryfpSite2",
+						  contentType: "application/json",
+						  async:false,
+						  data: JSON.stringify(beng),
+						  success: function(rr){
+							  rr=JSON.parse(rr);
+							  for(var i=0;i<rr.length;i++){								  
+								  var gsbz={
+											name:rr[i].name,
+											siteId:rr[i].siteId,
+											value:[rr[i].x,rr[i].y],
+											parentSite:[],
+											childSite:[],
+											level: 3,
+											type:"泵站",
+							    		};
+						    		DT.push(gsbz);
+						    		geoCoordMap[rr[i].name] = [rr[i].x,rr[i].y];	
+							  }
+						  }
+					  })
+				  }
+			  }
+		  }
+		});
+console.log(DT,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
+		for(var i=0;i<DT.length;i++){
+			$.ajax({
+			    type: "POST",
+			    url: baseURL + "sys/site/queryParentSite",
+			    contentType: "application/json",
+			    data: JSON.stringify(DT[i].siteId),
+				async:false,
+			    dataType:"json",
+			    success: function(r){
+			    	vm.site2=[];
+			     	for(var i=0; i<r.length; i++){
+			     		if(r[i].name.indexOf("出") != -1){
+			     			var lsp = "";
+			     			if(DT[i].type=="水厂"){
+			     				lsp = (r[i].siteId+",PTOUT;"+r[i].siteId+",FLS;"+r[i].siteId+",HOCL;"+r[i].siteId+",TUR;"+r[i].siteId+",PH;");
+			     			}else if(DT[i].type=="泵站"){
+			     				lsp = (r[i].siteId+",PTOUT;"+r[i].siteId+",FLS;");
+			     			}
+			     			LSP+=lsp;
+			     		}
+			    	}
+			    }
+			});
+			if(i==DT.length-1){
+				send();
+			}
+		}
+		//发送消息
+		function send() {
+			console.log(LSP);
+			$.ajax({
+			    type: "POST",
+			    url: "../../fac/data/listp",
+			    contentType: "application/json",
+			    data: JSON.stringify({"siteId":LSP}),
+			    success: function(r){
+			        console.log(r)
+			    }
+			}); 
+		}	
+    var levelColorMap = {
+        '1': 'rgba(241, 109, 115, .8)',
+        '2': 'rgba(241,230,37, .7)',
+        '3': 'rgba(147, 235, 248, 1)',
+        '4': 'rgba(0, 0, 139, 1)'
+    };
+
+    var convertData = function (data) {
+    	console.log(data,"!!!!!!!!!!!!!!!!!!!!!!!");
+        var res = [];
+        for (var i = 0; i < data.length; i++) {
+            var geoCoord = DT[data[i].name];
+            if (geoCoord) {
+                res.push({
+                    name: data[i].name,
+                    value: geoCoord.concat(data[i].value)
+                });
+            }
+        }
+        return res;
+    };
+	var defaultOpt = {
+		mapName: 'anji',     // 地图展示
+		goDown: false,        // 是否下钻
+		bgColor: '#404a59',   // 画布背景色
+        activeArea: [],       // 区域高亮,同echarts配置项
+        data: [],
+        // 下钻回调(点击的地图名、实例对象option、实例对象)
+        //callback: function(name, option, instance){}
+	};
+	if(opt) opt = this.util.extend(defaultOpt, opt);
+    console.log(opt);
+    var handleEvents = {
+        // 设置effectscatter散点图
+        initSeriesData: function(data){
+            var temp = [];
+            for(var i = 0;i < data.length;i++){
+                var geoCoord = geoCoordMap[data[i].name];
+                console.log(geoCoord);
+                if(geoCoord){
+                    temp.push({
+                        name: data[i].name,
+                        value: geoCoord.concat(data[i].value, data[i].level)
+                    });
+                }
+            };
+            return temp;
+        },
+
+        zoomAnimation: function(){
+            var count = null;
+            var zoom = function(per){
+                if(!count) count = per;
+                count = count + per;
+                // console.log(per,count);
+                chart.setOption({
+                    geo: {
+                        zoom: count
+                    }
+                });
+                if(count < 1) window.requestAnimationFrame(function(){
+                    zoom(0.2);
+                });
+            };
+            window.requestAnimationFrame(function(){
+                zoom(0.2);
+            });
+        }
+    };
+    
+    var option = {
+    		tooltip: {
+    	        padding: 0,
+    	        enterable: true,
+    	        transitionDuration: 1,
+    	        textStyle: {
+    	            color: '#000',
+    	            decoration: 'none',
+    	        },
+    	        // position: function (point, params, dom, rect, size) {
+    	        //   return [point[0], point[1]];
+    	        // },
+    	        formatter: function(params) {
+    	            var tipHtml = '';
+    	            console.log(params,DT,DT[params.dataIndex],"@@@@@@@@");
+    	            if(params.name.indexOf("梅溪水厂") != -1){
+        	            tipHtml = '<div class="tip">'
+            	            +'<div class="tipTit">'+params.name+'</div>'
+            	            +'<div class="tipBody">'
+            	            +'<table>'
+            	            +'<tr><td class="th1"></td><td class="th2">流量</td><td class="th2">压力</td><td class="th2">余氯</td><td class="th2">浊度</td><td class="th2">pH</td></tr>'
+            	            +'<tr><td class="th1">梅溪出水点</td><td class="th2" id="04-1-SC-LPMXC-FLS"></td><td class="th2" id="04-1-SC-LPMXC-PTOUT"></td><td class="th2" id="04-1-SC-LPMXC-HOCL"></td><td class="th2" id="04-1-SC-LPMXC-TUR"></td><td class="th2" id="04-1-SC-LPMXC-pH"></td></tr>'
+            	            +'<tr><td class="th1">晓墅出水点</td><td class="th2" id="04-1-SC-LPXSC-FLS"></td><td class="th2" id="04-1-SC-LPXSC-PTOUT"></td><td class="th2" id="04-1-SC-LPXSC-HOCL"></td><td class="th2" id="04-1-SC-LPXSC-TUR"></td><td class="th2" id="04-1-SC-LPXSC-pH"></td></tr>'
+            	            +'<tr><td class="th1">溪龙出水点</td><td class="th2" id="04-1-SC-LPXLC-FLS"></td><td class="th2" id="04-1-SC-LPXLC-PTOUT"></td><td class="th2" id="04-1-SC-LPXLC-HOCL"></td><td class="th2" id="04-1-SC-LPXLC-TUR"></td><td class="th2" id="04-1-SC-LPXLC-pH"></td></tr>'
+            	            +'</table>'
+            	            +'</div>';    	            	
+    	            }else if(params.name.indexOf("高禹水厂") != -1){
+        	            tipHtml = '<div class="tip">'
+            	            +'<div class="tipTit">'+params.name+'</div>'
+            	            +'<div class="tipBody">'
+            	            +'<table>'
+            	            +'<tr><td class="th1"></td><td class="th2">流量</td><td class="th2">压力</td><td class="th2">余氯</td><td class="th2">浊度</td><td class="th2">pH</td></tr>'
+            	            +'<tr><td class="th1">D600出水点</td><td class="th2" id="03-1-SC-GY1CC-FLS"></td><td class="th2" id="03-1-SC-GY1CC-PTOUT"></td><td class="th2" id="03-1-SC-GY1CC-HOCL"></td><td class="th2" id="03-1-SC-GY1CC-TUR"></td><td class="th2" id="03-1-SC-GY1CC-pH"></td></tr>'
+            	            +'<tr><td class="th1">D800出水点</td><td class="th2" id="03-1-SC-GY2CC-FLS"></td><td class="th2" id="03-1-SC-GY2CC-PTOUT"></td><td class="th2" id="03-1-SC-GY2CC-HOCL"></td><td class="th2" id="03-1-SC-GY2CC-TUR"></td><td class="th2" id="03-1-SC-GY2CC-pH"></td></tr>'
+            	            +'</table>'
+            	            +'</div>';    	            	
+    	            }else if(params.name.indexOf("杭垓水厂") != -1){
+        	            tipHtml = '<div class="tip">'
+            	            +'<div class="tipTit">'+params.name+'</div>'
+            	            +'<div class="tipBody">'
+            	            +'<table>'
+            	            +'<tr><td class="th1"></td><td class="th2">流量</td><td class="th2">压力</td><td class="th2">余氯</td><td class="th2">浊度</td><td class="th2">pH</td></tr>'
+            	            //+'<tr><td class="th1">杭垓水厂出水点</td><td class="th2" id="04-1-SC-LPMXC-FLS"></td><td class="th2" id="04-1-SC-LPMXC-PTOUT"></td><td class="th2" id="04-1-SC-LPMXC-HOCL"></td><td class="th2" id="04-1-SC-LPMXC-TUR"></td><td class="th2" id="04-1-SC-LPMXC-pH"></td></tr>'
+            	            +'<tr><td class="th1">出水点1</td><td class="th2" id="01-2-SC-HGCC1-FLS"></td><td class="th2" id="01-2-SC-HGCC1-PTOUT"></td><td class="th2" id="01-2-SC-HGCC1-HOCL"></td><td class="th2" id="01-2-SC-HGCC1-TUR"></td><td class="th2" id="01-2-SC-HGCC1-pH"></td></tr>'
+            	            +'<tr><td class="th1">出水点2</td><td class="th2" id="01-2-SC-HGCC2-FLS"></td><td class="th2" id="01-2-SC-HGCC2-PTOUT"></td><td class="th2" id="01-2-SC-HGCC2-HOCL"></td><td class="th2" id="01-2-SC-HGCC2-TUR"></td><td class="th2" id="01-2-SC-HGCC2-pH"></td></tr>'
+            	            +'<tr><td class="th1">出水点3</td><td class="th2" id="01-2-SC-HGCC3-FLS"></td><td class="th2" id="01-2-SC-HGCC3-PTOUT"></td><td class="th2" id="01-2-SC-HGCC3-HOCL"></td><td class="th2" id="01-2-SC-HGCC3-TUR"></td><td class="th2" id="01-2-SC-HGCC3-pH"></td></tr>'
+            	            +'</table>'
+            	            +'</div>';    	            	
+    	            }else if(params.name.indexOf("水厂") != -1){
+    	            	console.log(DT[params.dataIndex].siteId,"$$$$$$$$$$$$$$$$$$$$$$$$$$$4");
+        	            tipHtml = '<div class="tip2">'
+            	            +'<div class="tipTit2">'+params.name+'</div>'
+            	            +'<div class="tipBody2">'
+            	            +'<table>'
+            	            +'<tr><td class="th2">流量</td><td class="th2">压力</td><td class="th2">余氯</td><td class="th2">浊度</td><td class="th2">pH</td></tr>'
+            	            +'<tr><td class="th2" id="'+DT[params.dataIndex].siteId+'-FLS"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-PTOUT"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-HOCL"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-TUR"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-pH"></td></tr>'
+            	            +'</table>'
+            	            +'</div>'; 
+    	            	/* tipHtml = '<div class="tip22">'
+            	            +'<div class="tipTit22">'+params.name+'</div>'
+            	            +'<div class="tipBody22">'
+            	            +'<table>'
+            	            +'<tr><td class="th2">流量</td><td class="th2">压力</td><td class="th2">余氯</td><td class="th2">浊度</td><td class="th2">pH</td></tr>'
+            	            +'<tr><td class="th2" id="'+DT[params.dataIndex].siteId+'-FLS"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-PTOUT"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-HOCL"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-TUR"></td><td class="th2" id="'+DT[params.dataIndex].siteId+'-pH"></td></tr>'
+            	            +'</table>'
+            	            +'</div>';  */  
+    	            }else if(params.name.indexOf("泵站") != -1){
+    	            	console.log(DT[params.dataIndex].siteId,"$$$$$$$$$$$$$$$$$$$$$$$$$$$4");
+    	            	tipHtml = '<div class="tip3">'
+            	            +'<div class="tipTit3">'+params.name+'</div>'
+            	            +'<div class="tipBody3">'
+            	            +'<table>'
+            	            +'<tr><td class="th2">流量</td><td class="th2" id="'+DT[params.dataIndex].siteId+'-FLS"></td><td class="th2">压力</td><td class="th2" id="'+DT[params.dataIndex].siteId+'-PTOUT"></td></tr>'
+            	            +'</table>'
+            	            +'</div>';
+    	            }else{
+    	            	tipHtml = "点位信息不详";
+    	            }
+/*     	            setTimeout(function() {
+    	                tooltipCharts(params.name);
+    	            }, 10); */
+    	            return tipHtml;
+    	        }
+    	        
+    	    },
+    	backgroundColor: opt.bgColor,
+        geo: {
+        	map: opt.mapName,
+            // roam: true,
+            zoom: 1,
+        	label: {
+                normal: {
+                    show: true,
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                emphasis: {
+                    textStyle: {
+                        color: '#fff'
+                    }
+                }
+            },
+            itemStyle: {
+                normal: {
+                    borderColor: 'rgba(147, 235, 248, 1)',
+                    borderWidth: 1,
+                    areaColor: {
+                        type: 'radial',
+                        x: 0.5,
+                        y: 0.5,
+                        r: 0.8,
+                        colorStops: [{
+                            offset: 0, 
+                            color: 'rgba(147, 235, 248, 0)' // 0% 处的颜色
+                        }, {
+                            offset: 1, 
+                            color: 'rgba(147, 235, 248, .2)' // 100% 处的颜色
+                        }],
+                        globalCoord: false // 缺省为 false
+                    },
+                    shadowColor: 'rgba(128, 217, 248, 1)',
+                    // shadowColor: 'rgba(255, 255, 255, 1)',
+                    shadowOffsetX: -2,
+                    shadowOffsetY: 2,
+                    shadowBlur: 10
+                },
+                emphasis: {
+                    areaColor: '#389BB7',
+                    borderWidth: 0
+                }
+            },
+            regions: opt.activeArea.map(function(item){
+                if(typeof item !== 'string'){
+                    return {
+                        name: item.name,
+                        itemStyle: {
+                            normal: {
+                                areaColor: item.areaColor || '#389BB7'
+                            }
+                        },
+                        label: {
+                            normal: {
+                                show: item.showLabel,
+                                textStyle: {
+                                    color: '#fff'
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    return {
+                        name: item,
+                        itemStyle: {
+                            normal: {
+                                borderColor: '#91e6ff',
+                                areaColor: '#389BB7'
+                            }
+                        }
+                    }
+                }
+            })
+        },
+        series: [{
+            type: 'effectScatter',
+            coordinateSystem: 'geo',
+            // symbol: 'diamond',
+            showEffectOn: 'render',
+            // data: convertData(Data),
+            rippleEffect: {
+                period: 4,
+                scale: 3,
+                brushType: 'fill'
+            },
+            hoverAnimation: true,
+            itemStyle: {
+                normal: {
+                    color: function(params){
+                    	console.log(params,"*********************")
+                        return levelColorMap[params.value[4]];
+                    },
+                    shadowBlur: 10,
+                    shadowColor: '#333'
+                }
+            },
+            data: handleEvents.initSeriesData(DT)
+        }]
+    };
+
+    chart.setOption(option);
+
+
+    return chart;
+};
+
+$.getJSON(anji, function(geoJson){
+    echarts.registerMap('安吉国源水务', geoJson);
+    var myChart = echarts.extendsMap('EC', {
+    	bgColor: '#154e90', // 画布背景色
+    	mapName: '安吉国源水务',    // 地图名
+    	goDown: false,       // 是否下钻
+    });
+})
+</script>
+</body>
+</html>

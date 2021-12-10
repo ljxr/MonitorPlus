@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>排水统计分析</title>
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<style type="text/css">
+@charset "utf-8";
+*{margin:0;padding:0;box-sizing:border-box}
+body{color:rgba(0,0,0,.65);font-size:14px;line-height:1.8;font-family:"微软雅黑";background:#FAFAFA}
+a{text-decoration:none;color:#108EE9}
+a:hover{color:#108EE9!important;cursor:pointer}
+em{font-style:normal}
+ul{list-style:none}
+h1,h2,h3,h4,h5,h6{margin-bottom:1em;color:rgba(0,0,0,.85)}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:270px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar-wrapper.fixed{position:fixed;top:0px;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.menu-item .sub-title:after{content:'\ee4e';font-family:"iconfont";font-size:12px;line-height:1;color:#555;position:absolute;top:50%;right:44px;margin-top:-6px;transform:rotate(180deg);transition:all .15s ease}
+.menu-item.collapse .sub-title:after{margin-top:-5px;transform:rotate(0)}
+.menu-item .sub-title:hover:after{color:#108EE9}
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:36px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px}
+.menu-item-1>ul{display:none;margin-top:12px}
+.menu-item-1.active>ul{display:block}
+.menu-item-2{padding-top:8px;padding-bottom:8px;padding-left:15px;font-size:14px;line-height:28px}
+.menu-item-2>ul{display:none;margin-top:12px}
+.menu-item-2.active>ul{display:block}
+.main-container{position:relative;margin-left:280px;padding:0px}
+</style>
+<style type="text/css">
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+#analyse_header{height:40px; position:relative;margin:0px; padding:0px;  background-color:#f1f1f1;}
+#analyse_header p{line-height:40px;}
+#analyse_container{}
+#test10{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test6{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test7{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test8{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#test{}
+.layui-table-body{height:234px; overflow-x:auto; overflow-y:auto;}
+.layui-form-radio{margin-right:0px; padding-right:0px;}
+.menu-group{z-index:1;}
+.menu-group ul{z-index:2;}
+.menu-group ul ul{z-index:3;}
+</style>
+</head>
+
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+<div class="sidebar-wrapper fixed">
+	<div class="gs_site" onClick="window.location.href='psgwjc.html';">排水流量监测点</div>
+	<div class="sidebar">
+		<ul class="menu-group">
+			<li v-for="(item, index) in treeList" class="menu-item menu-item-1 collapse">
+				<a v-bind:id="item.siteId" class="sub-title" href="javascript:;" v-on:click="getIndex(item.siteId)"><input v-if="item.flag" name="site" type="checkbox" v-bind:value="item.siteId" />{{item.name}}</a>
+				<ul>
+					<li v-for="(citem, cindex) in item.treelist" class="menu-item menu-item-3 menu-item-check collapse">
+						<a v-bind:id="citem.siteId" class="no-sub" href="javascript:;" v-on:click="searchSiteId(citem.siteId)"><input v-if="citem.flag" name="site" type="checkbox" v-bind:siteName="citem.name" v-bind:value="citem.siteId" />{{citem.name}}</a>
+						<!-- <ul>
+                            <li v-for="(ccitem, ccindex) in citem.treelist" class="menu-item menu-item-3 menu-item-check collapse">
+                            	<a v-bind:id="ccitem.siteId" class="no-sub" href="javascript:;" v-on:click="searchSiteId(ccitem.siteId)"><input v-if="ccitem.flag" name="site" type="checkbox" v-bind:siteName="ccitem.name" v-bind:value="ccitem.siteId" />{{ccitem.name}}</a>
+                            </li>
+                        </ul> -->
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+<div class="main-container">
+	<div id="analyse_header">
+		<p>&nbsp;&nbsp;排水量分析</p>
+	</div>
+	<div id="analyse_container">
+		<form class="layui-form" action="">
+			<div class="layui-form-item" style="margin-top:10px;">
+			    <div class="layui-inline" style="width:300px;">
+			      <label class="layui-form-label" style="width:90px;">查询精度:</label>
+			      <div class="layui-input-inline" style="width:200px;">
+			        <input type="radio" name="precise" value="hour" lay-filter="unit" title="时" checked="true">
+					<input type="radio" name="precise" value="day" lay-filter="unit" title="日">
+					<input type="radio" name="precise" value="month" lay-filter="unit" title="月">
+					<input type="radio" name="precise" value="year" lay-filter="unit" title="年">
+			      </div>
+			    </div>
+			    <div class="layui-inline" style="width:400px;">
+			      <label class="layui-form-label" style="width:100px;">时间范围:</label>
+			      <div class="layui-input-inline" style="width:280px;" id="yy">
+			        <input type="text" class="layui-input" id="test7" placeholder="年范围">
+			      </div>
+			      <div class="layui-input-inline" style="width:280px;" id="mm">
+			        <input type="text" class="layui-input" id="test8" placeholder="年月范围">
+			      </div>
+			      <div class="layui-input-inline" style="width:280px;" id="dd">
+			        <input type="text" class="layui-input" id="test6" placeholder="日期范围">
+			      </div>
+			      <div class="layui-input-inline" style="width:280px;" id="hh">
+			        <input type="text" class="layui-input" id="test10" placeholder="日期时间范围">
+			      </div>
+			    </div>
+			    <div class="layui-inline" style="width:90px;">
+			      <div class="layui-input-inline" style="width:90px;">
+			        <button type="button" class="layui-btn" data-type="reload" onClick="queryAnalysisFlow()" style="width:">查询</button>
+			      </div>
+			    </div>
+			</div>
+		</form>
+	    <div class="layui-col-xs12 layui-col-md12" style="height:340px; margin:auto; padding:0px 70px;" id="echart1"></div>
+		<div class="layui-col-xs12 layui-col-md12">
+			<table class="layui-hide" id="demo"></table>
+		</div>
+	</div>
+</div>
+</div>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/psVital.js"></script>
+<script>
+layui.use(['form','table','layedit','laydate'], function(){
+  var form = layui.form
+  ,table = layui.table //表格
+  ,laydate = layui.laydate;
+  form.on('radio(unit)', function (data) {
+	    var abc=data.value;
+	    if(abc=="hour"){
+			vm.hh=true;
+			vm.dd=false;
+			vm.mm=false;
+			vm.yy=false;
+	    }else if(abc=="day"){
+			vm.hh=false;
+			vm.dd=true;
+			vm.mm=false;
+			vm.yy=false;
+	    }else if(abc=="month"){
+			vm.hh=false;
+			vm.dd=false;
+			vm.mm=true;
+			vm.yy=false;
+	    }else if(abc=="year"){
+			vm.hh=false;
+			vm.dd=false;
+			vm.mm=false;
+			vm.yy=true;
+	    }
+	    console.log("hh"+vm.hh,"dd"+vm.dd,"mm"+vm.mm,"yy"+vm.yy);
+          if(vm.hh){
+		    $("#hh").show();
+		    $("#mm").hide();
+		    $("#dd").hide();
+		    $("#yy").hide();
+	  }else if(vm.dd){
+		    $("#hh").hide();
+		    $("#mm").hide();
+		    $("#dd").show();
+		    $("#yy").hide();
+	  }else if(vm.mm){
+		    $("#hh").hide();
+		    $("#mm").show();
+		    $("#dd").hide();
+		    $("#yy").hide();
+	  }else if(vm.yy){
+		    $("#hh").hide();
+		    $("#mm").hide();
+		    $("#dd").hide();
+		    $("#yy").show();
+	  }
+	});
+//日期范围
+  laydate.render({
+    elem: '#test6'
+    ,range: true
+  });
+  
+  //年范围
+  laydate.render({
+    elem: '#test7'
+    ,type: 'year'
+    ,range: true
+  });
+  
+  //年月范围
+  laydate.render({
+    elem: '#test8'
+    ,type: 'month'
+    ,range: true
+  });
+  //日期时间范围
+  laydate.render({
+    elem: '#test10'
+    ,type: 'datetime'
+    ,value: Stime+' - '+Etime
+    ,range: true
+  });
+//展示已知数据
+  table.render({
+    elem: '#demo'
+    ,cols: [[ //标题栏
+	      {field: 'time', title: '时间（h）', rowspan:2, sort: true}
+	      ,{title: '流量（m³）', colspan:30, align:'center'}
+	    ],vm.siteThead]
+    ,data: vm.siteValue
+    ,even: true
+    ,limit:1000
+  });
+  
+});
+</script>	
+</body>
+</html>

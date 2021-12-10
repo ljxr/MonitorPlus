@@ -1,0 +1,191 @@
+	#main1{ 
+	  border:1px solid white;
+	  position:absolute;
+      top:5%;
+      left:1%;
+      background:white;
+      border-radius:3px 3px 3px 3px;
+	  box-shadow:0 0 10px #C0C0C0;	  
+     } 
+	#watertable{ 
+	  border:1px solid white;
+	  position:absolute;
+      top:20%;
+	  left:1%;
+	  background:white; 
+	  border-radius:3px 3px 3px 3px;
+	  box-shadow:0 0 10px #C0C0C0;	  
+     }
+	  #main2-1{  
+	   border:1px solid #DADADA;
+	   position:absolute; 
+       left:1%; 
+	   top:3%; 
+	   border-radius:3px 3px 3px 3px;
+      } 
+	  #main2-2{  
+	   border:1px solid #DADADA;
+	   position:absolute; 
+       left:51%; 
+	   top:3%; 
+	   border-radius:3px 3px 3px 3px;
+      } 
+	  #main2-3{  
+	   border:1px solid #DADADA;
+	   position:absolute; 
+       left:1%; 
+	   top:1.5%; 
+	   border-radius:3px 3px 3px 3px;
+      } 
+	  #main2-4{  
+	   border:1px solid #DADADA;
+	   position:absolute; 
+       left:1%; 
+	   top:50.5%; 
+	   border-radius:3px 3px 3px 3px;
+      } 
+	 #alertinfo{ 
+	  border:1px solid #DADADA;
+	  position:absolute;
+	  left:75%;
+      top:61%;
+	  background:white;
+	  border-radius:3px 3px 3px 3px;
+	  display:none;
+     }
+	 #main3-1{ 
+	  position:absolute;
+	  background:#D9544F;
+	  text-align:center;
+	  color:white
+     }
+	 #area{
+	 <!-- border:1px solid red; -->
+	 position:absolute;
+     margin-top:10px
+	}
+	.input-group{
+     position:absolute;
+     left:40%;
+	 top:14%;
+	 width:130px;
+	}
+	#input-group2{
+     position:absolute;
+     left:85%;
+	 top:14%;
+	 width:130px;
+	}
+	#input-group3{
+     position:absolute;
+     left:45%;
+	 top:14%;
+	 width:130px;
+	}
+	.form-control[readonly]{background-color: white;}
+	.col-lg-2{
+	 position:absolute;
+     left:1.5%;
+	 top:30%;
+	}
+	#user{
+	 position:absolute;
+     left:22%;
+	 top:30%;
+	}
+	#time1{
+	 position:absolute;
+     left:43%;
+	 top:30%;
+	}
+	#time2{
+	 position:absolute;
+     left:62%;
+	 top:30%;
+	}
+	#select{
+	 position:absolute;
+     left:85%;
+	 top:35%;
+	}
+	#reset{
+	 position:absolute;
+     left:90%;
+	 top:35%;
+	}
+     .content{ 
+	 height:100%;
+	 } 
+     html,body{
+     height: 100%;
+	 margin: 0;
+     padding: 0;
+     overflow: hidden;
+        }
+
+	 .father{
+	 height:100%;
+	 position:relative;
+	 }
+
+	#title{
+	 color:#FFFFFF;
+	 font-size:15px
+	}
+    .sidebar{
+	height:600px;
+	}
+	.navbar{
+	height:50px;
+	}
+    .li1{ 
+	  border-left:solid; 
+	  border-color:#367FA9;
+	  border-width:2px;
+	  height:50px;
+	  cursor:pointer;
+	  } 
+    .btn-group{
+	 top:10px;
+	 padding-left:20px;
+	}
+     td{
+	 color:black;
+	 text-align:center
+	 }
+	 th{
+	 text-align:center
+	 }
+	 caption{
+	 color:black;
+	 }
+	 .content-wrapper{
+	 position:relative
+	 } 
+     ul.nav-tabs{
+        width: 230px;
+        margin-top: 0px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+		position:absolute;
+		left:0%;
+    }
+    ul.nav-tabs li{
+        margin: 0;
+        border-top: 1px solid #ddd;
+    }
+    ul.nav-tabs li:first-child{
+        border-top: none;
+    }
+    ul.nav-tabs li a{
+        margin: 0;
+        padding: 8px 16px;
+        border-radius: 0;
+    }
+    ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover{
+        color: #fff;
+        background: #3C8DBC;
+        border: 1px solid #0088cc;
+    }
+    ul.nav-tabs.affix{
+        top: 30px; /* Set the top position of pinned element */
+    }

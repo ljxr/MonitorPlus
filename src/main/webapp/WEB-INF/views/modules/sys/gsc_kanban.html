@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>供水厂看板模式</title>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/map/css/switcher.css"></link>
+<link rel="stylesheet" href="../../statics/map/css/tools.css"></link>
+<script type="text/javascript" src="http://192.168.101.2:8081/statics/map/js/init.js"></script>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+table{border: solid 1px #f1f1f1; display:inline-block;position:relative;vertical-align: top;}
+tr{height:40px;}
+th{background-color:#3c8dbc; font-size:14px; color:#fff; text-align:center; font-weight:normal}
+td{font-size:14px; color:#363636; padding:0 20px;}
+td img{width:16px; height:16px;}
+</style>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px; overflow:scroll;">
+	<div style="width:100%; height:40px; margin:0px; padding:0px; text-align:right;">
+		<button type="button" class="btn btn-primary" onClick="window.location.href='gsc.html';">地图模式</button>
+	</div>
+	<table>
+		<tr>
+			<th>原水</th>
+		</tr>
+		<tr v-for="re in ys">
+			<td>{{re.name}}&nbsp&nbsp:&nbsp&nbsp{{re.value}}</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<th>出水</th>
+		</tr>
+		<tr v-for="re in cs">
+			<td>{{re.name}}&nbsp&nbsp:&nbsp&nbsp{{re.value}}</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td v-html="others_1_name"></td>
+		</tr>
+		<tr v-for="re in others_1">
+			<td>{{re.name}}&nbsp&nbsp:&nbsp&nbsp{{re.value}}</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td v-html="others_1_name"></td>
+		</tr>
+		<tr v-for="re in others_1">
+			<td>{{re.name}}&nbsp&nbsp:&nbsp&nbsp{{re.value}}</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td v-html="others_1_name"></td>
+		</tr>
+		<tr v-for="re in others_1">
+			<td>{{re.name}}&nbsp&nbsp:&nbsp&nbsp{{re.value}}</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td v-html="others_1_name"></td>
+		</tr>
+		<tr v-for="re in others_1">
+			<td>{{re.name}}&nbsp&nbsp:&nbsp&nbsp{{re.value}}</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td v-html="others_1_name"></td>
+		</tr>
+		<tr v-for="re in others_1">
+			<td>{{re.name}}&nbsp&nbsp:&nbsp&nbsp{{re.value}}</td>
+		</tr>
+	</table>
+</div>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/gsc_detail.js"></script>
+<script type="text/javascript" src="../../statics/map/js/switcher.js"></script>
+<script type="text/javascript" src="../../statics/map/js/tools.js"></script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>安吉国源智慧水务综合管理平台</title>
+<script type="text/javascript">
+	/* <![CDATA[ */
+	var host_url = 'http://192.168.101.2:8081/'
+	/* ]]> */
+</script>
+
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+
+<script type="text/javascript" src="../../statics/map/common/common.js"></script>
+<script type="text/javascript" src="../../statics/map/common/jquery.min.js"></script>
+<link rel="stylesheet" href="../../statics/map/css/switcher.css"></link>
+<link rel="stylesheet" href="../../statics/map/css/tools.css"></link>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css"></link>
+<link rel="stylesheet" href="../../statics/css/Tabstyle.css"></link>
+	
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+body{
+/* moz-user-select: -moz-none;
+-moz-user-select: none;
+-o-user-select:none;
+-khtml-user-select:none;
+-webkit-user-select:none;
+-ms-user-select:none;
+user-select:none; */
+}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+a:link{text-decoration:none;}
+a:visited{text-decoration:none;}
+a:hover{text-decoration:none;}
+a:active{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:180px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar-wrapper.fixed{position:fixed;top:0px;}
+.sidebar{padding:0;height:95%; padding-bottom:0px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:12px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:16px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:16px}
+.menu-item .sub-title:after{right:4px}
+.menu-item-1{padding-top:12px; color:#3c8dbc; font-weight:bold;}
+.menu-item-1>ul{margin-top:12px}
+.menu-item-2{padding-top:8px;padding-bottom:8px;padding-left:0px;font-size:14px;line-height:28px; color:#363636; font-weight:normal;}
+.menu-item-2>ul{margin-top:12px}
+.main-container{position:relative;margin-left:180px; padding:0px;}
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+
+.menu-group{z-index:1;}
+.menu-group ul{z-index:2;}
+
+
+.lk_li {float: left; width: 120px; height:40px; text-align: center; line-height: 40px; padding: 0px;}
+.lk_li a{font-size:14px; text-decoration:none; color:#363636;}
+.lk_li a:hover{color:#3c8dbc;}
+.lk_li.active a{color:#3c8dbc;}
+#slider {display: block;position: absolute;margin:0px 17px;padding:0px;border:0px;top: 40px;left: 0px; height: 3px;width:80px;background: #3c8dbc;transition: all 0.5s;}
+#container_leader{position:relative; width:100%; height:40px; border-bottom:solid 1px #f1f1f1;}
+#container{position:relative; width:100%; margin-top:5px; overflow-x:hidden; overflow-y:auto;}
+.containers{width:100%; height:100%; display:none; position:relative;}
+.containers.active{display:block;}
+
+#container_1{padding:10px;}
+#container_1 div span{font-size:14px;}
+.container_inner{overflow-y:auto;overflow-x:hidden; margin-bottom:60px;}
+.add{height:30px; padding:0 10px; margin:5px; border:solid 1px #3c8dbc; border-radius:5px; line-height:28px; background-color:#3c8dbc; color:#fff;}
+.remove{height:30px; padding:0 10px; margin:5px; border:solid 1px #3c8dbc; border-radius:5px; line-height:28px; color:#3c8dbc; background-color:#fff;}
+.content-wrapper{background-color:#000000!important;}
+.jcd:hover{color:#f00;}
+#jcd_container{position:absolute; height:0px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 0px #999; z-index:99; top:55px; padding:0px; margin-top:0px;}
+#jcd_container.active{position:absolute; height:240px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 1px #999; z-index:99; top:55px; padding:0px; margin-top:20px;}
+#jcd_container div button{font-size:12px;}
+#jcd_container2{position:absolute; height:0px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 0px #999; z-index:99; top:55px; padding:0px; margin-top:0px;}
+#jcd_container2.active{position:absolute; height:160px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 1px #999; z-index:99; top:55px; padding:0px; margin-top:20px;}
+#jcd_container2 div button{font-size:12px;}
+
+.history_body{height:300px; overflow-y:hidden; overflow-y:auto;}
+#test10{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+#list0{height:450px; overflow-x:hidden; overflow-y:auto;}
+#list1{height:450px; overflow-x:hidden; overflow-y:auto;}
+#container_2{padding:10px;overflow-y:auto;}
+#alarm_table{height:600px; overflow-y:auto;}
+#container_2 div span{font-size:14px;}
+#test11{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+.container_main{width:100%; padding:10px;}
+</style>
+<script type="text/javascript">
+	/* <![CDATA[ */
+
+	/* ]]> */
+</script>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+	<div class="sidebar-wrapper fixed">
+		<div class="gs_site" onClick="window.location.href='gsgw.html';">供水管网</div>
+		<div class="sidebar">
+<!-- 			<ul class="menu-group">
+				<li v-for="(item, index) in treeList" class="menu-item menu-item-1">
+					<a v-bind:id="item.siteId" href="javascript:;"><span class="glyphicon glyphicon-th-large"></span>&nbsp;{{item.name}}</a>
+					<ul>
+						<li v-for="(citem, cindex) in item.treelist" class="menu-item menu-item-2">
+							<a v-bind:id="citem.siteId" href="javascript:;" v-on:click="getIndex(citem.siteId)">{{citem.name}}</a>
+						</li>
+					</ul>
+				</li>
+			</ul> -->
+			<ul class="menu-group">
+				<li v-for="(item, index) in treeList" class="menu-item menu-item-1">
+					<a v-bind:id="item.siteId" href="javascript:;"><span class="glyphicon glyphicon-th-large"></span>&nbsp;{{item.name}}</a>
+					<ul>
+						<li v-for="(citem, cindex) in item.treelist" class="menu-item menu-item-2">
+							<a v-bind:id="citem.siteId" href="javascript:;" v-on:click="getIndex(citem.siteId)"><span v-bind:id="citem.siteId+'span1'" class="glyphicon glyphicon-chevron-right"></span><span v-bind:id="citem.siteId+'span2'" style="display:none;" class="glyphicon glyphicon-chevron-down"></span>&nbsp;&nbsp;{{citem.name}}</a>
+							<ul v-bind:id="citem.siteId+'ul'" style="display:none;">
+	                            <li v-for="(ccitem, ccindex) in citem.treelist" class="menu-item menu-item-3 menu-item-check">
+	                            	<a v-bind:id="ccitem.siteId" class="no-sub" href="javascript:;" v-on:click="getIndex3(ccitem.siteId)"><span v-bind:id="ccitem.siteId+'span1'" class="glyphicon glyphicon-chevron-right"></span><span v-bind:id="ccitem.siteId+'span2'" style="display:none;" class="glyphicon glyphicon-chevron-down"></span>&nbsp;&nbsp;{{ccitem.name}}</a>
+	                            	<ul v-bind:id="ccitem.siteId+'ul'" style="display:none;">
+			                            <li v-for="(cccitem, cccindex) in ccitem.treelist" class="menu-item menu-item-4 menu-item-check">
+			                            	<a v-bind:id="cccitem.siteId" class="no-sub" href="javascript:;" v-on:click="getIndex2(citem.siteId,cccitem.siteId,cccitem.name,cccitem.type)"><input v-if="cccitem.flag" name="site" type="checkbox" v-bind:siteName="cccitem.name" v-bind:value="cccitem.siteId" />{{cccitem.name}}</a>
+			                            </li>
+			                        </ul>
+	                            </li>
+	                        </ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="main-container">
+		<ul id="container_leader">
+			<li id="lk_1" class="lk_li active" onClick="javascript:lk_show(1);"><a id="lk_1_a">历史数据</a></li>
+			<li id="lk_2" class="lk_li" onClick="javascript:lk_show(2);"><a id="lk_2_a">报警记录</a></li>
+			<li id="slider"></li>
+		</ul>
+		<div id="container">
+			<div id="container_1" class="containers active">
+				<div id="container_1_main" class="container_main">
+					<div class="layui-row">
+					  <span>点位选择:</span>
+					  <div class="layui-input-inline" style="margin:0px 10px 0px 15px;">
+						<button v-for="(item, index) in historyData" v-on:click="dw_click('his'+index,index)" v-bind:class="item.cls" v-bind:id="'his'+index">{{item.name}}</button>
+					  </div>
+					</div>
+					<div class="layui-row">
+					  <span>时间范围:</span>
+					  <div class="layui-input-inline" style="margin:0px 10px;">
+						<input type="text" class="layui-input" id="test10" style="width:280px;margin-left:10px;" lay-filter="test10">
+					  </div>
+					</div>
+<!-- 					<div class="layui-row">
+					  <span>时间范围:</span>
+					  <div class="layui-input-inline" style="margin:0px 10px;">
+						<input type="text" class="layui-input" id="test10" style="width:280px;margin-left:10px;" lay-filter="test10">
+					  </div>
+					  <span class="jcd" onClick="jcd_sh()"><span class="glyphicon glyphicon-th-list"></span>&nbsp;&nbsp;选择监测项目&nbsp;&nbsp;<span v-if="jcd_sh" class="glyphicon glyphicon-chevron-right"></span><span v-if="!jcd_sh" class="glyphicon glyphicon-chevron-left"></span></span>
+					</div>
+					<div class="layui-row layui-col-space1 jcd" id="jcd_container">
+					    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					      <button v-for="(item, index) in historyData" v-on:click="dw_click('his'+index,index)" v-bind:class="item.cls" v-bind:id="'his'+index">{{item.name}}</button>
+					    </div>
+					</div> -->
+					<div class="layui-row container_inner" style="margin-top:20px">
+						<div id="echart0" style="height:400px; margin:0px; padding:0px; float:left;">
+					    </div>
+						<div id="echart1" style="height:400px; margin:0px; padding:0px; float:right;">
+					    </div>
+						<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" id="list0" style="border-right: solid 1px #999; margin:0x; padding:0px;">
+					    	<!-- <table id="jqGridSite1" style="width:100%;"></table>
+			    			<div id="jqGridPager1" style="width:100%;"></div> -->
+					    	<!-- <table class="table table-striped">
+								<caption></caption>
+								<thead>
+									<tr>
+										<th>监测项目</th>
+										<th>检测值</th>
+										<th>采集时间</th>
+									</tr>
+								</thead>
+								<tbody class="history_body">
+									<tr v-for="re in hisDetail[0].map">
+										<td>{{hisDetail[0].tit}}</td>
+										<td>{{re.value}}</td>
+										<td>{{re.time}}</td>
+									</tr>
+								</tbody>
+							</table> -->
+							<p>{{tableTit0}}</p>
+							<table class="layui-hide" id="history1Table" lay-filter="history1Table"></table>
+					    </div>
+						<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" id="list1" style="margin:0px; padding:0px;">
+ 					    	<!-- <table class="table table-striped">
+								<caption></caption>
+								<thead>
+									<tr>
+										<th>监测项目</th>
+										<th>检测值</th>
+										<th>采集时间</th>
+									</tr>
+								</thead>
+								<tbody class="history_body">
+									<tr v-for="re in hisDetail[1].map">
+										<td>{{hisDetail[1].tit}}</td>
+										<td>{{re.value}}</td>
+										<td>{{re.time}}</td>
+									</tr>
+								</tbody>
+							</table> -->
+							<p>{{tableTit1}}</p>
+							<table class="layui-hide" id="history2Table" lay-filter="history2Table"></table>
+					    </div>
+					 </div>
+				 </div>
+			</div>
+			<div id="container_2" class="containers">
+				<div id="container_2_main" class="container_main">
+				    <div class="layui-row">
+					  <span>时间范围：</span>
+					  <div class="layui-input-inline" style="margin-left:10px;">
+						<input type="text" class="layui-input" id="test11" style="width:280px;margin-left:10px;">
+					  </div>
+<!-- 					  <span class="jcd" onClick="jcd_sh2()"><span class="glyphicon glyphicon-th-list"></span>&nbsp;&nbsp;选择监测项目&nbsp;&nbsp;<span v-if="jcd_sh2" class="glyphicon glyphicon-chevron-right"></span><span v-if="!jcd_sh2" class="glyphicon glyphicon-chevron-left"></span></span>
+ -->					</div>
+					<div class="layui-row layui-col-space1 jcd" id="jcd_container2">
+					    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					      <button v-for="(item, index) in alarmData" v-on:click="dw_click3('alarm'+index,index)" v-bind:class="item.cls" v-bind:id="'alarm'+index">{{item.name}}</button>
+					    </div>
+					</div>
+					<div class="layui-row lv" style="padding-top:20px">
+					    <span>报警等级：</span>
+						  <div class="layui-input-inline" style="margin-left:15px;">
+						    <button class="add" onClick="dw_click1(this)">全部</button>
+						    <button class="remove" onClick="dw_click1(this)">异常</button>
+						    <button class="remove" onClick="dw_click1(this)">故障</button>
+						    <button class="remove" onClick="dw_click1(this)">超时</button>
+						   </div>
+					</div>
+					<div class="layui-row tp" style="padding-top:20px">
+					    <span>监测参数：</span>
+						  <div class="layui-input-inline" style="margin-left:15px;">
+						    <button class="add" onClick="dw_click2(this)">全部</button>
+						    <button class="remove" onClick="dw_click2(this)">流量</button>
+						    <button class="remove" onClick="dw_click2(this)">压力</button>
+						    <button class="remove" onClick="dw_click2(this)">COD</button>
+						    <button class="remove" onClick="dw_click2(this)">pH</button>
+						    <button class="remove" onClick="dw_click2(this)">余氯</button>
+						    <button class="remove" onClick="dw_click2(this)">浊度</button>
+						    <button class="remove" onClick="dw_click2(this)">SS</button>
+						    <button class="remove" onClick="dw_click2(this)">氨氮</button>
+						    <button class="remove" onClick="dw_click2(this)">总磷</button>
+						    <button class="remove" onClick="dw_click2(this)">液位</button>
+						   </div>
+					</div>
+					<div class="layui-form" >
+						<div class="layui-col-xs12 layui-col-sm12 layui-col-md12" id="alarm_table">
+					  		<table class="layui-hide" id="BaoJing_table" lay-filter="BaoJing_table"></table>
+					  	</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	<script src="../../statics/plugins/layui/lay/all.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../statics/map/js/switcher.js"></script>
+	<script type="text/javascript" src="../../statics/map/js/tools.js"></script>
+	<script src="${request.contextPath}/statics/js/modules/sys/gsgw_detail.js"></script>
+  <script src="${request.contextPath}/statics/plugins/layui/layui.js" charset="utf-8"></script>
+	<script>
+	layui.use(['laypage','element','laydate','table'], function(){
+		  var laypage = layui.laypage
+		  ,element = layui.element//导航的hover效果、二级菜单等功能，需要依赖element模块
+		  ,laydate = layui.laydate
+		  ,layer = layui.layer
+		  ,table = layui.table //表格
+		  //日期时间范围
+		  laydate.render({
+		    elem: '#test10'
+		    ,type: 'datetime'
+		    ,value: Stime+' - '+Etime
+		    ,range: true
+		    ,done: function(value, date, endDate){
+		    	console.log(value);
+		    	console.log(date);
+		    	console.log(endDate);
+		        search_hisData2(value);
+		      }
+		  });
+		  laydate.render({
+			    elem: '#test11'
+			    ,type: 'datetime'
+		    	,value: Stime+' - '+Etime
+			    ,range: true
+			    ,done: function(value, date, endDate){
+			    	console.log(value);
+			    	console.log(date);
+			    	console.log(endDate);
+			    	search_Alarm();
+			      }
+		  });
+	})
+	</script> 
+</body>
+</html>

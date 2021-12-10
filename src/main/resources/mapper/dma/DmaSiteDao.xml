@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.dma.dao.DmaSiteDao">
+	<resultMap id="siteResultMap" type="com.enjoyor.modules.dma.entity.DmaSiteEntity">
+		<result property="dareaId" column="darea_id" />
+		<result property="dareaName" column="darea_name" />
+		<result property="dsiteId" column="dsite_id" />
+		<result property="dsiteName" column="dsite_name" />
+		<result property="dsiteType" column="dsite_type" />
+		<result property="dsiteParentId" column="dsite_parentid" />
+		<result property="dsiteJc" column="dsite_jc" />
+		<result property="coefficient" column="coefficient" />
+	</resultMap>
+	<resultMap id="dmaSiteDataMap" type="com.enjoyor.modules.dma.entity.DmaSiteData">
+		<result property="siteId" column="site_id" />
+		<result property="dayFlow" column="dayflow" />
+		<result property="time" column="time" />
+	</resultMap>
+
+	<!-- 查询片区关联的点位列表 -->
+	<select id="querySiteList" resultMap="siteResultMap">
+		<!-- select * from (select id,darea_id,darea_name,dsite_id,dsite_name,dsite_type, 
+			dsite_parentid,dsite_jc,coefficient,rownum rn from watersite <where> <if 
+			test="dareaId != null and dareaId.trim() != ''"> and darea_id = #{dareaId} 
+			</if> <if test="dsiteId != null and dsiteId.trim() != ''"> and dsite_id = 
+			#{dsiteId} </if> <if test="dsiteType != null and dsiteType.trim() != ''"> 
+			and dsite_type = #{dsiteType} </if> <if test="dsiteJc != null and dsiteJc.trim() 
+			!= ''"> and dsite_jc = #{dsiteJc} </if> </where> ) b where 1=1 ) b where 
+			b.rn between #{offset} and #{limit} -->
+
+		select a.id, a.darea_id, c.darea_name, a.dsite_id, b.site_name as dsite_name,
+		a.dsite_type, a.dsite_parentid, a.dsite_jc, a.coefficient
+		from MONITOR.WATERSITE a
+		left join BASESYS.SYS_SITE b
+		on a.DSITE_ID =
+		b.SITE_ID
+		left join MONITOR.WATERAREA c
+		on a.DAREA_ID = c.DAREA_ID
+		<where>
+			<if test="dareaId != null and dareaId.trim() != ''">
+				and a.darea_id = #{dareaId}
+			</if>
+			<if test="dsiteId != null and dsiteId.trim() != ''">
+				and a.dsite_id = #{dsiteId}
+			</if>
+			<if test="dsiteType != null and dsiteType.trim() != ''">
+				and a.dsite_type = #{dsiteType}
+			</if>
+			<if test="dsiteJc != null and dsiteJc.trim() != ''">
+				and a.dsite_jc = #{dsiteJc}
+			</if>
+		</where>
+
+	</select>
+
+	<!-- 查询所有点位 -->
+	<select id="querySiteAll" resultMap="siteResultMap">
+		select a.darea_id, c.DAREA_NAME, a.dsite_id, b.SITE_NAME as dsite_name,
+		a.dsite_type, a.dsite_parentid, a.dsite_jc, a.coefficient from
+		MONITOR.WATERSITE a
+		left join BASESYS.SYS_SITE b
+		on a.DSITE_ID =
+		b.SITE_ID
+		left join MONITOR.WATERAREA c
+		on a.DAREA_ID = c.DAREA_ID
+		<where>
+			1=1
+			<if test="dareaId != null and dareaId.trim() != ''">
+				and a.darea_id like concat('%',concat(#{dareaId},'%'))
+			</if>
+			<if test="dsiteId != null and dsiteId.trim() != ''">
+				and a.dsite_id like concat('%',concat(#{dsiteId},'%'))
+			</if>
+			<if test="dsiteType != null and dsiteType.trim() != ''">
+				and a.dsite_type like concat('%',concat(#{dsiteType},'%'))
+			</if>
+		</where>
+
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+		</choose>
+
+		<!-- select * from watersite <where> 1=1 <if test="dareaId != null and 
+			dareaId.trim() != ''"> and darea_id like concat('%',concat(#{dareaId},'%')) 
+			</if> <if test="dsiteId != null and dsiteId.trim() != ''"> and dsite_id like 
+			concat('%',concat(#{dsiteId},'%')) </if> <if test="dsiteType != null and 
+			dsiteType.trim() != ''"> and dsite_type like concat('%',concat(#{dsiteType},'%')) 
+			</if> </where> <choose> <when test="sidx != null and sidx.trim() != ''"> 
+			order by ${sidx} ${order} </when> </choose> -->
+	</select>
+
+	<!-- 查询所有点位数量 -->
+	<select id="querySiteCount" resultType="int">
+		select count(*) from watersite
+		<where>
+			1=1
+			<if test="dareaId != null and dareaId.trim() != ''">
+				and darea_id = #{dareaId}
+			</if>
+			<if test="dsiteId != null and dsiteId.trim() != ''">
+				and dsite_id = #{dsiteId}
+			</if>
+			<if test="dsiteType != null and dsiteType.trim() != ''">
+				and dsite_type = #{dsiteType}
+			</if>
+			<if test="dsiteJc != null and dsiteJc != ''">
+				and dsite_jc = #{dsiteJc}
+			</if>
+		</where>
+	</select>
+
+	<!-- 保存点位数据 -->
+	<insert id="save" parameterType="com.enjoyor.modules.dma.entity.DmaSiteEntity">
+		insert into watersite
+		(
+		darea_id,
+		dsite_id,
+		dsite_type,
+		dsite_parentid,
+		dsite_jc,
+		coefficient
+		)
+		values
+		(
+		#{dareaId,jdbcType=VARCHAR},
+		#{dsiteId,jdbcType=VARCHAR},
+		#{dsiteType,jdbcType=VARCHAR},
+		#{dsiteParentId,jdbcType=VARCHAR},
+		#{dsiteJc,jdbcType=VARCHAR},
+		#{coefficient,jdbcType=NUMERIC}
+		)
+	</insert>
+
+	<!-- 更新片区信息 -->
+	<update id="update" parameterType="com.enjoyor.modules.dma.entity.DmaSiteEntity">
+		update watersite
+		<set>
+			<if test="dareaId != null">darea_id = #{dareaId}, </if>
+			<if test="dsiteId != null">dsite_id = #{dsiteId}, </if>
+			<if test="dsiteType != null">dsite_type = #{dsiteType},</if>
+			<if test="dsiteParentId != null">dsite_parentid = #{dsiteParentId}</if>
+			<if test="dsiteJc != null">dsite_jc = #{dsiteJc}</if>
+		</set>
+		where id = #{id,jdbcType=NUMERIC}
+	</update>
+
+	<!-- 删除片区信息 -->
+	<delete id="delete">
+		delete from watersite where id = #{id}
+	</delete>
+
+	<!-- 根据片区编号删除片区信息 -->
+	<delete id="deleteByAreaId">
+		delete from watersite where darea_id = #{dareaId}
+	</delete>
+
+	<!-- 查询点位日流量历史记录 -->
+	<select id="querySiteDayFlow" resultMap="dmaSiteDataMap">
+		select SITE_ID, VALUE as DAYFLOW, TIME
+		from MONITOR.FLOWDAY
+		<where>
+			<if test="null != siteId">
+				SITE_ID = #{siteId}
+			</if>
+			<if test="null != beginTime and null != endTime">
+				and time &gt;= #{beginTime}
+				and time &lt;= #{endTime}
+			</if>
+		</where>
+		order by time asc
+	</select>
+</mapper>

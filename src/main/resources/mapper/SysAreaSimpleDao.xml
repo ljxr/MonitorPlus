@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.sys.dao.SysAreaDao">
+    <resultMap id="sysAreaSimpleResultMap" type="com.enjoyor.modules.sys.entity.SysAreaSimpleEntity">
+      <result property="id" column="ID"/>
+      <result property="areaId" column="AREA_ID"/>
+      <result property="areaName" column="AREA_NAME"/>
+      <result property="areaParentId" column="AREA_PARENTID"/> 
+    </resultMap>
+    
+    <select id="findAllArea" resultMap="sysAreaSimpleResultMap">
+	    select ID, AREA_ID, AREA_NAME, AREA_PARENTID
+	    from "BASESYS".SYS_AREA
+     <where>
+		 <if test="queryRegionId != null">
+           area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+         </if>
+     </where>    
+    </select>
+    
+    <select id="findAllPsArea" resultMap="sysAreaSimpleResultMap">
+	    select ID, AREA_ID, AREA_NAME, AREA_PARENTID
+	    from "BASESYS".SYS_AREA
+     <where>
+     	area_parentid = '3'
+		 <if test="queryRegionId != null">
+           and area_id in     
+          <foreach collection="queryRegionId" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+         </if>
+     </where>    
+    </select>
+		
+	<select id="queryAllArea" resultMap="sysAreaSimpleResultMap">
+	    select ID, AREA_ID, AREA_NAME 
+		from "BASESYS".SYS_AREA 
+		where AREA_PARENTID in (
+			select AREA_ID
+			from "BASESYS".SYS_AREA 
+			where AREA_PARENTID = '1'
+		)
+    </select>
+
+	<select id="queryAreaInfo" resultMap="sysAreaSimpleResultMap">
+		select AREA_ID,AREA_NAME from "BASESYS".SYS_AREA
+		<where>
+			<if test="areaParentId != null and areaParentId.trim() != ''">
+				AREA_PARENTID = #{areaParentId}
+			</if>
+		</where>
+	</select>
+</mapper>

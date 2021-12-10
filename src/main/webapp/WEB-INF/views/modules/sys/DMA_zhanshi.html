@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DMA分区展示</title>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/map/css/switcher.css"></link>
+<link rel="stylesheet" href="../../statics/map/css/tools.css"></link>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<script type="text/javascript" src="../../statics/js/echarts.js"></script>
+<script type="text/javascript" src="http://192.168.101.2:8081/statics/map/js/init.js"></script>
+<!-- 引入组件库 -->
+<script src="${request.contextPath}/statics/libs/element.js"></script>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+a{text-decoration:none}
+a:hover{text-decoration:none}
+#tab::-webkit-scrollbar { width: 0 !important }
+#tab { -ms-overflow-style: none; }
+#tab { overflow: -moz-scrollbars-none;}
+#tab p {line-height:160%;}
+.pop{background-image: url("${request.contextPath}/statics/img/pop.png"); background-repeat: cover; width:245px; height:142px; margin-left:-70px; margin-bottom:20px; padding:20px 20px 60px 20px;}
+.pop a{position:absolute; right:30px; top:50px;}
+.setting{padding:10px;}
+.setting label{font-size:14px;}
+.setting button{float:right;}
+.sc_name{font-size:12px; font-weight:bold; z-index:30;}
+#mbx{position:absolute; top:10px; right:10px; width:100%; height:30px; line-height:30px; background-color:rgba(255,255,255,0.5); font-weight:bold; text-align:right; z-index:99;}
+#mbx span a{color:#363636;cursor:pointer;}
+#mbx span a:hover{color:#3c85af;}
+#mbx span a:last-child{color:#363636;}
+
+.tbH{color:#666666; background-color:#eeeeee; text-align:center; height:40px;}
+.tbB td{color:#666666; background-color:#ffffff; text-align:center; height:26px; line-height:26px; padding:5px;}
+
+#echart1{width:100%; height:250px; background-color:#ffffff;}
+#echart2{width:100%; height:250px; background-color:#ffffff;}
+canvas{width:100%; height:100%;}
+.TIP{font-size:10px; color:#363636; background-color:rgba(255,255,255,0.5); z-index:88;}
+#myModal{z-index:9999;}
+</style>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+<div style="width:78%;  height:100%; float:left; overflow:hidden; position:relative;">
+	<div style="width:100%;  height:calc(100% - 160px); overflow:hidden; position:relative;">
+		<div id="mapcontent">
+			<noscript>地图加载失败！页面必须引入esri.css、global.js、map.js与init.js！
+			</noscript>
+		</div>
+		<div class="mapType-wrapper" style="position:absolute; bottom:20px; right:30px;">
+			<div class="mapType">
+				<div class="mapTypeCard">
+					<img src="${request.contextPath}/statics/img/pic_2.jpg" alt="卫星" /> <span>卫星地图</span>
+				</div>
+			   <div class="mapTypeCard">
+					<img src="${request.contextPath}/statics/img/pic_4.jpg" alt="地形" /> <span>地形地图</span>
+				</div>
+				<div class="mapTypeCard">
+					<img src="${request.contextPath}/statics/img/pic_1.jpg" alt="矢量" /> <span>矢量地图</span>
+				</div>
+			</div>
+		</div>
+		<div id="mbx">
+			<span>
+			  <a v-for="(item,index) in dareaLL" @click=jump(index,item.siteId,item.siteName)><cite>{{item.siteName}}</cite></a>
+			</span>
+		</div>
+	</div>
+	<div style="width:100%;  height:160px; overflow:auto; position:relative;">
+		<table border="1" style="borderCollapse:collapse; width:100%; border:#e6e6e6">
+			<caption style="text-align:center; vertical-align:middle; color:#363636;">夜间小流量预警</caption>
+			<tr class="tbH">
+				<td>片区名称</td>
+				<td>点位名称</td>
+				<td>X值</td>
+				<td>Y值</td>
+				<td>最小流量</br>(m³/h)</td>
+				<td>出现时间</td>
+				<td>夜间平均流量</br>(m³/h)</td>
+				<td>七日夜间平均流量</br>(m³/h)</td>
+				<td>夜倍率</br>(%)</td>
+				<td>日平均流量</br>(m³/h)</td>
+				<td>七日日平均流量</br>(m³/h)</td>
+				<td>日倍率</br>(%)</td>
+				<td>对应压力</br>(MPa)</td>
+			</tr>
+			<tr v-for="item in dsiteList" class="tbB">
+				<td>{{item.dareaName}}</td>
+				<td>{{item.siteName}}</td>
+				<td>{{parseFloat(item.x).toFixed(3)}}</td>
+				<td>{{parseFloat(item.y).toFixed(3)}}</td>
+				<td>{{parseFloat(item.min).toFixed(3)}}</td>
+				<td>{{item.time2}}</td>
+				<td>{{parseFloat(item.avgNig).toFixed(3)}}</td>
+				<td>{{parseFloat(item.nightsavg).toFixed(3)}}</td>
+				<td :style="{'color':computed25Color(parseFloat(item.ybl*100))}">{{parseFloat(item.ybl*100).toFixed(3)}}</td>
+				<td>{{parseFloat(item.avgDay).toFixed(3)}}</td>
+				<td>{{parseFloat(item.daysavg).toFixed(3)}}</td>
+				<td :style="{'color':computed25Color2(parseFloat(item.rbl*100))}">{{parseFloat(item.rbl*100).toFixed(3)}}</td>
+				<td>{{parseFloat(item.pressure).toFixed(3)}}</td>
+			</tr>
+		</table>
+	</div>
+</div>
+	<div id="tab" style="width:22%; height:100%; float:right; overflow-x: hidden; overflow-y: scroll; borderLeft:1px solid #aaa">
+		<div class="setting" style="height:40px;padding:0px;">
+			<button type="button" class="btn btn-primary" onClick="window.location.href='./DMALink.html';">导图模式</button>
+		</div>
+		<div v-for="re in dareaList" class="list-group">
+			<a href="#" class="list-group-item active" style="height:34px; background-color:rgba(60,141,188,0.8); text-align:left">
+				<h5 class="list-group-item-heading"   data-toggle="modal" data-target="#myModal" @click=current(re.dareaId,re.dareaName)>{{re.dareaName}}</h5>
+				<span style="z-index:99; position:absolute; right:10px; bottom:5px; color:#fff;" @click=send(re.dareaId,re.dareaName)>>></span>
+			</a>
+			<a href="#" class="list-group-item">
+				<p class="list-group-item-text">
+					昨日进水：{{re.dareaFlowIn}}m³<br>
+					昨日出水：{{re.dareaFlowOut}}m³<br>
+					昨日漏损量：{{re.lsl}}m³<br>
+					昨日漏损率：{{re.lsv}}%<br>
+				</p>
+			</a>
+			<!-- <button type="button" class="btn btn-primary">更多</button> -->
+		</div>
+	</div>
+	<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+	<div class="modal-dialog" style="width:1000px">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+				{{currentDarea.siteName}}
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div><input type="text" class="layui-input" id="TM" placeholder=" - "></div>
+				<p style="font-size:12px; color:#363636; height:30px; line-height:30px; text-align:left;">{{msg}}</p>
+				<div id="echart1" style="width:1000px; height:250px; background-color:#ffffff;"></div>
+				<div id="echart2" style="width:1000px; height:250px; background-color:#ffffff;"></div>
+			</div>
+			<!-- <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-primary">
+					提交更改
+				</button>
+			</div> -->
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+</div>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/DMA_zhanshi.js"></script>
+<script type="text/javascript" src="../../statics/map/js/switcher.js"></script>
+<script type="text/javascript" src="../../statics/map/js/tools.js"></script>
+<script type="text/javascript">
+
+var websocket = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+	var hs;
+	$.ajax({
+	    type: "POST",
+	    url: "../../fac/data/querySession",
+	    async:false,
+	    contentType: "application/json",
+	    data: JSON.stringify(),
+	    success: function(r){
+	    	hs=eval(r);
+	       
+	    }
+	}); 
+
+	//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+	websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}
+else {
+console.log('当前浏览器 Not support websocket')
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+console.log("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+console.log("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+	var infor=[];
+	console.log(event.data);
+	infor=JSON.parse(event.data);
+	setMessageInnerHTML(infor);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+	closeWebSocket();
+console.log("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+//将消息显示在网页上
+function setMessageInnerHTML(obj) {
+console.log(obj);
+var gsc_data;
+}
+//关闭WebSocket连接
+function closeWebSocket(){
+websocket.close();
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/closeSession",
+    contentType: "application/json",
+    data: JSON.stringify(),
+    success: function(r){
+        console.log(r)
+    }
+});
+}
+//发送消息
+function send(){
+$.ajax({
+    type: "POST",
+    url: baseURL + "fac/data/list",
+    contentType: "application/json",
+    data: JSON.stringify({"siteId":inlineData}),
+    success: function(r){
+        console.log(r);
+    }
+}); 
+}
+</script>
+<script>
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+  //日期范围
+  laydate.render({
+	    elem: '#TM'
+	    ,value: Stime+' - '+Etime
+	    ,range: true
+	    ,done: function(value, date, endDate){
+	    	console.log(value);//新的时间
+	    	var DT=value.split(" - ");
+	    	queryDmaWaterHis(vm.currentDarea.siteId,DT[0],DT[1]);
+	      }
+	  });
+})
+</script>
+<script type="text/javascript">
+function computed25Color(obj){
+	if(obj>110){
+		return ("#f00");
+	}else{
+		return("#666666");
+	}
+}
+function computed25Color2(obj){
+	if(obj>120){
+		return ("#f00");
+	}else{
+		return("#666666");
+	}
+}
+</script>
+</body>
+</html>

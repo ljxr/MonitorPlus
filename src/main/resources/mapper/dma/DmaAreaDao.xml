@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.dma.dao.DmaAreaDao">
+    <resultMap id="areaResultMap" type="com.enjoyor.modules.dma.entity.DmaAreaEntity">
+      <result property="dareaId" column="darea_id"/>
+      <result property="dareaName" column="darea_name"/>
+      <result property="dareaParentId" column="darea_parentid"/>
+      <result property="dareaParentName" column="darea_parentname"/>
+      <result property="border" column="border"/> 
+      <result property="intra" column="intra"/>
+      <result property="borderwidth" column="borderwidth"/> 
+      <result property="dareaType" column="darea_type"/> 
+      <result property="x" column="x"/>
+      <result property="y" column="y"/>
+      <result property="innerX" column="innerx"/>
+      <result property="innerY" column="innery"/> 
+      <!-- <result property="geom" column="darea_geom"
+		javaType="oracle.spatial.geometry.JGeometry"
+		jdbcType="STRUCT"
+		typeHandler="com.enjoyor.common.utils.SdoGeometryTypeHandler"/> -->
+	  <result property="day" column="day"/>
+	  <result property="week" column="week"/>
+	  <result property="month" column="month"/>
+	  <result property="year" column="year"/>
+	  <result property="orderNum" column="ordernum"/>
+    </resultMap>
+    
+    <resultMap id="areaDTOMap" type="com.enjoyor.modules.dma.entity.DmaAreaDTO">
+      <result property="dareaId" column="darea_id"/>
+      <result property="dareaName" column="darea_name"/>
+      <result property="dareaParentId" column="darea_parentid"/>
+      <result property="dareaFlowIn" column="darea_flowin"/>
+	  <result property="dareaFlowOut" column="darea_flowout"/>
+	  <result property="lsv" column="lsv"/>
+	  <result property="time" column="time"/>
+	  <result property="border" column="border"/>
+	  <result property="borderwidth" column="borderwidth"/>
+	  <result property="x" column="x"/>
+	  <result property="innerX" column="innerx"/>
+	  <result property="y" column="y"/>
+	  <result property="innerY" column="innery"/>
+	  <result property="dareaType" column="darea_type"/>
+	  <result property="intra" column="intra"/>
+	  <result property="geomString" column="geomstring"/>
+    </resultMap>
+    
+    <resultMap id="dmaFlowNightWarnResultMap" type="com.enjoyor.modules.dma.entity.DmaFlowNightWarnEntity">
+      <result property="dareaName" column="DAREA_NAME"/>
+      <result property="siteName" column="DSITE_NAME"/>
+      <result property="x" column="SITE_X"/>
+      <result property="y" column="SITE_Y"/>
+      <result property="min" column="MIN"/>
+      <result property="time2" column="TIME2"/>
+      <result property="avgNig" column="AVG_NIG"/>
+      <result property="avgDay" column="AVG_DAY"/>
+      <result property="pressure" column="PRESSURE"/>
+      <result property="daysavg" column="DAYSAVG"/>
+      <result property="nightsavg" column="NIGHTSAVG"/>
+    </resultMap>
+    
+    <resultMap id="areaTreeDTOMap" type="com.enjoyor.modules.dma.entity.DmaAreaTreeDTO">
+      <result property="dareaId" column="darea_id"/>
+      <result property="dareaName" column="darea_name"/>
+      <result property="dareaParentId" column="darea_parentid"/>
+      <result property="dareaFlowIn" column="darea_flowin"/>
+	  <result property="dareaFlowOut" column="darea_flowout"/>
+	  <result property="lsv" column="lsv"/>
+    </resultMap>
+
+    <!-- 分页查询片区列表 -->
+	<select id="queryAreaList" resultMap="areaResultMap">
+		select * from (select id,darea_id,darea_name,DAREA_PARENTID,
+		border,intra,BORDERWIDTH,darea_type,x,y,INNERX,INNERY,DAREA_GEOM,GEOMSTRING,day,week,month,year,ordernum,rownum rn from waterarea c 
+		<where>
+		 <if test="dareaName != null and dareaName.trim() != ''">
+		    and darea_name like concat('%',concat(#{dareaName},'%'))
+		 </if>
+		</where>
+		order by ordernum) b	
+		<where>		  
+		  <if test="offset != null and limit != null">
+			 b.rn between #{offset} and #{limit}
+		  </if>		  
+		</where>
+	</select>
+	
+	 <!-- 查询片区父子结构列表 -->
+	<select id="queryAreaParent" resultMap="areaResultMap">
+		select * from (select id,darea_id,darea_name,DAREA_PARENTID,border,intra,
+		BORDERWIDTH,darea_type,x,y,INNERX,INNERY,DAREA_GEOM,rownum rn from waterarea ) b	
+		<where>
+		 b.darea_parentid is null	 	  
+		</where>			
+		 order by b.id asc
+	</select>
+	
+	<!-- 查询片区父子结构列表2 -->
+	<select id="queryAreaChild" resultMap="areaResultMap">
+		select * from (select id,darea_id,darea_name,DAREA_PARENTID,border,intra,
+		BORDERWIDTH,darea_type,x,y,INNERX,INNERY,DAREA_GEOM,rownum rn from waterarea ) b	
+		<where>
+		1 = 1
+		  <if test="dareaParentId != null and dareaParentId.trim() != ''">
+		   and b.darea_parentid like concat('%',concat(#{dareaParentId,jdbcType=VARCHAR},'%'))
+		  </if>  
+		</where>			
+			order by b.id desc
+	</select>
+	
+	<!-- 查询所有片区ID与名称 --> 
+	<select id="queryAll" resultMap="areaResultMap">
+		select id,darea_id,darea_name,DAREA_PARENTID,border,intra,
+		BORDERWIDTH,darea_type,x,y,INNERX,INNERY,DAREA_GEOM,DAY,WEEK,MONTH,YEAR,ORDERNUM
+		from waterarea
+	</select>
+	
+	<!--  --> 
+	<select id="queryCountAreaId" resultType="Integer">
+		select count(*) from waterarea where darea_id = #{dareaId,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 片区数量 -->
+	<select id="queryAreaCount" resultType="Integer">
+		select count(*) from (select id,darea_id,darea_name,DAREA_PARENTID,border,intra,
+		BORDERWIDTH,darea_type,x,y,INNERX,INNERY,DAREA_GEOM,rownum rn from waterarea ) b	
+		<where>
+		 1=1
+		  <if test="dareaName != null and dareaName.trim() != ''">
+		    and b.darea_name like concat('%',concat(#{dareaName},'%'))
+		  </if>	  
+		</where>
+	</select>
+	
+	<!-- 保存片区信息 --> 
+	<insert id="save" parameterType="com.enjoyor.modules.dma.entity.DmaAreaEntity">
+		insert into waterarea
+		( 
+		    darea_id, 
+			darea_name, 
+            darea_parentId,			
+			border,
+		    intra,
+		    borderwidth,
+		    darea_type,
+		    x,
+		    y,
+		    innerX,
+		    innerY,
+		    geomstring,
+			<!-- <if test="geom != null and geom != null">
+			  area_geom
+			</if> -->
+			day,
+			week,
+			month,
+			year
+		)
+		values
+		(
+			#{dareaId,jdbcType=VARCHAR}, 
+			#{dareaName,jdbcType=VARCHAR}, 
+			#{dareaParentId,jdbcType=VARCHAR},  
+			#{border,jdbcType=VARCHAR},
+		    #{intra,jdbcType=VARCHAR},
+		    #{borderwidth,jdbcType=NUMERIC},
+		    #{dareaType,jdbcType=VARCHAR},
+		    #{x,jdbcType=NUMERIC},
+		    #{y,jdbcType=NUMERIC},
+		    #{innerX,jdbcType=NUMERIC},
+		    #{innerY,jdbcType=NUMERIC},
+		    #{geomString,jdbcType=NUMERIC},
+			<!-- <if test="geom !=null and geom!=null">
+			#{geom,javaType=oracle.spatial.geometry.JGeometry,typeHandler=com.enjoyor.common.utils.SdoGeometryTypeHandler,jdbcType=STRUCT,mode=IN}
+		    </if> -->
+		    #{day,jdbcType=NUMERIC},
+		    #{week,jdbcType=NUMERIC},
+		    #{month,jdbcType=NUMERIC},
+		    #{year,jdbcType=NUMERIC}
+		)
+	</insert>
+
+    <!-- 更新片区信息 -->
+    <update id="update" parameterType="com.enjoyor.modules.dma.entity.DmaAreaEntity">
+       update waterarea 
+		<set> 
+			<if test="dareaId != null">darea_id = #{dareaId}, </if>
+			<if test="dareaName != null">darea_name = #{dareaName}, </if>
+			<if test="dareaParentId != null">darea_parentId = #{dareaParentId}, </if>
+			<if test="border != null">border = #{border},</if>
+			<if test="intra != null">intra = #{intra},</if>
+			<if test="borderwidth != null">borderwidth = #{borderwidth},</if>
+			<if test="dareaType != null">darea_type = #{dareaType},</if>
+			<if test="x != null">x = #{x},</if>
+			<if test="y != null">y = #{y},</if>
+			<if test="innerX != null">innerX = #{innerX},</if>
+			<if test="innerY != null">innerY = #{innerY},</if>
+			<if test="geomString != null">GEOMSTRING = #{geomString},</if>
+			<!-- <if test="geom!= null">darea_geom = #{geom,javaType=oracle.spatial.geometry.JGeometry,typeHandler=com.enjoyor.common.utils.SdoGeometryTypeHandler,jdbcType=STRUCT,mode=IN}</if> -->
+			<if test="orderNum != null">ordernum = #{orderNum},</if>
+		</set>
+		where id = #{id,jdbcType=NUMERIC}
+    </update>
+    
+    <!-- 更新片区信息 -->
+    <update id="updateByDareaId" parameterType="com.enjoyor.modules.dma.entity.DmaAreaEntity">
+       update waterarea 
+		<set> 
+			<if test="dareaName != null">darea_name = #{dareaName}, </if>
+			<if test="dareaParentId != null">darea_parentId = #{dareaParentId}, </if>
+			<if test="border != null">border = #{border},</if>
+			<if test="intra != null">intra = #{intra},</if>
+			<if test="borderwidth != null">borderwidth = #{borderwidth},</if>
+			<if test="dareaType != null">darea_type = #{dareaType},</if>
+			<if test="x != null">x = #{x},</if>
+			<if test="y != null">y = #{y},</if>
+			<if test="innerX != null">innerX = #{innerX},</if>
+			<if test="innerY != null">innerY = #{innerY},</if>
+<!-- 			<if test="geom!= null">darea_geom = #{geom,javaType=oracle.spatial.geometry.JGeometry,typeHandler=com.enjoyor.common.utils.SdoGeometryTypeHandler,jdbcType=STRUCT,mode=IN}</if>
+ -->			
+ 			<if test="day != null">day = #{day},</if>
+			<if test="week != null">week = #{week},</if>
+			<if test="month != null">month = #{month},</if>
+			<if test="year != null">year = #{year},</if>
+		</set>
+		where darea_id = #{dareaId}
+    </update>
+    
+    <!-- 删除片区信息 -->
+    <delete id="delete">
+      delete from waterarea where id = #{id}
+    </delete>
+    
+    <!-- 查询子集DMA分区昨日水量 -->
+	<select id="querySonList" resultMap="areaDTOMap">
+		select a.DAREA_ID,a.DAREA_NAME,a.DAREA_PARENTID,
+		a.BORDER, a.BORDERWIDTH, a.X, a.INNERX, a.Y, a.INNERY, a.DAREA_TYPE, 
+		a.INTRA, a.GEOMSTRING, 
+		b.DAREA_FLOWIN,b.DAREA_FLOWOUT,b.LSV, b.TIME
+		from MONITOR.WATERAREA a
+		left join MONITOR.WATERDAY b
+		on a.DAREA_ID = b.DAREA_ID
+		and b.time = to_date(#{time,jdbcType=VARCHAR},'yyyy-mm-dd')
+		<if test='dareaParentId != ""'>
+			where a.DAREA_PARENTID like concat('%',concat(#{dareaParentId,jdbcType=VARCHAR},'%'))
+		</if>
+		<if test='dareaParentId == ""'>
+			where a.DAREA_PARENTID is null
+		</if>
+	</select>
+	
+	<!-- 查询子集DMA分区昨日水量 -->
+	<select id="queryDmaFlowNightWarnList" resultMap="dmaFlowNightWarnResultMap">
+		select a.darea_name, a.dsite_name, c.site_x, c.site_y, b.min, b.time2
+		, b.AVG_NIG, b.NIGHTSAVG, b.AVG_DAY, b.DAYSAVG, b.PRESSURE
+		from MONITOR.WATERSITE a
+		left join MONITOR.FLOWNIGHT b
+		on a.DSITE_ID = b.SITE_ID
+		left join BASESYS.SYS_SITE c
+		on b.SITE_ID = c.SITE_ID
+		<where>
+		<if test='dareaId != ""'>
+			a.DAREA_ID in (select darea_id from MONITOR.WATERAREA where darea_parentid like concat('%',concat(#{dareaId,jdbcType=VARCHAR},'%'))) 
+		</if>
+		<if test='dareaId == ""'>
+			a.DAREA_ID in (select darea_id from MONITOR.WATERAREA where darea_parentid is null)
+		</if>
+		and b.time = #{time,jdbcType=VARCHAR}
+		</where> 
+    </select>
+    
+    <!-- 查询某片区进出水历史 -->
+	<select id="queryDmaWaterHis" resultMap="areaDTOMap">
+		select DAREA_ID, DAREA_NAME, DAREA_FLOWIN, DAREA_FLOWOUT, LSV, TIME
+		from MONITOR.WATERDAY
+		<where>
+			darea_id = #{dareaId}
+			and time &gt;= TO_DATE(#{beginTime}, 'YYYY-MM-DD hh24:mi:ss')
+			and time &lt;= TO_DATE(#{endTime}, 'YYYY-MM-DD hh24:mi:ss')
+		</where>
+		order by time asc
+	</select>
+	
+	<!-- 查询所有DMA分区昨日水量 -->
+	<select id="queryAllAreaYesterdayWater" resultMap="areaTreeDTOMap">
+		select a.DAREA_ID,a.DAREA_NAME,a.DAREA_PARENTID,
+		b.DAREA_FLOWIN,b.DAREA_FLOWOUT,b.LSV
+		from MONITOR.WATERAREA a
+		left join MONITOR.WATERDAY b
+		on a.DAREA_ID = b.DAREA_ID
+		and b.time = to_date(#{time,jdbcType=VARCHAR},'yyyy-mm-dd')
+	</select>
+</mapper>

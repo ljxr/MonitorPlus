@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>DMA分区设置</title>
+
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<!-- <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://unpkg.com/element-ui/lib/index.js"></script> -->
+<style type="text/css">
+@charset "utf-8";
+*{margin:0;padding:0;box-sizing:border-box}
+body{color:rgba(0,0,0,.65);font-size:14px;line-height:1.8;font-family:"微软雅黑";background:#FAFAFA}
+a{text-decoration:none;color:#108EE9}
+a:hover{color:#108EE9!important;cursor:pointer}
+em{font-style:normal}
+ul{list-style:none}
+h1,h2,h3,h4,h5,h6{margin-bottom:1em;color:rgba(0,0,0,.85)}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')}
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:270px; height:100%; border-right:1px solid #E9E9E9;}
+.sidebar-wrapper.fixed{position:fixed;top:0px;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.menu-item .sub-title:after{content:'\ee4e';font-family:"iconfont";font-size:12px;line-height:1;color:#555;position:absolute;top:50%;right:44px;margin-top:-6px;transform:rotate(180deg);transition:all .15s ease}
+.menu-item.collapse .sub-title:after{margin-top:-5px;transform:rotate(0)}
+.menu-item .sub-title:hover:after{color:#108EE9}
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:36px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px}
+.menu-item-1>ul{display:none;margin-top:12px}
+.menu-item-1.active>ul{display:block}
+.menu-item-2{padding-top:8px;padding-bottom:8px;padding-left:15px;font-size:14px;line-height:28px}
+.menu-item-2>ul{display:none;margin-top:12px}
+.menu-item-2.active>ul{display:block}
+.main-container{position:relative;margin-left:280px;padding:0px}
+.md{display:inline-block; margin:0; padding:0;}
+</style>
+<style type="text/css">
+.site_name{font-size:14px; color:#363636;}
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+#analyse_header{height:40px; position:relative;margin:0px; padding:0px;  background-color:#f1f1f1;}
+#analyse_header p{line-height:40px;}
+#analyse_container{}
+#checkBoxLine{display:inline-block}
+.layui-table-body{overflow-x:auto; overflow-y:auto;}
+.layui-form-radio{margin-right:0px; padding-right:0px;}
+.menu-group{z-index:1;}
+.menu-group ul{z-index:2;}
+.menu-group ul ul{z-index:3;}
+#waterOutSiteTable + div > .layui-table-box > .layui-table-body {height:140px; overflow-y:auto; overflow-x:auto}
+#waterInSiteTable + div > .layui-table-box > .layui-table-body {height:140px; overflow-y:auto; overflow-x:auto}
+</style>
+</head>
+
+<body>
+
+<div class="layui-form-item">
+ 	<label class="layui-form-label chaxun" style="width:100px;">分区名:</label>
+	<div class="layui-input-inline chaxun" style="width:280px;">
+		<input type="text" class="layui-input" id="queryParamDAreaName" placeholder="分区名">
+	</div>
+ 	<button class="layui-btn chaxun" onClick="search_Area()">查询</button>					   
+	<button class="layui-btn"  data-toggle="modal" data-target="#new_Area" onClick="add()" id="xinzeng">新增</button>
+</div>
+
+<table class="layui-hide chaxun" id="area_table" lay-filter="area_table"></table>
+
+<div id = "app">
+<div class="modal fade" id="new_Area" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						新增分区
+					</h4>
+				</div>
+				<div class="modal-body gyt_container"> 
+	               <form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="firstname" class="col-sm-3 control-label">分区编号</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="dareaId" placeholder="分区编号">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">分区名称</label>
+							<div class="col-sm-9">
+								 <input type="text" class="form-control" id="dareaName" placeholder="分区名称"> 
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">上级分区</label>
+							<div class="col-sm-9">
+								<select class="form-control" multiple="multiple" id="dareaParentName">
+				                   <option v-for="re in allAreaList" :value="re.dareaId"><span class="site_name">{{re.dareaName}}</span></option> 
+				                </select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">区域绘制</label>
+							<div class="col-sm-9">
+							  <input type="text" id="tipA"  class="form-control"  placeholder="" v-model="geomName"  v-on:click="showGeomGetPage()"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">中心点X</label>
+							<div class="col-sm-9">
+							  <input type="text" id="tipX2"   class="form-control"  placeholder="点击绘制中心点" v-model="geomName2"   v-on:click="showGeomGetPage2(0)"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">中心点Y</label>
+							<div class="col-sm-9">
+							  <input type="text" id="tipX2"   class="form-control"  placeholder="点击绘制中心点" v-model="geomName3"   v-on:click="showGeomGetPage2(0)"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">排序</label>
+							<div class="col-sm-9">
+								 <input type="text" class="form-control" id="orderNum" placeholder="分区名称"> 
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onClick="saveArea()">添加</button>
+				</div>
+			</div>
+		</div>
+</div>
+
+<div class="modal fade" id="modify_Area" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title" id="myModalLabel4update">
+						修改分区
+					</h4>
+				</div>
+				<div class="modal-body gyt_container"> 
+	               <form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="firstname" class="col-sm-3 control-label">分区编号</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="dareaId4update" placeholder="分区编号">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">分区名称</label>
+							<div class="col-sm-9">
+								 <input type="text" class="form-control" id="dareaName4update" placeholder="分区名称"> 
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">上级分区</label>
+							<div class="col-sm-9">
+							  <select class="form-control" multiple="multiple" id="dareaParentName4update">
+				                  <option v-for="re in allAreaList" :value="re.dareaId"><span class="site_name">{{re.dareaName}}</span></option> 
+				               </select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">区域绘制</label>
+							<div class="col-sm-9">
+							  <input type="text" id="tipE"   class="form-control"  placeholder="点击绘制区域" v-model="geomName"  v-on:click="showGeomGetPage()"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">中心点X</label>
+							<div class="col-sm-9">
+							  <input type="text" id="tipX"   class="form-control"  placeholder="点击绘制中心点" v-model="geomName2"   v-on:click="showGeomGetPage2(0)"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">中心点Y</label>
+							<div class="col-sm-9">
+							  <input type="text" id="tipY"   class="form-control"  placeholder="点击绘制中心点" v-model="geomName3"   v-on:click="showGeomGetPage2(0)"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="lastname" class="col-sm-3 control-label">排序</label>
+							<div class="col-sm-9">
+								 <input type="text" class="form-control" id="orderNum4update" placeholder="分区名称"> 
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onClick="modifyArea()">修改</button>
+				</div>
+			</div>
+		</div>
+</div>
+
+<div class="modal fade" id="set_Area" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="width:1070px">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+					<h4 class="modal-title">
+						点位设置   &nbsp &nbsp &nbsp &nbsp     DMA分区编号：{{dareaSite4Set}}  &nbsp &nbsp &nbsp &nbsp  DMA分区名：{{dareaName4Set}}
+					</h4>
+				</div>
+				<div class="modal-body"  style="height:560px"> 
+					<div>
+				    	<div style="width:100%; height:40px">
+				    		<label class="layui-form-label" style="width:60px; line-height:30px; padding:0; margin:0">点位编号:</label>
+				    		<div class="col-sm-2">
+				    			<input type="text" class="form-control" id="siteId4set" placeholder="点位编号">
+				    		</div>
+				    		<label class="layui-form-label" style="width:60px; line-height:30px; padding:0; margin:0">点位名称:</label>
+				    		<div class="col-sm-2">
+				    			<input type="text" class="form-control" id="siteName4set" placeholder="点位名称">
+				    		</div>
+				    		<label class="layui-form-label" style="width:60px; line-height:30px; padding:0; margin:0">点位类型:</label>
+				    		<div class="col-sm-2">
+				    			<select class="form-control" id="siteType4set">
+									<option value=""></option>  
+				                	<option v-for="re in dicList4SiteType" :value="re.dicValue"><span class="site_name">{{re.name}}</span></option> 
+				               	</select>
+				    		</div>
+				    		<label class="layui-form-label" style="width:60px; line-height:30px; padding:0; margin:0">所属区域:</label>
+				    		<div class="col-sm-2">
+			    			    <select class="form-control" id="areaName4set">
+									<option value=""></option>  
+				                	<option v-for="re in allSysAreaList" :value="re.areaId"><span class="site_name">{{re.areaName}}</span></option> 
+				               	</select>
+				    		</div>
+				    		<button type="button" class="btn btn-primary" onClick="initSysSiteTable()">查询</button>
+				    						    		
+				    	</div>
+				    	<div class="md" style="width:48%; float:left">
+				    		<!-- sysSite表格 -->
+				    		<table class="layui-hide" id="sysSiteTable"></table>
+				    	</div>
+				    	
+				    	<!-- 箭头 -->
+				    	<div class="layui-btn-group demoTable" style="width:4%; height:400px; text-align:center;">
+				    		<button class="layui-btn" data-type="addJ" style="margin-top:100px; padding:0px 7px;"> —> </button>
+				    		<button class="layui-btn" data-type="removeJ"  style="margin-top:30px; padding:0px 7px;"> <— </button>
+				    		<button class="layui-btn" data-type="addC"  style="margin-top:100px; padding:0px 7px;"> —> </button>
+				    		<button class="layui-btn" data-type="removeC"  style="margin-top:30px; padding:0px 7px;"> <— </button>
+				    	</div>
+				    	
+					    <div class="md" style="float:right; width:48%; height:400px">
+					    	<div id="checkBoxLine">
+								<input type="checkbox" id="dayCheckBox"  v-model="day4Set">日
+								<input type="checkbox" id="weekCheckBox"  v-model="week4Set">周
+	  							<input type="checkbox" id="monthCheckBox"  v-model="month4Set">月
+	  							<input type="checkbox" id="yearCheckBox"  v-model="year4Set">年
+							</div>	
+					    	<div style="width:100%; height:230px;">
+					    		进水口：
+					    		<div style="float:right">    			
+						    		<label class="layui-form-label" style="line-height:35px; padding:0; margin:0px 10px;">进水口系数:</label>
+						    		<input type="text" class="form-control" id="coefficient4In" style="width:60px;">
+					    		</div>		
+					    		<!-- InSite表格 -->				    						    		
+					    		<table class="layui-hide" id="waterInSiteTable" lay-filter="waterInSiteTable"></table> 
+					    	</div>					    	
+					    	<div style="width:100%; height:230px">
+					    		出水口
+					    		<div style="float:right">    			
+						    		<label class="layui-form-label" style="line-height:35px; padding:0; margin:0px 10px;">出水口系数:</label>
+						    		<input type="text" class="form-control" id="coefficient4Out" style="width:60px;">
+					    		</div>		
+					    		<!-- OutSite表格 -->
+					    		<table class="layui-hide" id="waterOutSiteTable" lay-filter="waterOutSiteTable"></table>
+					    	</div>
+				     	</div>
+			    	</div>			    				    	
+   				</div>								   
+	               <div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" onClick="saveAreaSet()">保存</button>
+					</div>	                         
+				</div>
+			</div>
+</div>
+		
+</div>
+</div>
+
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/DMA_SetUp.js"></script>
+
+<script type="text/html" id="barDemo">
+	<a class="layui-btn layui-btn-primary layui-btn-xs xiugai" lay-event="edit" data-toggle="modal" data-target="#modify_Area" onClick="edit()">修改</a>
+	<a class="layui-btn layui-btn-xs shanchu" lay-event="del">删除</a>
+	<a class="layui-btn layui-btn-danger layui-btn-xs shezhi" lay-event="set" data-toggle="modal" data-target="#set_Area">设置</a>
+</script>
+
+<script>
+
+layui.use(['table','form'], function(){
+	var table = layui.table;
+  
+  //监听分区table
+  table.on('tool(area_table)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'edit'){
+    	vm.currentEdit.id = data.id;
+    	$("#dareaId4update").val(data.dareaId);
+    	$("#dareaName4update").val(data.dareaName);
+    	$("#dareaParentName4update").val(data.dareaParentId?data.dareaParentId.split(","):[]);
+    	$("#orderNum4update").val(data.orderNum);
+    	vm.currentEdit = data;
+    	vm.geomName=vm.currentEdit.geomString?'区域已绘制点击编辑':'区域未绘制点击绘制';
+    	vm.geomName2=vm.currentEdit.x?vm.currentEdit.x:'中心点未绘制点击绘制';
+    	vm.geomName3=vm.currentEdit.y?vm.currentEdit.y:'中心点未绘制点击绘制';
+    	
+    } else if(obj.event === 'del'){
+    	var r=confirm("确认删除片区：" + data.dareaName + " ?");
+    	if (r==true)
+    	  {
+    		vm.deleteArea.id = data.id;
+    		vm.deleteArea.dareaId = data.dareaId;
+        	deleteArea();
+    	  }
+    } else if(obj.event === 'set'){
+    	console.log(data);
+    	// 清空进出水口点位列表
+    	vm.waterInSiteList = [];
+    	vm.waterOutSiteList = [];
+    	// 赋值片区参数
+    	vm.dareaId = data.dareaId;
+    	vm.dareaSite4Set = data.dareaId;
+    	vm.dareaName4Set = data.dareaName;
+    	vm.day4Set = data.day?true:false;
+    	vm.week4Set = data.week?true:false;
+    	vm.month4Set = data.month?true:false;
+    	vm.year4Set = data.year?true:false;
+    	//初始化片区属性
+    	//initAttr4Area();
+    	// 查询全部sysSite和片区进出水口点位列表
+    	initSysSiteTable();
+    	initWaterInSiteTable();
+    	initWaterOutSiteTable();
+    }
+  });
+  
+  var $ = layui.$, active = {
+		  
+		addJ: function(){
+			var checkStatus = table.checkStatus('sysSiteTable')
+	        ,data = checkStatus.data;
+			if(data.length > 0){
+				addJ(data);
+			}			
+		},
+
+		removeJ: function(){
+			var checkStatus = table.checkStatus('waterInSiteTable')
+	        ,data = checkStatus.data;
+			if(data.length > 0){
+				removeJ(data);
+			}			
+		},
+		
+		addC: function(){
+			var checkStatus = table.checkStatus('sysSiteTable')
+	        ,data = checkStatus.data;
+			if(data.length > 0){
+				addC(data);
+			}			
+		},
+		
+		removeC: function(){
+			var checkStatus = table.checkStatus('waterOutSiteTable')
+	        ,data = checkStatus.data;
+			if(data.length > 0){
+				removeC(data);
+			}			
+		}
+    
+  };
+  
+  
+  $('.demoTable .layui-btn').on('click', function(){
+	    var type = $(this).data('type');
+	    active[type] ? active[type].call(this) : '';
+	  });
+});
+</script>
+
+</body>
+</html>

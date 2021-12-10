@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>供水厂数据详情</title>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/map/css/switcher.css"></link>
+<link rel="stylesheet" href="../../statics/map/css/tools.css"></link>
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+body{
+/* moz-user-select: -moz-none;
+-moz-user-select: none;
+-o-user-select:none;
+-khtml-user-select:none;
+-webkit-user-select:none;
+-ms-user-select:none;
+user-select:none; */
+}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+a:link{text-decoration:none;}
+a:visited{text-decoration:none;}
+a:hover{text-decoration:none;}
+a:active{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+.gsc_tit{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; margin-bottom:39px; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+.gsc{width:100%; height:60px; line-height:60px; text-align:center; color:#363636; font-size:14px;cursor:pointer;}
+.gsc:hover{height:60px; line-height:60px; background-color:#f1f1f1;} 
+.gsc.active{background-color:#999; color:#fff;}
+#detail_header{width:100%; height:40px; ling-height:40px; position:relative; background-color:#f1f1f1;}
+#detail_header p{font-size:14px; color:#3c8dbc; line-height:40px; text-align:left; margin-left:40px;}
+#detail_header p span{color:#363636; font-size:14px; line-height:40px; display:inline-block; margin-right:40px;}
+#detail_container{width:100%; position:relative;}
+.lk_li {float: left; width: 120px; height:40px; text-align: center; line-height: 40px; padding: 0px;}
+.lk_li a{font-size:14px; text-decoration:none; color:#363636;}
+.lk_li a:hover{color:#3c8dbc;}
+.lk_li.active a{color:#3c8dbc;}
+#slider {display: block;position: absolute;margin:0px 17px;padding:0px;border:0px;top: 40px;left: 0px;height: 3px;width:80px;background: #3c8dbc;transition: all 0.5s;}
+#container_leader{position:relative; width:100%; height:40px; border-bottom:solid 1px #f1f1f1;}
+#container{position:relative; width:100%; margin-top:5px;}
+.containers{width:100%; height:100%; display:none; position:relative;}
+.containers.active{display:block;}
+.container_1{display:none; width:1100px; height:640px; margin-left:-550px; position:relative; left:50%;}
+.container_1 iframe{width:100%; height:100%; border:0px;}
+#container_2_main iframe{width:100%; height:100%; border:0px;}
+.container_1 img{text-align:center;}
+.container_1.active{display:block;}
+#gyt_leader{position:absolute;right:100px; text-align:left;}
+
+.container_main{width:100%; padding:10px;}
+.movie{background-color:#282b33;}
+
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+
+.sidebar-wrapper{position:absolute;top:0;z-index:99;width:260px; height:100%; border-right:1px solid #E9E9E9; background-color:#fff;}
+.sidebar{padding:0;height:100%; padding-bottom:50px; overflow-y:auto}
+.sidebar .menu-group{margin-left:-12px}
+.menu-item{padding-left:20px;font-size:14px;line-height:28px}
+.menu-item .sub-title{position:relative;padding-right:64px;margin:4px 0;font-size:14px;font-weight:normal;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+
+.menu-item-check.active{color:#108EE9;border-right:3px solid #108EE9}
+.menu-item a{padding-right:36px;font-size:14px;line-height:22px;display:block;color:inherit}
+.menu-item .sub-title{margin:0;padding-right:36px}
+.menu-item .sub-title:after{right:24px}
+.menu-item-1{padding-top:12px; color:#3c8dbc; font-weight:bold;}
+.menu-item-1>ul{margin-top:12px}
+.menu-item-1.active>ul{display:block}
+.menu-item-2{padding-left:25px;font-size:14px;line-height:20px; color:#363636; font-weight:normal;}
+.menu-item-2>ul{margin-top:12px}
+.menu-item-2.active>ul{display:block}
+
+.main_container{position:relative; margin-top:0px; margin-left:260px; padding:0px; background-color:#fff;}
+
+
+#container_4{padding:10px;}
+#container_4 div span{font-size:14px;}
+.container_inner{overflow-y:auto;overflow-x:hidden;}
+.add{height:30px; padding:0 10px; margin:5px; border:solid 1px #3c8dbc; border-radius:5px; line-height:28px; background-color:#3c8dbc; color:#fff;}
+.remove{height:30px; padding:0 10px; margin:5px; border:solid 1px #3c8dbc; border-radius:5px; line-height:28px; color:#3c8dbc; background-color:#fff;}
+.content-wrapper{background-color:#000000!important;}
+.jcd:hover{color:#f00;}
+/* #jcd_container{position:absolute; height:0px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 0px #999; z-index:99; top:55px; padding:0px; margin-top:0px;}*/
+#jcd_container.active{position:absolute; height:140px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 1px #999; z-index:99; top:55px; padding:0px; margin-top:20px;}
+
+.history_body{height:400px; overflow-y:hidden; overflow-y:auto;}
+</style>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+	<div class="sidebar-wrapper">
+		<div class="gs_site" onClick="backBZ()">供水泵站</div>
+		<div class="sidebar">
+			<ul class="menu-group">
+				<li v-for="(item, index) in treeList" class="menu-item menu-item-1">
+					<a v-bind:id="item.siteId" href="javascript:;"><span class="glyphicon glyphicon-th-large"></span>&nbsp;{{item.name}}</a>
+					<ul>
+						<li v-for="(citem, cindex) in item.treelist" class="menu-item menu-item-2">
+							<a v-bind:id="citem.siteId" href="javascript:;" v-on:click="getIndex(citem.siteId)"><span v-bind:id="citem.siteId+'span1'" class="glyphicon glyphicon-chevron-right"></span><span v-bind:id="citem.siteId+'span2'" style="display:none;" class="glyphicon glyphicon-chevron-down"></span>&nbsp;&nbsp;{{citem.name}}</a>
+							<ul v-bind:id="citem.siteId+'ul'" style="display:none;">
+	                            <li v-for="(ccitem, ccindex) in citem.treelist" class="menu-item menu-item-3 menu-item-check">
+	                            	<a v-bind:id="ccitem.siteId" class="no-sub" href="javascript:;" v-on:click="getIndex2(citem.siteId,ccitem.siteId,ccitem.name)"><input v-if="ccitem.flag" name="site" type="checkbox" v-bind:siteName="ccitem.name" v-bind:value="ccitem.siteId" />{{ccitem.name}}</a>
+	                            </li>
+	                        </ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="main_container">
+		<!-- <div id="detail_header">
+			<p>今日供水&nbsp:&nbsp&nbsp<span>{{jrgs}}</span>出水流量&nbsp:&nbsp&nbsp<span>{{csll}}</span>出水水质&nbsp:&nbsp&nbsp<span>{{cssz}}</span></p>
+		</div> -->
+		<div id="detail_container">
+			<ul id="container_leader">
+				<li id="lk_1" class="lk_li active" onClick="javascript:lk_show(1);"><a id="lk_1_a">工艺图</a></li>
+				<li id="lk_2" class="lk_li" onClick="javascript:lk_show(2);"><a id="lk_2_a">监控数据</a></li>
+				<li id="lk_3" class="lk_li" onClick="javascript:lk_show(3);"><a id="lk_3_a">监控视频</a></li>
+				<li id="lk_4" class="lk_li" onClick="javascript:lk_show(4);"><a id="lk_4_a">历史数据</a></li>
+				<li id="lk_5" class="lk_li" onClick="javascript:lk_show(5);"><a id="lk_5_a">报警记录</a></li>
+				<li id="lk_6" class="lk_li" onClick="javascript:lk_show(6);"><a id="lk_6_a">调度日志</a></li>
+				<li id="slider"></li>
+			</ul>
+			<div id="container">
+				<div id="container_1" class="containers active">
+					<div id="container_1_main" class="container_main">
+					<!-- 需要提供该水厂的所有相关工艺图点位，包括子点位的id,name,工艺图字符串 -->
+						<div id="container_11" class="container_1 active">
+							<iframe src="" id="area"></iframe>
+						</div>
+						<div id="gyt_leader">
+							<div class="btn-group">
+								<!-- <button type="button" class="btn btn-default btn-primary" v-on:click="change_gyt('btn11',current_gsc,current_gsc,'')" id="btn11">总览图</button> -->
+								<button v-for="(item, index) in gyt_list" type="button" class="btn btn-default" v-on:click="change_gyt('btn'+index,(item.siteId)?item.siteId:item.siteParentId,item.siteParentId,item.siteId)" v-bind:id="'btn'+index">{{item.name}}</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="container_2" class="containers">
+					<div id="container_2_main" class="container_main">
+						<iframe src="" id="jksj"></iframe>
+					</div>
+				</div>
+				<div id="container_3" class="containers">
+					<div class="container_main movie">
+						<div class="row clearfix">
+							<div class="col-md-10 column" style="background-color:#000;">
+								<iframe id="supplyvideo" style="width:100%; height:100%;" allowfullscreen></iframe>
+							</div>
+							<div class="col-md-2 column" style="background-color:#282b33;">
+								<ul class="layui-nav layui-nav-tree layui-inline" lay-filter="demo" style="margin-right: 10px;">
+								  <li class="layui-nav-item" v-for="re in video_ld"><a href="javascript:" @click="getVideoSrc(re)">{{re.name}}</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="container_4" class="containers">
+					<div class="container_main">
+						<div class="layui-row">
+						  <span>点位选择:</span>
+						  <div class="layui-input-inline" style="margin:0px 10px 0px 15px;">
+							<button v-for="(item, index) in historyData" v-on:click="dw_click('his'+index,index)" v-bind:class="item.cls" v-bind:id="'his'+index">{{item.name}}</button>
+						  </div>
+						</div>
+						<div class="layui-row">
+						  <span>时间范围:</span>
+						  <div class="layui-input-inline" style="margin:0px 10px;">
+							<input type="text" class="layui-input" id="test10" style="width:280px;margin-left:10px;" placeholder="2019-05-01 00:00:00 - 2019-05-02 00:00:00">
+						  </div>
+						</div>
+						<div class="layui-row container_inner" style="margin-top:20px">
+							<div id="echart0" style="height:400px; margin:0px; padding:0px; float:left;">
+						    </div>
+							<div id="echart1" style="height:400px; margin:0px; padding:0px; float:right;">
+						    </div>
+							<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" id="list0" style="border-right: solid 1px #999; margin:0x; padding:0px;">
+						    	<!-- <table class="table table-striped">
+									<caption></caption>
+									<thead>
+										<tr>
+											<th>监测项目</th>
+											<th>检测值</th>
+											<th>采集时间</th>
+										</tr>
+									</thead>
+									<tbody class="history_body">
+										<tr v-for="re in hisDetail[0].map">
+											<td>{{hisDetail[0].tit}}</td>
+											<td>{{re.value}}</td>
+											<td>{{re.time}}</td>
+										</tr>
+									</tbody>
+								</table> -->
+								<script type="text/html" id="st1">
+  									{{hisDetail[0].tit}}
+								</script>
+								<table class="layui-hide" id="history1Table" lay-filter="history1Table"></table>
+						    
+						    </div>
+							<div class="layui-col-xs6 layui-col-sm6 layui-col-md6" id="list1" style="margin:0px; padding:0px;">
+						    	<!-- <table class="table table-striped">
+									<caption></caption>
+									<thead>
+										<tr>
+											<th>监测项目</th>
+											<th>检测值</th>
+											<th>采集时间</th>
+										</tr>
+									</thead>
+									<tbody class="history_body">
+										<tr v-for="re in hisDetail[1].map">
+											<td>{{hisDetail[1].tit}}</td>
+											<td>{{re.value}}</td>
+											<td>{{re.time}}</td>
+										</tr>
+									</tbody>
+								</table> -->
+								<script type="text/html" id="st2">
+  									{{hisDetail[1].tit}}
+								</script>
+								<table class="layui-hide" id="history2Table" lay-filter="history2Table"></table>
+					    
+						    </div>
+						 </div>
+					 </div>
+				</div>
+				<div id="container_5" class="containers">
+					<div id="container_5_main" class="container_main">
+					    <div class="layui-row">
+						  <span>时间范围：</span>
+						  <div class="layui-input-inline" style="margin-left:10px;">
+							<input type="text" class="layui-input" id="test11" style="width:280px;margin-left:10px;" placeholder="2019-04-03 00:00:00 - 2019-04-04 00:00:00">
+						  </div>
+						</div>
+						<div class="layui-row lv" style="padding-top:20px">
+						    <span>报警等级：</span>
+						    <button class="add" onClick="dw_click1(this)">全部</button>
+						    <button class="remove" onClick="dw_click1(this)">异常</button>
+						    <button class="remove" onClick="dw_click1(this)">故障</button>
+						    <button class="remove" onClick="dw_click1(this)">超时</button>
+						</div>
+						<div class="layui-row tp" style="padding-top:20px">
+						    <span>监测参数：</span>
+						    <button class="add" onClick="dw_click2(this)">全部</button>
+						    <button class="remove" onClick="dw_click2(this)">流量</button>
+						    <button class="remove" onClick="dw_click2(this)">压力</button>
+						    <button class="remove" onClick="dw_click2(this)">COD</button>
+						    <button class="remove" onClick="dw_click2(this)">PH</button>
+						    <button class="remove" onClick="dw_click2(this)">余氯</button>
+						    <button class="remove" onClick="dw_click2(this)">浊度</button>
+						    <button class="remove" onClick="dw_click2(this)">SS</button>
+						    <button class="remove" onClick="dw_click2(this)">氨氮</button>
+						    <button class="remove" onClick="dw_click2(this)">总磷</button>
+						    <button class="remove" onClick="dw_click2(this)">液位</button>
+						</div>
+						<div class="layui-form">
+							<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+						  		<table class="layui-hide" id="BaoJing_table" lay-filter="BaoJing_table"></table>
+						  	</div>
+						</div>
+					</div>
+				</div>
+				<div id="container_6" class="containers">
+					<div id="container_6_main" class="container_main">
+					    <div class="layui-row">
+						  <span>时间范围：</span>
+						  <div class="layui-input-inline" style="margin-left:10px;">
+							<input type="text" class="layui-input" id="test12" style="width:280px;margin-left:10px;" placeholder="2019-04-03 00:00:00 - 2019-04-04 00:00:00">
+						  </div>
+						</div>
+						<div class="layui-row dd" style="padding-top:20px">
+						    <span>内容类别：</span>
+						    <button class="add" onClick="dw_click3(this)">全部</button>
+						    <button class="remove" onClick="dw_click3(this)">调度操作</button>
+						    <button class="remove" onClick="dw_click3(this)">水质检测</button>
+						    <button class="remove" onClick="dw_click3(this)">其他</button>
+						</div>
+						<div class="layui-row" style="padding-top:20px; text-align:right;">
+							<button class="add" data-toggle="modal" data-target="#record_Modal"><span class="glyphicon glyphicon-plus"></span>添加日志</button>
+							<button class="add"  onClick="deleteLog()"><span class="glyphicon glyphicon-minus"></span>批量删除</button>
+						</div>						  
+						<div id="logTable"></div>
+						
+						<div class="modal fade" id="record_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+											&times;
+										</button>
+										<h4 class="modal-title" id="myModalLabel">
+											新增日志
+										</h4>
+									</div>
+									<div class="modal-body tit_container">
+										<form class="layui-form" action="">
+											<div class="layui-form-item">
+												<label class="layui-form-label" style="width:100px;">操作时间：</label>
+												<div class="layui-input-block">
+											      <input type="text" class="layui-input" id="test5" placeholder="yyyy-MM-dd HH:mm:ss">
+											    </div>
+											</div>
+											<div class="layui-form-item">
+												<label class="layui-form-label" style="width:100px;">操作内容：</label>
+												<div class="layui-input-block">
+											      <textarea id="content" placeholder="请输入内容" class="layui-textarea"></textarea>
+											    </div>
+											</div>
+											<div class="layui-form-item">
+												<label class="layui-form-label" style="width:100px;">内容类别：</label>
+												<div class="layui-input-block">
+												    <select id="contentType">
+											          <option>调度操作</option>
+											          <option>水质检测</option>
+											          <option>其他</option>
+											        </select>
+												</div>
+											</div>
+											<div class="layui-form-item">
+												<label class="layui-form-label" style="width:100px;">操作人：</label>
+												<div class="layui-input-block">
+											      <input id="operator" type="text" class="layui-input" placeholder="请填写操作人">
+											    </div>
+											</div>
+										</form>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+										<button type="button" class="btn btn-primary" data-dismiss="modal" onClick="addLog()">添加</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="${request.contextPath}/statics/js/modules/sys/gsbz_detail.js"></script>
+<script type="text/javascript" src="../../statics/map/js/switcher.js"></script>
+<script type="text/javascript" src="../../statics/map/js/tools.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+var websocket = null;
+//判断当前浏览器是否支持WebSocket
+if ('WebSocket' in window) {
+var hs;
+$.ajax({
+    type: "POST",
+    url: "../../fac/data/querySession",
+    async:false,
+    contentType: "application/json",
+    data: JSON.stringify(),
+    success: function(r){
+    	hs=eval(r);
+       
+    }
+}); 
+
+//websocket = new WebSocket("ws://localhost:8080/MonitorPlus/websocket/"+hs);
+websocket = new WebSocket("ws://192.168.101.10:8082/MonitorPlus/websocket/"+hs);
+}
+else {
+alert('当前浏览器 Not support websocket');
+}
+//连接发生错误的回调方法
+websocket.onerror = function () {
+console.log("WebSocket连接发生错误");
+};
+//连接成功建立的回调方法
+websocket.onopen = function () {
+	console.log("WebSocket连接成功");
+}
+//接收到消息的回调方法
+websocket.onmessage = function (event) {
+setMessageInnerHTML(event.data);
+}
+//连接关闭的回调方法
+websocket.onclose = function () {
+	closeWebSocket();
+//setMessageInnerHTML("WebSocket连接关闭");
+}
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+window.onbeforeunload = function () {
+closeWebSocket();
+}
+//将消息显示在网页上
+function setMessageInnerHTML(innerHTML) {
+	var inner=JSON.parse(innerHTML);
+	console.log(inner);
+	if(vm.model==1){
+		document.getElementById("area").contentWindow.setMessageInnerHTML_gyt(inner);
+	}else if(vm.model==2){
+		document.getElementById("jksj").contentWindow.setMessageInnerHTML_jksj(inner);
+	}
+}
+//关闭WebSocket连接
+function closeWebSocket() {
+websocket.close();
+$.ajax({
+  type: "POST",
+  url: "../../fac/data/closeSession",
+  contentType: "application/json",
+  data: JSON.stringify(),
+  async:false,
+  success: function(r){
+      console.log(r)
+  }
+}); 
+}
+//发送消息
+function send() {
+var baseURL = "../../";
+//websocket.send(message);
+setTimeout(
+	function(){
+		$.ajax({
+		  type: "POST",
+		  url: baseURL + "fac/data/list",
+		  contentType: "application/json",
+		  data: JSON.stringify({"siteId":"03-1-SB-YS,PTSET;05-1-SB-JKWCK,PTOUT;"}),
+		  success: function(r){
+		      console.log(r)
+		  }
+		}); 
+	},2000)
+}
+</script>
+<script>
+layui.use(['laypage','element','laydate','table'], function(){
+  var laypage = layui.laypage
+  ,element = layui.element//导航的hover效果、二级菜单等功能，需要依赖element模块
+  ,laydate = layui.laydate
+  ,layer = layui.layer
+  ,table = layui.table //表格
+var $ = layui.$, active = {
+  getCheckData: function(){ //获取选中数据
+    var checkStatus = table.checkStatus('idTest')
+    ,data = checkStatus.data;
+    layer.alert(JSON.stringify(data));
+  }};
+  //日期时间范围
+  laydate.render({
+    elem: '#test10'
+    ,type: 'datetime'
+    ,value: Stime+' - '+Etime
+    ,range: true
+    ,done: function(value, date, endDate){
+        search_hisData2(value);
+      }
+  });
+  laydate.render({
+	    elem: '#test11'
+	    ,type: 'datetime'
+	    ,value: Stime+' - '+Etime
+	    ,range: true
+	    ,change: function(value, date, endDate){
+	    	search_Alarm();
+	      }
+	  });
+  laydate.render({
+	    elem: '#test12'
+	    ,type: 'datetime'
+	    ,value: Stime+' - '+Etime
+	    ,range: true
+	    ,done: function(value, date, endDate){
+	    	queryLogList(value);
+	      }
+	  });
+  //日期时间选择器
+  laydate.render({
+    elem: '#test5'
+    ,type: 'datetime'
+  });
+  //分页
+  laypage.render({
+    elem: 'demo7'
+    ,count: 100
+    ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+    ,jump: function(obj){
+      console.log(obj)
+    }
+  });
+  //监听导航点击
+  element.on('nav(demo)', function(elem){
+    //console.log(elem)
+    //layer.msg(elem.text());
+	  layer.msg("123123");
+  });
+});
+function dw_click1(obj){
+	$("#container_5_main .lv button").addClass("remove");
+	$("#container_5_main .lv button").removeClass('add');
+	$(obj).addClass('add');
+	$(obj).removeClass("remove");
+	var level=$(obj).html();
+	console.log(level);
+	if(level=="全部"){
+		vm.alarm.level="3";
+	}else if(level=="异常"){
+		vm.alarm.level="1";
+	}else if(level=="故障"){
+		vm.alarm.level="2";
+	}else if(level=="超时"){
+		vm.alarm.level="4";
+	}
+	search_Alarm();
+}
+function dw_click2(obj){
+	$("#container_5_main .tp button").addClass("remove");
+	$("#container_5_main .tp button").removeClass('add');
+	$(obj).addClass('add');
+	$(obj).removeClass("remove");
+	var type=$(obj).html();
+	console.log(type);
+	if(type=="全部"){
+		debugger;
+		vm.alarm.type="3";
+	}else if(type=="流量"){
+		debugger;
+		vm.alarm.type="FLS";
+	}else if(type=="压力"){
+		vm.alarm.type=" PTOUT";
+	}else if(type=="COD"){
+		vm.alarm.type="COD";
+	}else if(type=="PH"){
+		vm.alarm.type="PH";
+	}else if(type=="余氯"){
+		vm.alarm.type="HOCL";
+	}else if(type=="浊度"){
+		vm.alarm.type="TUR";
+	}else if(type=="SS"){
+		vm.alarm.type="SS";
+	}else if(type=="总氮"){
+		vm.alarm.type="TN";
+	}else if(type=="总磷"){
+		vm.alarm.type="TP";
+	}else if(type=="液位"){
+		vm.alarm.type="LEVEL";
+	}
+	search_Alarm();
+}
+function dw_click3(obj){
+	$("#container_6_main .dd button").addClass("remove");
+	$("#container_6_main .dd button").removeClass('add');
+	$(obj).addClass('add');
+	$(obj).removeClass("remove");
+	clickContentType($(obj).html());
+}
+
+window.parent.onbeforeunload = function(){
+	closeWebSocket();
+    };
+</script>
+</body>
+</html>

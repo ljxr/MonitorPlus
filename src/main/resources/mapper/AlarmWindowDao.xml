@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">    
+<mapper namespace="com.enjoyor.modules.monitor.dao.AlarmWindowDao">
+    <resultMap id="alarmResultMap"
+		type="com.enjoyor.modules.monitor.entity.AlarmTotalEntity">
+		<result property="siteId" column="SITE_ID" />
+		<result property="siteName" column="SITE_NAME" />
+		<result property="hoclAlarm" column="HOCL_ALARM" />
+		<result property="turAlarm" column="TUR_ALARM" />
+		<result property="phAlarm" column="PH_ALARM" />
+		<result property="codAlarm" column="COD_ALARM" />
+		<result property="tnAlarm" column="TN_ALARM" />
+		<result property="tpAlarm" column="TP_ALARM" />
+		<result property="ssAlarm" column="SS_ALARM" />
+		<result property="ptoutAlarm" column="PTOUT_ALARM" />
+		<result property="flsAlarm" column="FLS_ALARM" />
+		<result property="time" column="TIME" />
+	</resultMap>
+	<resultMap id="alarmIgnoreMap"
+		type="com.enjoyor.modules.monitor.entity.AlarmIgnoreEntity">
+		<result property="id" column="ID" />
+		<result property="siteId" column="SITE_ID" />
+		<result property="type" column="TYPE" />
+<!-- 		<result property="time" column="TIME" />
+ -->	</resultMap> 
+	
+	<select id="selectAllIgnore" resultMap="alarmIgnoreMap">
+		select * 
+		from MONITOR.ALARM_WINDOW_IGNORE
+	</select>
+	
+	<select id="alarmWindow" resultMap="alarmResultMap">
+		select * 
+		from MONITOR.ALARMTOTAL
+		where id in (
+			select max(id) as id
+			from MONITOR.ALARMTOTAL
+			where time &gt; #{date,jdbcType=VARCHAR}
+			GROUP BY site_id
+			)
+		ORDER BY time desc
+	</select>
+	
+	<insert id="insertIgnore">
+		insert into
+		MONITOR.ALARM_WINDOW_IGNORE
+		(SITE_ID, TYPE, ENDTIME)
+		values
+		(#{siteId,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{endTime,jdbcType=VARCHAR})
+	</insert>
+	
+	<delete id="deleteOverdue">
+		delete from MONITOR.ALARM_WINDOW_IGNORE
+		where endTime &lt; #{date,jdbcType=VARCHAR}	
+	</delete>
+	
+
+</mapper>

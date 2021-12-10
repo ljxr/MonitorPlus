@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.enjoyor.modules.monitor.dao.MonitorDao">
+
+	<resultMap id="monitorResultMap"
+		type="com.enjoyor.modules.monitor.entity.MonitorTotalEntity">
+		<result property="siteId" column="SITE_ID" />
+		<result property="turbidityValue" column="TURBIDITY_VALUE" />
+		<result property="phValue" column="PH_VALUE" />
+		<result property="chlorineValue" column="CHLORINE_VALUE" />
+		<result property="codValue" column="COD_VALUE" />
+		<result property="tnValue" column="TN_VALUE" />
+		<result property="tpValue" column="TP_VALUE" />
+		<result property="ssValue" column="SS_VALUE" />
+		<result property="rain" column="RAIN" />
+		<result property="temperature" column="TEMPERATURE" />
+		<result property="pressure" column="PRESSURE_VALUE" />
+		<result property="pressureOut" column="PRESSURE_OUTVALUE" />
+		<result property="pressureSet" column="PRESSURE_SETVALUE" />
+		<result property="flow" column="FLOW_VALUE" />
+		<result property="totalFlow" column="TOTALFLOW_VALUE" />
+		<result property="ltValue" column="LT_VALUE" />
+		<result property="ltSetValue" column="LT_SETVALUE" />
+		<result property="time" column="TIME" />
+		<result property="pumpStart" column="PUMP_START" />
+		<result property="pumpStop" column="PUMP_STOP" />
+		<result property="pumpFault" column="PUMP_FAULT" />
+		<result property="pumpA" column="PUMP_A" />
+		<result property="pumpR" column="PUMP_R" />
+		<result property="pumpU" column="PUMP_U" />
+		<result property="pumpP" column="PUMP_P" />
+	</resultMap>
+
+	<resultMap id="alarmResultMap"
+		type="com.enjoyor.modules.monitor.entity.AlarmTotalEntity">
+		<result property="siteId" column="SITE_ID" />
+		<result property="siteName" column="SITE_NAME" />
+		<result property="hoclAlarm" column="HOCL_ALARM" />
+		<result property="turAlarm" column="TUR_ALARM" />
+		<result property="phAlarm" column="PH_ALARM" />
+		<result property="codAlarm" column="COD_ALARM" />
+		<result property="tnAlarm" column="TN_ALARM" />
+		<result property="tpAlarm" column="TP_ALARM" />
+		<result property="ssAlarm" column="SS_ALARM" />
+		<result property="ptoutAlarm" column="PTOUT_ALARM" />
+		<result property="flsAlarm" column="FLS_ALARM" />
+		<result property="time" column="TIME" />
+	</resultMap>
+
+	<resultMap id="thresholdAndNameResultMap"
+		type="com.enjoyor.modules.monitor.entity.ThresholdAndName">
+		<result property="id" column="ID" />
+		<result property="siteId" column="SITE_ID" />
+		<result property="thresholdId" column="THRESHOLD_ID" />
+		<result property="lowValue" column="LOW_VALUE" />
+		<result property="lowerValue" column="LOWER_VALUE" />
+		<result property="highValue" column="HIGH_VALUE" />
+		<result property="higherValue" column="HIGHER_VALUE" />
+		<result property="thresholdOrderNum" column="THRESHOLD_ORDERNUM" />
+		<result property="unit" column="UNIT" />
+		<result property="dicSubitem" column="DIC_SUBITEM" />
+	</resultMap>
+
+	<resultMap id="AlarmTypeFromDicResultMap"
+		type="com.enjoyor.modules.monitor.entity.AlarmTypeFromDic">
+		<result property="dicSubitem" column="DIC_SUBITEM" />
+		<result property="dicValue" column="DIC_VALUE" />
+	</resultMap>
+
+	<select id="queryHisData" parameterType="String" resultType="map">
+		${sql}
+	</select>
+
+	<select id="queryHisCount" parameterType="String" resultType="int">
+		select count(*) from monitortotal where site_id= #{siteId} and (time
+		between #{stime} and #{etime})
+	</select>
+
+	<select id="queryAlarmData" parameterType="String" resultMap="alarmResultMap">
+		${sql}
+	</select>
+
+	<select id="queryAlarmCount" parameterType="String" resultType="int">
+		${sql}
+	</select>
+
+	<select id="queryInsAlarm" resultMap="alarmResultMap">
+		select a.site_name,b.* from "BASESYS".sys_site a,
+		(select * from alarmtotal where time between #{stime,jdbcType=VARCHAR} and
+		#{etime,jdbcType=VARCHAR}) b
+		where a.site_id=b.site_id order by time desc
+	</select>
+
+	<select id="listAlarm" parameterType="String" resultMap="alarmResultMap">
+		${sql}
+	</select>
+
+	<!-- 阈值表全部内容拼上字典表中的阈值指标名称 -->
+	<select id="queryThreAndDic" resultMap="thresholdAndNameResultMap">
+		select a.*, b.DIC_SUBITEM
+		from BASESYS.SYS_THRESHOLD a
+		left join BASESYS.SYS_DICTIONARY b
+		on a.THRESHOLD_ID = b.DIC_VALUE
+		and b.DIC_PARENTID = '5'
+		order by
+		a.THRESHOLD_ID DESC
+	</select>
+
+	<select id="queryAlarmTypeFromDic" resultMap="AlarmTypeFromDicResultMap">
+		select DIC_SUBITEM,
+		DIC_VALUE
+		from BASESYS.SYS_DICTIONARY
+		where DIC_PARENTID = (SELECT
+		DIC_CODENUM FROM BASESYS.SYS_DICTIONARY WHERE DIC_TYPE = '报警状态值')
+	</select>
+
+	<select id="queryTodayMonitor" resultMap="monitorResultMap">
+		select
+		* from MONITORTOTAL where time = #{time,jdbcType=VARCHAR} and site_id
+		= #{siteId,jdbcType=VARCHAR}
+	</select>
+
+	<select id="queryMinTimeMonitor" resultMap="monitorResultMap">
+		select m.* from (select site_id, min(time) as time from "MONITOR".MONITORTOTAL where
+		time like concat(#{time,jdbcType=VARCHAR},'%') and site_id not like '%J' and site_id not like '%YS' GROUP BY site_id)
+		m,"BASESYS".SYS_SITE s
+		where m.site_id = s.site_id and s.DIC_VALUE in ('S02','W01') 
+	</select>
+	
+	<select id="queryMinTimeMonitor2" resultMap="monitorResultMap">
+		select m.* from (select site_id,min(time) as time from MONITORTOTAL where
+		time like concat(#{time,jdbcType=VARCHAR},'%') and site_id = #{siteId,jdbcType=VARCHAR} 
+		GROUP BY site_id) m,"BASESYS".SYS_SITE s
+		where m.site_id = s.site_id and (s.DIC_VALUE = 'S02' or s.DIC_VALUE = 'W01')
+	</select>
+</mapper>

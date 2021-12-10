@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoyor.modules.dma.dao.DmaBookDao">
+    <resultMap id="bookResultMap" type="com.enjoyor.modules.dma.entity.DmaBookEntity">
+      <result property="bookId" column="BOOK_ID"/>
+      <result property="bookName" column="BOOK_NAME"/>
+      <result property="cycle" column="CYCLE"/>
+      <result property="userNum" column="USER_NUM"/> 
+      <result property="dmaAreaId" column="DMA_AREA_ID"/>
+      <result property="geomString" column="GEOMSTRING"/>
+      <result property="x" column="X"/>
+      <result property="y" column="Y"/>
+      <result property="intra" column="INTRA"/>
+      <result property="borderwidth" column="BORDERWIDTH"/>
+      <result property="border" column="BORDER"/>
+    </resultMap>
+    
+    <resultMap id="bookQueryResultMap" type="com.enjoyor.modules.dma.entity.DmaBookQueryEntity">
+      <result property="bookId" column="BOOK_ID"/>
+      <result property="bookName" column="BOOK_NAME"/>
+      <result property="cycle" column="CYCLE"/>
+      <result property="userNum" column="USER_NUM"/> 
+      <result property="dmaAreaId" column="DMA_AREA_ID"/>
+      <result property="dmaAreaName" column="DAREA_NAME"/>
+      <result property="geomString" column="GEOMSTRING"/>
+      <result property="x" column="X"/>
+      <result property="y" column="Y"/>
+      <result property="intra" column="INTRA"/>
+      <result property="borderwidth" column="BORDERWIDTH"/>
+      <result property="border" column="BORDER"/>
+    </resultMap>
+    
+    <!-- 计数count -->
+    <select id="count" parameterType="com.enjoyor.modules.dma.entity.DmaBookEntity" resultType="Integer">
+    	select count(*) from monitor.waterbook
+    	<where>
+			<if test="bookId != null">
+		    	and book_id like concat('%',concat(#{bookId},'%'))
+		 	</if>
+		 	<if test="bookName != null">
+		    	and book_name like concat('%',concat(#{bookName},'%'))
+		 	</if>
+		 	<if test="cycle != null">
+		    	and cycle = #{cycle}
+		 	</if>
+		 	<if test="dmaAreaId != null">
+		    	and dma_area_id = #{dmaAreaId}
+		 	</if>
+		</where>
+    </select>
+	
+	<!-- 查询表册号 -->
+	<select id="query" resultMap="bookQueryResultMap">
+		select * from (
+		select a.book_id, a.book_name, a.cycle, a.user_num, a.dma_area_id, b.darea_name, a.geomString, a.x, a.y, a.intra, a.borderwidth, a.border, rownum rn
+		from monitor.waterbook a
+		left join monitor.waterarea b
+		on a.dma_area_id = b.darea_id
+		<where>
+			<if test="bookId != null">
+		    	and a.book_id like concat('%',concat(#{bookId},'%'))
+		 	</if>
+		 	<if test="bookName != null">
+		    	and a.book_name like concat('%',concat(#{bookName},'%'))
+		 	</if>
+		 	<if test="cycle != null">
+		    	and a.cycle = #{cycle}
+		 	</if>
+		 	<if test="dmaAreaId != null">
+		    	and a.dma_area_id = #{dmaAreaId}
+		 	</if>
+		</where>
+		) b
+		<where>		  
+		  <if test="offset != null and limit != null">
+			 b.rn between #{offset} and #{limit}
+		  </if>		  
+		</where>
+	</select>
+	
+	<select id="queryExist" resultMap="bookQueryResultMap">
+		select * 
+		from monitor.waterbook
+		where book_id = #{bookId}
+	</select>
+	
+	<!-- 保存表册号信息 --> 
+	<insert id="save" parameterType="com.enjoyor.modules.dma.entity.DmaBookEntity">
+		insert into monitor.waterbook
+		(BOOK_ID, BOOK_NAME, CYCLE, USER_NUM, DMA_AREA_ID, GEOMSTRING, X, Y, INTRA, BORDERWIDTH, BORDER)
+		values
+		(
+			#{bookId,jdbcType=VARCHAR}, 
+			#{bookName,jdbcType=VARCHAR}, 
+			#{cycle,jdbcType=NUMERIC},  
+			#{userNum,jdbcType=NUMERIC},
+		    #{dmaAreaId,jdbcType=VARCHAR},
+		    #{geomString,jdbcType=VARCHAR}, 
+		    #{x,jdbcType=NUMERIC}, 
+		    #{y,jdbcType=NUMERIC}, 
+		    #{intra,jdbcType=VARCHAR}, 
+		    #{borderwidth,jdbcType=NUMERIC}, 
+		    #{border,jdbcType=VARCHAR}
+		)
+	</insert>
+
+    <!-- 更新表册号信息 -->
+    <update id="update" parameterType="com.enjoyor.modules.dma.entity.DmaBookEntity">
+       update monitor.waterbook 
+		<trim prefix="set" suffixOverrides=",">
+			<if test="bookName != null">BOOK_NAME = #{bookName},</if>
+			<if test="cycle != null">CYCLE = #{cycle},</if>
+			<if test="userNum != null">USER_NUM = #{userNum},</if>
+			<if test="dmaAreaId != null">DMA_AREA_ID = #{dmaAreaId},</if>
+			<if test="geomString != null">GEOMSTRING = #{geomString},</if>
+			<if test="geomString != null">X = #{y},</if>
+			<if test="geomString != null">Y = #{x},</if>
+			<if test="geomString != null">INTRA = #{intra},</if>
+			<if test="geomString != null">BORDERWIDTH = #{borderwidth},</if>
+			<if test="geomString != null">BORDER = #{border},</if>
+		</trim>
+		where BOOK_ID = #{bookId}
+    </update>
+
+    <!-- 删除表册号信息 -->
+    <delete id="delete">
+      delete from monitor.waterbook where book_id = #{bookId}
+    </delete>
+</mapper>

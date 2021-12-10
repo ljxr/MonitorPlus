@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">    
+<mapper namespace="com.enjoyor.modules.monitor.dao.DispatchLogDao">
+    <resultMap id="DispatchLogResultMap" type="com.enjoyor.modules.monitor.entity.DispatchLog">
+      <result property="id" column="ID"/>
+      <result property="time" column="TIME"/>
+      <result property="operateContent" column="OPERATE_CONTENT"/>
+      <result property="contentType" column="CONTENT_TYPE"/>
+      <result property="operator" column="OPERATOR"/>
+    </resultMap>
+    
+    <select id="query" parameterType="com.enjoyor.modules.monitor.entity.DispatchLogQueryDTO" resultMap="DispatchLogResultMap">
+    	select a.*,a.rn from (select id, time, OPERATE_CONTENT, CONTENT_TYPE, OPERATOR, rownum rn from DISPATCH_LOG
+    	<where>
+    	<if test="siteId != null">
+			and site_id = #{siteId}
+		</if>
+    	<if test="beginTime != null and endTime != null">
+			and time between #{beginTime} and #{endTime}
+		</if>		
+    	<if test='contentType !="全部"'>and CONTENT_TYPE = #{contentType} 
+    	</if>
+    	 	order by time desc) a
+			where a.rn between #{offset} and #{limit}
+    	</where>
+    </select>
+    
+    <select id="countAll" parameterType="com.enjoyor.modules.monitor.entity.DispatchLogQueryDTO" resultType="Integer">
+    	select count(1) from DISPATCH_LOG a
+    	<where>
+    	<if test="siteId != null">
+			and site_id = #{siteId}
+		</if>
+    	<if test="beginTime != null and endTime != null">
+			and time between #{beginTime} and #{endTime}
+		</if>
+    	<if test='contentType !="全部"'>and CONTENT_TYPE = #{contentType}</if>
+    	</where>
+    </select>
+    
+    <insert id="add" parameterType="com.enjoyor.modules.monitor.entity.DispatchLog">
+		insert into DISPATCH_LOG (
+		ID,
+		TIME,
+		OPERATE_CONTENT,
+		CONTENT_TYPE,
+		OPERATOR,
+		SITE_ID
+		) values(
+	     NULL,
+		 #{time},
+		 #{operateContent}, 
+		 #{contentType},
+		 #{operator},
+		 #{siteId}
+	   )
+	</insert>
+	
+	<update id="update" parameterType="com.enjoyor.modules.monitor.entity.DispatchLog">
+		update DISPATCH_LOG 
+		<set>
+		    <if test="time !=null">TIME = #{time},</if>
+		    <if test="operateContent !=null">OPERATE_CONTENT = #{operateContent},</if> 
+            <if test="contentType !=null">CONTENT_TYPE = #{contentType},</if>
+            <if test="operator !=null">OPERATOR = #{operator},</if>		
+		</set>
+		where ID = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from DISPATCH_LOG
+		where id in
+		<foreach item="id" collection="idList" open="(" separator="," close=")">
+			#{id}
+		</foreach>		
+	</delete>
+    
+</mapper>

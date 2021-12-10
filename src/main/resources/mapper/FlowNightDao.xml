@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">    
+<mapper namespace="com.enjoyor.modules.monitor.dao.FlowNightDao">
+    <resultMap id="flowNightResultMap" type="com.enjoyor.modules.monitor.entity.FlowNightEntity">
+      <result property="id" column="ID"/>
+      <result property="siteId" column="SITE_ID"/>
+      <result property="yysName" column="YYSNAME"/>
+      <result property="time" column="TIME"/>
+      <result property="value" column="VALUE"/>
+      <result property="min" column="MIN"/>
+      <result property="time2" column="TIME2"/>
+      <result property="avgNig" column="AVG_NIG"/>
+      <result property="avgDay" column="AVG_DAY"/>
+      <result property="pressure" column="PRESSURE"/>
+      <result property="value2" column="VALUE2"/>
+      <result property="daysavg" column="DAYSAVG"/>
+      <result property="nightsavg" column="NIGHTSAVG"/>
+    </resultMap>
+    <resultMap id="sgSiteResultMap" type="com.enjoyor.modules.monitor.entity.SGSiteDTO">
+      <result property="siteId" column="site_id"/>
+      <result property="siteName" column="site_name"/>
+      <result property="areaId" column="area_id"/>
+      <result property="areaName" column="area_name"/> 
+      <result property="orderNum" column="ordernum"/> 
+    </resultMap>
+	
+    <select id="oldquery" resultMap="flowNightResultMap">
+		select * 
+		from "MONITOR".flownight 
+		where site_id = #{siteId}
+			and time between #{beginTime} and #{endTime}
+			order by time asc
+	</select>
+	
+	<select id="query" resultMap="flowNightResultMap">
+	select a.*, d.area_name as yysname
+		from "MONITOR".flownight a
+		left join "BASESYS".SYS_SITE b on a.site_id = b.site_id
+		left join "BASESYS".SYS_AREA c on b.area_id = c.area_id
+		left join "BASESYS".SYS_AREA d on c.AREA_PARENTID = d.area_id
+		where 
+		a.site_id = #{siteId}
+		and a.time between #{beginTime} and #{endTime}
+		order by a.time asc
+	</select>
+     	
+	<select id="querySGSiteList" resultMap="sgSiteResultMap">
+	    select a.site_id, a.site_name, a.area_id, b.area_name
+		from "BASESYS".SYS_SITE a
+		right join "BASESYS".SYS_AREA b
+		on a.area_id = b.area_id
+		where a.site_id like '%-SG-%'
+		and a.dic_value = 'S04'
+	</select>
+	
+	<select id="querySGSiteListByDma" resultMap="sgSiteResultMap">
+	    select b.DSITE_ID as site_id, b.DSITE_NAME as site_name, a.DAREA_ID as area_id, a.DAREA_NAME as area_name, a.ORDERNUM
+		from "MONITOR".WATERAREA a
+		right join "MONITOR".WATERSITE b
+		on a.DAREA_ID = b.DAREA_ID
+		where b.DSITE_TYPE = 'S04'
+		and b.DSITE_ID like '%-SG-%'
+	</select>
+	
+	<select id = "queryFlowByArea"  resultMap="flowNightResultMap">
+	    select site_id, MIN, AVG_DAY, AVG_NIG, VALUE2, time, DAYSAVG, NIGHTSAVG
+		from "MONITOR".FLOWNIGHT
+		where site_id in(select site_id from "BASESYS".sys_site where area_id = #{areaId} and dic_value in ('S04','S05'))
+		and time = #{time}
+    </select>   
+</mapper>

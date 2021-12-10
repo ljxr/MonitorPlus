@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>排水监控报警记录</title>
+<link rel="icon" href="${request.contextPath}/statics/img/gyt_.jpg" type="image/x-icon">
+
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<script src="${request.contextPath}/statics/libs/jquery-1.10.2.min.js"></script>
+<script src="${request.contextPath}/statics/js/echarts.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+
+<style type="text/css">
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+body{moz-user-select: -moz-none;
+-moz-user-select: none;
+-o-user-select:none;
+-khtml-user-select:none;
+-webkit-user-select:none;
+-ms-user-select:none;
+user-select:none;}
+*{padding:0px; margin: 0px;}
+li{list-style:none;}
+a{text-decoration:none;}
+a:link{text-decoration:none;}
+a:visited{text-decoration:none;}
+a:hover{text-decoration:none;}
+a:active{text-decoration:none;}
+img{border:none; border:0px; outline: none;}
+img[src=""]{opacity: 0;border:none; border:0px; outline: none;}
+@font-face{font-family:'iconfont';src:url('../../statics/fonts/iconfont.woff') format('woff')} <!-- 整个页面的字体 -->
+
+.main-container{position:relative;margin-left:180px; padding:0px;}
+.gs_site{text-align:center; width:100%; height:40px; line-height:40px; margin:auto; color:#fff; font-size:14px; font-weight:bold; background-color:#3c8dbc; cursor:pointer;}
+
+#slider {display: block;position: absolute;margin:0px 17px;padding:0px;border:0px;top: 40px;left: 0px; height: 3px;width:80px;background: #3c8dbc;transition: all 0.5s;}
+#container_leader{position:relative; width:100%; height:40px; border-bottom:solid 1px #f1f1f1;}
+
+#container{position:relative; width:100%; margin-top:5px; overflow-x:hidden; overflow-y:auto;}
+
+.containers{width:100%; height:100%; position:relative;}
+.containers.active{display:block;}
+
+#container_1{padding:10px;}
+#container_1 div span{font-size:14px;}
+.container_inner{overflow-y:auto;overflow-x:hidden; margin-bottom:60px;}
+.add{height:30px; padding:0 10px; margin:5px; border:solid 1px #3c8dbc; border-radius:5px; line-height:28px; background-color:#3c8dbc; color:#fff;}
+.remove{height:30px; padding:0 10px; margin:5px; border:solid 1px #3c8dbc; border-radius:5px; line-height:28px; color:#3c8dbc; background-color:#fff;}
+.content-wrapper{background-color:#000000!important;}
+.jcd:hover{color:#f00;}
+#jcd_container{position:absolute; height:0px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 0px #999; z-index:99; top:55px; padding:0px; margin-top:0px;}
+#jcd_container.active{position:absolute; height:240px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 1px #999; z-index:99; top:55px; padding:0px; margin-top:20px;}
+#jcd_container div button{font-size:12px;}
+#jcd_container2{position:absolute; height:0px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 0px #999; z-index:99; top:55px; padding:0px; margin-top:0px;}
+#jcd_container2.active{position:absolute; height:160px; overflow-y:scroll;overflow-x:hidden; background-color:#fff; border:solid 1px #999; z-index:99; top:55px; padding:0px; margin-top:20px;}
+#jcd_container2 div button{font-size:12px;}
+
+.history_body{height:300px; overflow-y:hidden; overflow-y:auto;}
+#container_2{padding:10px;overflow-y:auto;}
+#alarm_table{height:600px; overflow-y:auto;}
+#container_2 div span{font-size:14px;}
+#alarmTime{font-size:12px; color:#363636; margin:0px; padding:0px 10px;}
+.container_main{width:100%; padding:10px;}
+</style>
+</head>
+<body>
+<div id="container">
+			<div id="container_2" class="containers">
+				<div id="container_2_main" class="container_main">
+				    <div class="layui-row">
+					  <span>报警时间：<input type="text" class="layui-input" id="alarmTime" style="width:280px;margin-left:10px;"></span>
+					</div>
+					<div class="layui-row layui-col-space1 jcd" id="jcd_container2">
+					    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					      <button v-for="(item, index) in alarmData" v-on:click="dw_click3('alarm'+index,index)" v-bind:class="item.cls" v-bind:id="'alarm'+index">{{item.name}}</button>
+					    </div>
+					</div>
+					<div id="siteType" class="layui-row siteType" style="padding-top:5px">
+					    <span>点位类型：
+					    	<button class="add" onClick="showArea(this, 'all')">全部</button>					   
+						    <button class="remove" onClick="showArea(this, 'psgw')">排水管网</button>
+						    <button class="remove" onClick="showArea(this, 'psbz')">排水泵站</button>
+						</span>					 
+					</div>
+					<div id="alarmLevel" class="layui-row lv" style="padding-top:5px">
+					    <span>报警等级：
+					    	<button class="add" onClick="dw_click3(this)">全部</button>
+						    <button class="remove" onClick="dw_click3(this)">异常</button>
+						    <button class="remove" onClick="dw_click3(this)">故障</button>
+						    <button class="remove" onClick="dw_click3(this)">超时</button>
+						</span>
+						    
+					</div>
+					<div class="layui-row tp" style="padding-top:5px">
+					    <span>监测参数：
+						    <button class="add" onClick="dw_click4(this)">全部</button>
+						    <button class="remove" onClick="dw_click4(this)">流量</button>
+						    <button class="remove" onClick="dw_click4(this)">压力</button>
+						    <button class="remove" onClick="dw_click4(this)">COD</button>
+						    <button class="remove" onClick="dw_click4(this)">pH</button>
+						    <button class="remove" onClick="dw_click4(this)">余氯</button>
+						    <button class="remove" onClick="dw_click4(this)">浊度</button>
+						    <button class="remove" onClick="dw_click4(this)">SS</button>
+						    <button class="remove" onClick="dw_click4(this)">氨氮</button>
+						    <button class="remove" onClick="dw_click4(this)">总磷</button>
+						</span>
+					</div>
+					<div class="layui-form" >
+						<div class="layui-col-xs12 layui-col-sm12 layui-col-md12" id="alarm_table">
+					  		<table class="layui-hide" id="BaoJing_table" lay-filter="BaoJing_table"></table>
+					  	</div>
+					</div>
+				</div>
+			</div>
+		</div>
+<script src="${request.contextPath}/statics/js/modules/sys/bjjl2.js"></script>
+<script>
+
+layui.use('laydate', function(){
+	var laydate = layui.laydate;
+
+	  //日期时间范围
+	  laydate.render({
+	    elem: '#alarmTime'
+	    ,type: 'datetime'
+	    ,value: Stime+' - '+Etime
+	    ,range: true
+/* 	    ,done: function(value, date, endDate){
+	    	console.log(value);
+	    	console.log(date);
+	    	console.log(endDate);
+	        search_hisData2(value);
+	      } */
+	  });
+})
+</script>
+</body>
+</html>

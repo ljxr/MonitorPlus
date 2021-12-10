@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">    
+<mapper namespace="com.enjoyor.modules.monitor.dao.MonitorDataDao">
+    <resultMap id="gytResultMap" type="com.enjoyor.modules.monitor.entity.GytEntity">
+      <result property="siteId" column="SITEID"/>
+      <result property="gytId" column="GYTID"/>
+    </resultMap>
+    <resultMap id="titleResultMap" type="com.enjoyor.modules.monitor.entity.GytEntity">
+      <result property="text" column="TEXT"/>
+      <result property="siteId" column="SITEID"/>
+      <result property="dcolor" column="COLOR"/>
+      <result property="dsize" column="SIZET"/>
+      <result property="dweight" column="WEIGHT"/>
+      <result property="x" column="X"/>
+      <result property="y" column="Y"/>
+      <result property="divId" column="DIVID"/>
+    </resultMap>
+    <resultMap id="informationResultMap" type="com.enjoyor.modules.monitor.entity.GytEntity">
+      <result property="text" column="TEXT"/>
+      <result property="gytId" column="GYTID"/>
+      <result property="dcolor" column="DCOLOR"/>
+      <result property="dsize" column="DSIZET"/>
+      <result property="dweight" column="DWEIGHT"/>
+      <result property="tcolor" column="TCOLOR"/>
+      <result property="tsize" column="TSIZET"/>
+      <result property="tweight" column="TWEIGHT"/>
+      <result property="type" column="TTYPE"/>
+      <result property="siteId" column="SITEID"/>
+      <result property="x" column="X"/>
+      <result property="y" column="Y"/>
+      <result property="divId" column="DIVID"/>
+      <result property="parentSiteId" column="PARENTSITEID"/>
+    </resultMap>
+    <resultMap id="pointResultMap" type="com.enjoyor.modules.monitor.entity.GytEntity">
+      <result property="gytId" column="GYTID"/>
+      <result property="siteId" column="SITEID"/>
+      <result property="x" column="X"/>
+      <result property="y" column="Y"/>
+      <result property="divId" column="DIVID"/>
+      <result property="text" column="SRC"/>
+      <result property="tweight" column="WIDTH"/>
+      <result property="tsize" column="HEIGHT"/>
+    </resultMap>
+    <resultMap id="gytBaseResultMap" type="com.enjoyor.modules.monitor.entity.GytBaseInfoEntity">
+      <result property="gytName" column="GYTNAME"/>
+      <result property="siteParentName" column="SITEPARENTNAME"/>
+      <result property="siteParentId" column="SITEPARENTID"/>
+      <result property="siteType" column="SITETYPE"/>
+      <result property="siteName" column="SITENAME"/>
+      <result property="siteId" column="SITEID"/>
+      <result property="createTime" column="CREATETIME"/>
+      <result property="createPerson" column="CREATEPERSON"/>
+      <result property="updateTime" column="UPDATETIME"/>
+    </resultMap>
+    <resultMap id="seatResultMap" type="com.enjoyor.modules.monitor.entity.SeatEntity">
+      <result property="seat" column="SEAT"/>
+      <result property="linkParentId" column="LINKPARENTID"/>
+      <result property="linkSiteId" column="LINKSITEID"/>
+      <result property="divId" column="DIVID"/>
+      <result property="siteId" column="SITEID"/>
+    </resultMap>
+    <resultMap id="flowResultMap" type="com.enjoyor.modules.monitor.entity.AnalysisEntity">
+      <result property="id" column="id"/>
+      <result property="ybNuber" column="yb_nuber"/>
+      <result property="siteId" column="site_id"/>
+      <result property="siteParentId" column="site_parentid"/>
+      <result property="value" column="value"/>
+      <result property="time" column="time"/>
+      <result property="siteName" column="site_name"/>
+    </resultMap>
+   
+   	<select id="queryGytAll" resultMap="gytResultMap">
+		select * from gytbgn
+	</select>
+   
+	<select id="queryGyt" resultMap="gytResultMap">
+		select * from gytbgn where GYTID = #{siteId}
+	</select>
+	
+    <select id="queryTitle" resultMap="titleResultMap">
+		select * from titleinfo where SITEID = #{siteId}
+	</select>
+	
+	<select id="queryInformation" resultMap="informationResultMap">
+		select * from information where GYTID = #{siteId}
+	</select>
+	
+	<select id="queryPoint" resultMap="pointResultMap">
+		select * from pointinfo where GYTID = #{siteId}
+	</select>
+	
+    <select id="queryTitle2" resultMap="titleResultMap">
+		select * from titleinfo 
+		<where>
+		1=1
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and SITEID = #{siteId} 
+		 </if>
+		 <if test="divId != null and divId.trim() != ''">
+		 and DIVID= #{divId}
+		 </if>
+		</where> 
+	</select>
+	
+	<select id="queryInformation2" resultMap="informationResultMap">
+		select * from information  
+		<where>
+		1=1
+		 <if test="gytId != null and gytId.trim() != ''">
+		 and GYTID = #{gytId} 
+		 </if>
+		 <if test="divId != null and divId.trim() != ''">
+		 and DIVID= #{divId}
+		 </if>
+		</where> 
+	</select>
+	
+	<select id="queryPoint2" resultMap="pointResultMap">
+		select * from pointinfo 
+		<where>
+		1=1
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and SITEID = #{siteId} 
+		 </if>
+		 <if test="divId != null and divId.trim() != ''">
+		 and DIVID= #{divId}
+		 </if>
+		</where> 
+	</select>
+	
+	<select id="queryGytgl" resultMap="gytBaseResultMap">
+	   select * from gytbaseinfo where siteparentid=#{siteParentId,jdbcType=VARCHAR} and siteId is not null
+	</select>
+	
+	<select id="queryGytbase" resultMap="gytBaseResultMap">
+		SELECT b.* FROM
+		(SELECT A.*,ROWNUM rn FROM (select * from gytbaseinfo) A 
+		<where>
+		   1=1
+		  <if test="gytName != null and gytName.trim() != ''">
+			 and A.GYTNAME like concat('%',concat(#{gytName},'%'))
+		  </if>
+		  <if test="siteParentId != null and siteParentId.trim() != ''">
+			 and A.SITEPARENTID like concat('%',concat(#{siteParentId},'%'))
+		  </if>		 
+		</where>
+		) b
+		<where>
+		b.rn between #{offset} and #{limit}	
+		</where>
+		
+<!-- 		<if test="list != null">
+          and area_id in     
+          <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+         </if> -->
+	</select>
+	
+	<select id="queryGytbaseCount" resultType="int">
+		SELECT count(*) FROM gytbaseinfo
+		<where>
+		SITEPARENTID IN(
+        select c.siteparentid from		
+		(SELECT A.* FROM (select * from gytbaseinfo) A 
+		<where>
+		   1=1
+		  <if test="gytName != null and gytName.trim() != ''">
+			 and A.GYTNAME like concat('%',concat(#{gytName},'%'))
+		  </if>
+		  <if test="siteParentId != null and siteParentId.trim() != ''">
+			 and A.SITEPARENTID like concat('%',concat(#{siteParentId},'%'))
+		  </if>		 
+		</where>
+		) c 
+<!-- 		<if test="list != null">
+          and area_id in     
+          <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+		   #{item}
+	      </foreach>
+         </if> -->
+         )
+         </where>
+	</select>	
+	
+	<insert id="saveGytbase" parameterType="com.enjoyor.modules.monitor.entity.GytBaseInfoEntity">
+	   insert into gytbaseinfo(
+	    gytname,
+	    siteparentname,
+	    siteparentid,
+	    sitetype,
+	    sitename,
+	    siteid,
+	    createtime,
+	    createperson,
+	    updatetime
+	   )values(
+	     #{gytName,jdbcType=VARCHAR}, 
+		 #{siteParentName,jdbcType=VARCHAR},
+		 #{siteParentId,jdbcType=VARCHAR}, 
+		 #{siteType,jdbcType=VARCHAR},
+		 #{siteName,jdbcType=VARCHAR}, 
+		 #{siteId,jdbcType=VARCHAR},
+		 #{createTime,jdbcType=VARCHAR},
+		 #{createPerson,jdbcType=VARCHAR}, 
+		 #{updateTime,jdbcType=VARCHAR}
+	   )
+	</insert>
+	
+	<update id="updateGytbase" parameterType="com.enjoyor.modules.monitor.entity.GytBaseInfoEntity">
+		update gytbaseinfo 
+		<set>
+		    <if test="gytName !=null">gytname = #{gytName},</if>
+		    <if test="siteParentName !=null">siteparentname = #{siteParentName},</if> 
+            <if test="siteParentId !=null">siteparentid = #{siteParentId},</if>
+            <if test="siteType !=null">sitetype = #{siteType},</if>
+			<if test="siteName !=null">sitename = #{siteName},</if>
+			<if test="siteId !=null">siteid = #{siteId},</if>
+			<if test="createTime !=null">createtime = #{createTime},</if>
+			<if test="createPerson !=null">createperson = #{createPerson},</if>
+			<if test="updateTime !=null">updatetime = #{updateTime}</if>			
+		</set>
+		where id = #{id,jdbcType=NUMERIC}
+	</update>
+	
+	<delete id="deleteGytbase">
+	 delete from gytbaseinfo where id =#{id,jdbcType=NUMERIC}
+	</delete>
+	
+	<insert id="saveGytbgn" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		insert into gytbgn
+		(
+			GYTID,
+			SITEID
+		)
+		values
+		(
+			#{gytId,jdbcType=VARCHAR}, 
+			#{siteId,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="saveInformation" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		insert into information
+		(
+			GYTID,
+			SITEID,
+			X,
+			Y,
+			TEXT,
+			DCOLOR,
+			DSIZE,
+			DWEIGHT,
+			TTYPE,
+			TCOLOR,
+			TSIZE,
+			TWEIGHT,
+			DIVID,
+			PARENTSITEID
+		)
+		values
+		(
+			#{gytId,jdbcType=VARCHAR}, 
+			#{siteId,jdbcType=VARCHAR},
+			#{x,jdbcType=VARCHAR},
+			#{y,jdbcType=VARCHAR},
+			#{text,jdbcType=VARCHAR},
+			#{dcolor,jdbcType=VARCHAR},
+			#{dsize,jdbcType=VARCHAR},
+			#{dweight,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR},
+			#{tcolor,jdbcType=VARCHAR},
+			#{tsize,jdbcType=VARCHAR},
+			#{tweight,jdbcType=VARCHAR},
+			#{divId,jdbcType=VARCHAR},
+			#{parentSiteId,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="saveTitleInfo" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		insert into titleinfo
+		(
+			TEXT,
+			SITEID,
+			COLOR,
+			SIZET,
+			WEIGHT,
+			X,
+			Y,
+			DIVID
+		)
+		values
+		(
+			#{text,jdbcType=VARCHAR}, 
+			#{siteId,jdbcType=VARCHAR},
+			#{dcolor,jdbcType=VARCHAR}, 
+			#{dsize,jdbcType=VARCHAR},
+			#{dweight,jdbcType=VARCHAR}, 
+			#{x,jdbcType=VARCHAR},
+			#{y,jdbcType=VARCHAR},
+			#{divId,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="savePointInfo" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		insert into pointinfo
+		(
+			GYTID,
+			SITEID,
+			X,
+			Y,
+			DIVID,
+			TYPE,
+			SRC,
+			WIDTH,
+			HEIGHT
+		)
+		values
+		(
+			#{gytId,jdbcType=VARCHAR}, 
+			#{siteId,jdbcType=VARCHAR},
+			#{x,jdbcType=VARCHAR}, 
+			#{y,jdbcType=VARCHAR},
+			#{divId,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR},
+			#{text,jdbcType=VARCHAR},
+			#{tweight,jdbcType=VARCHAR},
+			#{tsize,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="updateGytbgn" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		update gytbgn 
+		<set>
+		    <if test="siteId !=null">SITEID = #{siteId}</if> 
+		</set>
+		where GYTID = #{gytId,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updateInformation" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		update information 
+		<set>
+		    <if test="gytId !=null">SITEID = #{siteId},</if>
+		    <if test="x !=null">X = #{x},</if> 
+            <if test="y !=null">Y = #{y},</if>
+            <if test="text !=null">TEXT = #{text},</if>
+			<if test="dcolor !=null">DCOLOR = #{dcolor},</if>
+			<if test="dsize !=null">DSIZE = #{dsize},</if>
+			<if test="dweight !=null">DWEIGHT = #{dweight},</if>
+			<if test="type !=null">TTYPE = #{type},</if>
+			<if test="tcolor !=null">TCOLOR = #{tcolor},</if>
+			<if test="tsize !=null">TSIZE = #{tsize},</if>
+			<if test="tweight !=null">TWEIGHT = #{tweight},</if>
+			<if test="parentSiteId !=null">PARENTSITEID = #{parentSiteId}</if>				
+		</set>
+		where GYTID = #{gytId,jdbcType=VARCHAR} and DIVID=#{divId,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updateTitleInfo" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		update titleinfo 
+		<set>
+		    <if test="x !=null">X = #{x},</if> 
+            <if test="y !=null">Y = #{y},</if>
+            <if test="text !=null">TEXT = #{text},</if>
+			<if test="dcolor !=null">COLOR = #{dcolor},</if>
+			<if test="dsize !=null">SIZET = #{dsize},</if>
+			<if test="dweight !=null">WEIGHT = #{dweight}</if>				
+		</set>
+		where SITEID = #{siteId,jdbcType=VARCHAR} and DIVID= #{divId,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updatePointInfo" parameterType="com.enjoyor.modules.monitor.entity.GytEntity">
+		update pointinfo 
+		<set>
+		    <if test="gytId !=null">GYTID = #{gytId},</if>
+		    <if test="x !=null">X = #{x},</if> 
+            <if test="y !=null">Y = #{y},</if>	
+            <if test="type !=null">TYPE = #{type},</if>	
+            <if test="text !=null">SRC = #{text},</if> 
+            <if test="tweight !=null">WIDTH = #{tweight},</if>	
+            <if test="tsize !=null">HEIGHT = #{tsize}</if>			
+		</set>
+		where SITEID = #{siteId,jdbcType=VARCHAR} and DIVID = #{divId,jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="deleteGytbgn" parameterType="String">
+		delete from gytbgn where GYTID=#{siteId,jdbcType=VARCHAR}
+	</delete>
+	
+	<delete id="deleteInformation" parameterType="String">
+		delete from information 
+		<where>
+		1=1
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and GYTID = #{siteId} 
+		 </if>
+		 <if test="divId != null and divId.trim() != ''">
+		 and DIVID= #{divId}
+		 </if>
+		</where> 
+	</delete>
+	
+	<delete id="deleteTitleInfo" parameterType="String">
+		delete from titleinfo 
+		<where>
+		1=1
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and SITEID = #{siteId} 
+		 </if>
+		 <if test="divId != null and divId.trim() != ''">
+		 and DIVID= #{divId}
+		 </if>
+		</where> 
+	</delete>
+	
+	<delete id="deletePointInfo" parameterType="String">
+		delete from pointinfo 
+		<where>
+		1=1
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and GYTID = #{siteId} 
+		 </if>
+		 <if test="divId != null and divId.trim() != ''">
+		 and DIVID= #{divId}
+		 </if>
+		</where> 
+	</delete>
+	
+	<select id="queryGytbaseId" resultMap="gytBaseResultMap">
+	  select * from gytbaseinfo where id=#{id,jdbcType=NUMERIC}
+	</select>	
+	
+	<select id="querySeat" resultMap="seatResultMap">
+		select * from GYTSEAT 
+		<where>
+		1=1
+		 <if test="linkParentId != null and linkParentId.trim() != ''">
+		 and LINKPARENTID = #{linkParentId} 
+		 </if>
+		 <if test="linkSiteId != null and linkSiteId.trim() != ''">
+		 and LINKSITEID = #{linkSiteId}
+		 </if>
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and SITEID = #{siteId}
+		 </if>
+		</where> 
+	</select>
+	
+	<select id="querySeat2" resultMap="seatResultMap">
+		select * from GYTSEAT 
+		<where>
+		1=1		
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and SITEID = #{siteId}
+		 </if>
+		 <if test="divId != null and divId.trim() != ''">
+		 and DIVID = #{divId}
+		 </if>
+		</where> 
+	</select>
+	
+	<insert id="saveSeat" parameterType="com.enjoyor.modules.monitor.entity.SeatEntity">
+		insert into GYTSEAT
+		(
+			SEAT,
+			LINKPARENTID,
+			LINKSITEID,
+			DIVID,
+			SITEID,
+			TSIZE,
+			TWEIGHT,
+			X,
+			Y
+		)
+		values
+		(
+			#{seat,jdbcType=VARCHAR}, 
+			#{linkParentId,jdbcType=VARCHAR},
+			#{linkSiteId,jdbcType=VARCHAR}, 
+			#{divId,jdbcType=VARCHAR},
+			#{siteId,jdbcType=VARCHAR},
+			#{tsize,jdbcType=VARCHAR},
+			#{tweight,jdbcType=VARCHAR}, 
+			#{x,jdbcType=VARCHAR},
+			#{y,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="updateSeat" parameterType="com.enjoyor.modules.monitor.entity.SeatEntity">
+		update GYTSEAT 
+		<set>
+		    <if test="seat !=null">SEAT = #{seat},</if>
+		    <if test="linkParentId !=null">LINKPARENTID = #{linkParentId},</if> 
+		    <if test="linkSiteId !=null">LINKSITEID = #{linkSiteId},</if>
+		    <if test="tsize !=null">tsize = #{tsize},</if>
+		    <if test="tweight !=null">tweight = #{tweight},</if> 
+		    <if test="x !=null">x = #{x},</if> 
+		    <if test="y !=null">y = #{y}</if> 
+		</set>
+		where SITEID = #{siteId,jdbcType=VARCHAR} and DIVID = #{divId,jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="deleteSeat" parameterType="String">
+		delete from GYTSEAT 
+		<where>
+		1=1
+		 <if test="linkParentId != null and linkParentId.trim() != ''">
+		 and LINKPARENTID = #{linkParentId} 
+		 </if>
+		 <if test="linkSiteId != null and linkSiteId.trim() != ''">
+		 and LINKSITEID = #{linkSiteId}
+		 </if>
+		 <if test="siteId != null and siteId.trim() != ''">
+		 and SITEID = #{siteId}
+		 </if>
+		</where> 
+	</delete>	
+	
+	<select id="queryAnalysisHourFlow" resultMap="flowResultMap">
+		select b.*,s.site_name from "BASESYS".sys_site s,
+		(select * from flowhour where site_id=#{siteId,jdbcType=VARCHAR} and time between #{stime,jdbcType=VARCHAR} 
+		and #{etime,jdbcType=VARCHAR} order by time asc) b where s.site_id=b.site_id
+	</select>
+	<select id="queryAnalysisDayFlow" resultMap="flowResultMap">
+		select b.*,s.site_name from "BASESYS".sys_site s,
+		(select * from flowday where site_id=#{siteId,jdbcType=VARCHAR} and time between #{stime,jdbcType=VARCHAR} 
+		and #{etime,jdbcType=VARCHAR} order by time asc) b where s.site_id=b.site_id
+	</select>
+	<select id="queryAnalysisMonthFlow" resultMap="flowResultMap">
+		select b.*,s.site_name from "BASESYS".sys_site s,
+		(select * from flowmonth where site_id=#{siteId,jdbcType=VARCHAR} and time between #{stime,jdbcType=VARCHAR} 
+		and #{etime,jdbcType=VARCHAR} order by time asc) b where s.site_id=b.site_id
+	</select>
+	<select id="queryAnalysisYearFlow" resultMap="flowResultMap">
+		select b.*,s.site_name from "BASESYS".sys_site s,
+		(select * from flowyear where site_id=#{siteId,jdbcType=VARCHAR} and time between #{stime,jdbcType=VARCHAR} 
+		and #{etime,jdbcType=VARCHAR} order by time asc) b where s.site_id=b.site_id
+	</select>
+
+</mapper>

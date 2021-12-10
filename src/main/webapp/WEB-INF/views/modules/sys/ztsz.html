@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>组态设置</title>
+<link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css">
+<script src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<link rel="stylesheet" href="../../statics/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../statics/css/jquery-ui.min.css">
+<script src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${request.contextPath}/statics/libs/bootstrap.min.js"></script>
+<script src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<script src="${request.contextPath}/statics/libs/jquery-ui.min.js"></script>
+<style type="text/css">
+body{moz-user-select: -moz-none;
+-moz-user-select: none;
+-o-user-select:none;
+-khtml-user-select:none;
+-webkit-user-select:none;
+-ms-user-select:none;
+user-select:none;}
+.ztsz_container{position:relative; width:1152px; height:648px; margin-top:40px; margin-left:-576px; left:50%;}
+.ztsz_container div{couser:point; position:absolute;}
+.thumbnail:hover{border:solid 1px #337ab7; cursor:pointer}
+.gyt_container{width:100%; height:500px; overflow-y:scroll;}
+.gyt_name{width:100%; height:100%; line-height:100%; font-size:14px; color:#666; text-align:center; margin-top:5px;}
+#gyt_img{position:absolute; width:1152px; height:648px; display:inline-block; z-index:-1}
+.point_bgn_container{width:100%; height:180px; overflow-y:scroll;}
+.point_name{width:100%; height:100%; line-height:100%; font-size:14px; color:#666; text-align:center; margin-top:5px;}
+#test1{width:40px; height:40px; position:relative;}
+#test1 div{width:100%; height:100%;}
+#test11 {width:40px; height:40px; position:relative;}
+#test11 div{width:100%; height:100%;}
+#test2{width:40px; height:40px; position:relative;}
+#test2 div{width:100%; height:100%;}
+#test22{width:40px; height:40px; position:relative;}
+#test22 div{width:100%; height:100%;}
+#layui-colorpicker1{width:280px!important}
+.layui-inline{width:100px;}
+</style>
+<style>
+#menu {width:100px; border:1px solid #aaa; border-radius:5px; position:absolute; left:0; top:0; display:none; background:white; z-index:99;}
+#menu li{padding:3px;}
+#menu li:hover {background:#CCC; cursor: pointer; z-index:99;}
+#video{cursor: pointer;}
+#gyt_main{position:relative;}
+.move_div{position:absolute;cursor:pointer;}
+.point img{width:100%; height:100%;}
+#video{position:absolute;width:30px; height:30px; bottom:30px; left:30px; display:inline-block;couser:point;}
+#siteID{position:absolute; top:300px; left:300px;}
+#siteID span{color:#fff; font-size:16px; font-weight:bold;}
+#siteID_div{font-size:16px; font-weight:bold;}
+</style>
+</head>
+<body>
+<div id="app" style="width:100%; height:100%; margin:0px; padding:0px;">
+<div class="btn-group" data-toggle="buttons">
+   <label class="btn btn-primary" data-toggle="modal" data-target="#gyt_Modal">
+		<input type="radio" name="options" id="option1"> 工艺图
+	</label>
+	<label class="btn btn-primary" data-toggle="modal" data-target="#tit_Modal">
+		<input type="radio" name="options" id="option2"> 标题文本
+	</label>
+	<label class="btn btn-primary" data-toggle="modal" data-target="#data_Modal">
+		<input type="radio" name="options" id="option3"> 数据文本
+	</label>
+	<label class="btn btn-primary" data-toggle="modal" data-target="#point_Modal">
+		<input type="radio" name="options" id="option4"> 点位状态
+	</label>
+	<label class="btn btn-primary" data-toggle="modal" data-target="#link_Modal">
+		<input type="radio" name="options" id="option5"> 点位关联
+	</label>
+	<label class="btn btn-primary" onclick="window.location.href='ztjc.html';">
+		<input type="radio" name="options" id="option7"> 返回列表
+	</label>
+</div>
+<ul id="menu">
+	<li>删除</li>
+</ul>
+<div class="ztsz_container" ondblclick="c()" id="gyt_main">
+	<img id="gyt_img" :src="gytId" alt="gyt"/>
+	<!-- <img id="video"  src="../../statics/img/video.png"/> -->
+	<div id="hint" style="position: absolute; z-index:99;"></div>
+	<div class="tit move_div" v-for="re in tit" :id="re.divId" ondblclick="tit_dbclick(this)">
+		<span>{{re.text}}</span>
+	</div>
+	<div class="information move_div" v-for="re in information" :id="re.divId" ondblclick="data_dbclick(this)">
+		<span class="discription">{{re.description.text}}</span><span class="data">{{re.data.siteId}}{{re.data.type}}</span>
+	</div>
+	<div class="point move_div resizable" v-if="point_l" v-for="re in point" :id="re.divId">
+		<img :src="re.text" />
+	</div>
+	<button class="seat move_div resizable btn btn-primar" v-if="seat_l" v-for="(re,index) in seat" :id="re.divId" style="top:50px; right:0px">
+		{{re.linkParentId}}
+	</button>
+</div>
+<div class="modal fade" id="gyt_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					请选择工艺图
+				</h4>
+			</div>
+			<div class="modal-body gyt_container">
+				<div class="row">
+				    <div class="col-sm-6 col-md-4" v-for="re in gyt_imgs">
+				        <div class="thumbnail" :imgAttr="re.src_big" onClick="gyt_click(this)" ondblclick="gyt_dbclick(this)">
+				            <img :src="re.src_small">
+				            <p class="gyt_name">{{re.name}}</p>
+				        </div>
+				    </div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onClick="add_gyt()">添加</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="tit_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					请设置标题文本
+				</h4>
+			</div>
+			<div class="modal-body tit_container">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">文本输入：</label>
+						<div class="layui-input-block">
+					      <input type="text" id="tit" autocomplete="off" placeholder="请输入标题" class="layui-input" />
+					    </div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">字体设置：</label>
+						<div class="layui-input-inline" style="width:50px;">
+							<div class="layui-input-block" style="margin-left:10px;">
+							    <div>
+								  <div id="test1"></div>
+								</div>
+							</div>
+						</div>
+						<div class="layui-input-inline" style="width:198px;">
+						    <select name="fontSize_tit" id="fontSize_tit">
+					          <option value="">字号</option>
+					          <option value="10px">10px</option>
+					          <option value="12px">12px</option>
+					          <option value="14px">14px</option>
+					          <option value="16px">16px</option>
+					          <option value="18px">18px</option>
+					          <option value="20px">20px</option>
+					          <option value="22px">22px</option>
+					          <option value="24px">24px</option>
+					          <option value="26px">26px</option>
+					          <option value="28px">28px</option>
+					          <option value="30px">30px</option>
+					          <option value="32px">32px</option>
+					          <option value="34px">34px</option>
+					          <option value="36px">36px</option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:198px; margin-right:0px;">
+					      <select name="fontWeight_tit" id="fontWeight_tit">
+					        <option value="">粗细</option>
+					        <option value="nomal">正常</option>
+					        <option value="light">细</option>
+					        <option value="bold">粗</option>
+					        <option value="bolder">加粗</option>
+					      </select>
+					    </div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onClick="add_tit()">添加</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="titEdit_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					请修改标题文本
+				</h4>
+			</div>
+			<div class="modal-body tit_container">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">文本输入：</label>
+						<div class="layui-input-block">
+					      <input type="text" id="titEdit" autocomplete="off" placeholder="请输入标题" class="layui-input" v-model="tit_current.text" />
+					    </div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">字体设置：</label>
+						<div class="layui-input-inline" style="width:50px;">
+							<div class="layui-input-block" style="margin-left:10px;">
+							    <div>
+								  <div id="test11"></div>
+								</div>
+							</div>
+						</div>
+						<div class="layui-input-inline" style="width:198px;">
+						    <select name="fontSize_titEdit" id="fontSize_titEdit">
+					          <option value="">字号</option>
+					          <option value="10px">10px</option>
+					          <option value="12px">12px</option>
+					          <option value="14px">14px</option>
+					          <option value="16px">16px</option>
+					          <option value="18px">18px</option>
+					          <option value="20px">20px</option>
+					          <option value="22px">22px</option>
+					          <option value="24px">24px</option>
+					          <option value="26px">26px</option>
+					          <option value="28px">28px</option>
+					          <option value="30px">30px</option>
+					          <option value="32px">32px</option>
+					          <option value="34px">34px</option>
+					          <option value="36px">36px</option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:198px; margin-right:0px;">
+					      <select name="fontWeight_titEdit" id="fontWeight_titEdit">
+					        <option value="">粗细</option>
+					        <option value="nomal">正常</option>
+					        <option value="light">细</option>
+					        <option value="bold">粗</option>
+					        <option value="bolder">加粗</option>
+					      </select>
+					    </div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onClick="edit_tit()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="data_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					请设置数据文本
+				</h4>
+			</div>
+			<div class="modal-body data_container">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">说明文字：</label>
+						<div class="layui-input-block">
+					      <input type="text" id="describe" autocomplete="off" placeholder="请输入数据说明" class="layui-input">
+					    </div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">字体设置：</label>
+						<div class="layui-input-inline" style="width:50px;">
+							<div class="layui-input-block" style="margin-left:10px;">
+							    <div>
+								  <div id="test2"></div>
+								</div>
+							</div>
+						</div>
+						<div class="layui-input-inline" style="width:198px;">
+						    <select name="fontSize" id="fontSize_discription">
+					          <option value="">字号</option>
+					          <option value="10px">10px</option>
+					          <option value="12px">12px</option>
+					          <option value="14px">14px</option>
+					          <option value="16px">16px</option>
+					          <option value="18px">18px</option>
+					          <option value="20px">20px</option>
+					          <option value="22px">22px</option>
+					          <option value="24px">24px</option>
+					          <option value="26px">26px</option>
+					          <option value="28px">28px</option>
+					          <option value="30px">30px</option>
+					          <option value="32px">32px</option>
+					          <option value="34px">34px</option>
+					          <option value="36px">36px</option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:198px; margin-right:0px;">
+					      <select name="fontWight" id="fontWeight_discription">
+					        <option value="">粗细</option>
+					        <option value="nomal">正常</option>
+					        <option value="light">细</option>
+					        <option value="bold">粗</option>
+					        <option value="bolder">加粗</option>
+					      </select>
+					    </div>
+					</div>
+					<hr/>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">数据参数：</label>
+						<div class="layui-input-inline" style="width:224px; margin-left:10px;">
+							<select name="modules" lay-search="" id="siteId">
+					          <option :value="siteId">本点位</option>
+					          <option v-for="re in site2" :value="re.value"><span class="site_name">{{re.name}}</span></option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:224px; margin-right:0px;">
+							<select name="modules" lay-search="" id="type">
+					          <option value="">点位类型</option>
+					          <option v-for="(item,index) in beng_state" :value="item.value"><span class="type_name">{{item.name}}</span>(<span class="type_unit">{{item.unit}}</span>)</option>
+					        </select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">数据设置：</label>
+						<div class="layui-input-inline" style="width:224px; margin-left:10px;">
+						    <select name="fontSize" id="fontSize_data">
+					          <option value="">字号</option>
+					          <option value="10px">10px</option>
+					          <option value="12px">12px</option>
+					          <option value="14px">14px</option>
+					          <option value="16px">16px</option>
+					          <option value="18px">18px</option>
+					          <option value="20px">20px</option>
+					          <option value="22px">22px</option>
+					          <option value="24px">24px</option>
+					          <option value="26px">26px</option>
+					          <option value="28px">28px</option>
+					          <option value="30px">30px</option>
+					          <option value="32px">32px</option>
+					          <option value="34px">34px</option>
+					          <option value="36px">36px</option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:224px; margin-right:0px;">
+					      <select name="fontWight" id="fontWeight_data">
+					        <option value="">粗细</option>
+					        <option value="nomal">正常</option>
+					        <option value="light">细</option>
+					        <option value="bold">粗</option>
+					        <option value="bolder">加粗</option>
+					      </select>
+					    </div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onClick="add_data()">添加</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="dataEdit_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					请修改数据文本
+				</h4>
+			</div>
+			<div class="modal-body data_container">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">说明文字：</label>
+						<div class="layui-input-block">
+					      <input type="text" id="describeEdit" autocomplete="off" placeholder="请输入数据说明" class="layui-input" v-model="data_current.description.text">
+					    </div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">字体设置：</label>
+						<div class="layui-input-inline" style="width:50px;">
+							<div class="layui-input-block" style="margin-left:10px;">
+							    <div>
+								  <div id="test22"></div>
+								</div>
+							</div>
+						</div>
+						<div class="layui-input-inline" style="width:198px;">
+						    <select name="fontSize" id="fontSize_discriptionEdit" v-model="data_current.description.dsize">
+					          <option value="">字号</option>
+					          <option value="10px">10px</option>
+					          <option value="12px">12px</option>
+					          <option value="14px">14px</option>
+					          <option value="16px">16px</option>
+					          <option value="18px">18px</option>
+					          <option value="20px">20px</option>
+					          <option value="22px">22px</option>
+					          <option value="24px">24px</option>
+					          <option value="26px">26px</option>
+					          <option value="28px">28px</option>
+					          <option value="30px">30px</option>
+					          <option value="32px">32px</option>
+					          <option value="34px">34px</option>
+					          <option value="36px">36px</option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:198px; margin-right:0px;">
+					      <select name="fontWight" id="fontWeight_discriptionEdit" v-model="data_current.description.dweight">
+					        <option value="">粗细</option>
+					        <option value="nomal">正常</option>
+					        <option value="light">细</option>
+					        <option value="bold">粗</option>
+					        <option value="bolder">加粗</option>
+					      </select>
+					    </div>
+					</div>
+					<hr/>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">数据参数：</label>
+						<div class="layui-input-inline" style="width:224px; margin-left:10px;">
+							<select name="modules" lay-search="" id="siteIdEdit" v-model="data_current.data.siteId">
+					          <option :value="siteId">点位选择</option>
+					          <option v-for="re in site2" :value="re.value"><span class="site_name">{{re.name}}</span></option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:224px; margin-right:0px;">
+							<select name="modules" lay-search="" id="typeEdit" v-model="data_current.data.type">
+					          <option value="">点位类型</option>
+					          <option v-for="(item,index) in beng_state" :value="item.value"><span class="type_name">{{item.name}}</span>(<span class="type_unit">{{item.unit}}</span>)</option>
+					        </select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">数据设置：</label>
+						<div class="layui-input-inline" style="width:224px; margin-left:10px;">
+						    <select name="fontSize" id="fontSize_dataEdit" v-model="data_current.data.tsize">
+					          <option value="">字号</option>
+					          <option value="10px">10px</option>
+					          <option value="12px">12px</option>
+					          <option value="14px">14px</option>
+					          <option value="16px">16px</option>
+					          <option value="18px">18px</option>
+					          <option value="20px">20px</option>
+					          <option value="22px">22px</option>
+					          <option value="24px">24px</option>
+					          <option value="26px">26px</option>
+					          <option value="28px">28px</option>
+					          <option value="30px">30px</option>
+					          <option value="32px">32px</option>
+					          <option value="34px">34px</option>
+					          <option value="36px">36px</option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:224px; margin-right:0px;">
+					      <select name="fontWight" id="fontWeight_dataEdit" v-model="data_current.data.tweight">
+					        <option value="">粗细</option>
+					        <option value="nomal">正常</option>
+					        <option value="light">细</option>
+					        <option value="bold">粗</option>
+					        <option value="bolder">加粗</option>
+					      </select>
+					    </div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onClick="edit_data()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="point_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					请设置点位状态
+				</h4>
+			</div>
+			<div class="modal-body point_container">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">数据参数：</label>
+						<div class="layui-input-inline" style="width:224px; margin-left:10px;">
+							<select name="modules" lay-verify="required" lay-search="" id="siteId2">
+					          <option :value="siteId">点位选择</option>
+					          <option v-for="re in site2" :value="re.value"><span class="site_name">{{re.name}}</span></option>
+					        </select>
+						</div>
+						<div class="layui-input-inline" style="width:224px; margin-right:0px;">
+							<select name="modules" lay-verify="required" lay-search="" id="type2">
+					          <option value="">点位类型</option>
+					          <option v-for="(item,index) in point_state" :value="item.value"><span class="type_name">{{item.name}}</span>(<span class="type_unit">{{item.unit}}</span>)</option>
+					        </select>
+						</div>
+					</div>
+					<div class="row point_bgn_container">
+					    <div class="col-sm-6 col-md-4" v-for="re in point_imgs">
+					        <div class="thumbnail" :imgAttr="re.src" onClick="point_click(this)">
+					            <img :src="re.src" style="height:108px;">
+					        </div>
+					    </div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onClick="add_point()">添加</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="link_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+				&times;
+			</button>
+			<h4 class="modal-title" id="myModalLabel">
+				请设置关联工艺图
+			</h4>
+		</div>
+		<div class="modal-body link_container">
+			<form class="layui-form" action="">
+				<div class="layui-form-item">
+					<label class="layui-form-label" style="width:100px;">关联组态：</label>
+					<div class="layui-input-inline" style="width:224px; margin-left:10px;">
+						<select name="modules" lay-verify="required" lay-search="" id="linkSiteId">
+				          <option value="">点位选择</option>
+				          <option v-for="re in site" :value="re.value"><span class="site_name">{{re.name}}</span></option>
+				        </select>
+					</div>
+<!-- 					<div class="layui-input-inline" style="width:224px; margin-right:0px;">
+						<select name="modules" lay-verify="required" lay-search="">
+				          <option value="">点位选择</option>
+				          <option v-for="re in site3" :value="re.value"><span class="site_name">{{re.name}}</span></option>
+				        </select>
+					</div> -->
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label" style="width:100px;"></label>
+					<div class="layui-input-inline" style="width:140px; margin-left:10px;">
+						<button type="button" class="btn btn-primary" onClick="link_modal_hide(1)">左上角坐标设置</button>
+    				</div>
+					<div class="layui-input-inline" style="width:20px; margin-right:0px;"><div class="layui-form-mid layui-word-aux">X:</div></div>
+					<div class="layui-input-inline" style="width:100px; margin-right:0px;">
+						<input type="text" autocomplete="off" id="tlx" class="layui-input" readonly="readonly">
+				    </div>
+				    <div class="layui-input-inline" style="width:40px; margin-right:0px;"><label class="layui-form-label" style="width:100px;"></label></div>
+					<div class="layui-input-inline" style="width:20px; margin-right:0px;"><div class="layui-form-mid layui-word-aux">Y:</div></div>
+					<div class="layui-input-inline" style="width:100px; margin-right:0px;">
+						<input type="text" autocomplete="off" id="tly" class="layui-input" readonly="readonly">
+				    </div>
+				</div>
+    			<div class="layui-form-item">
+					<label class="layui-form-label" style="width:100px;"></label>
+					<div class="layui-input-inline" style="width:140px; margin-left:10px;"> 
+						<button type="button" class="btn btn-primary" onClick="link_modal_hide(2)">右下角坐标设置</button>
+    				</div>
+					<div class="layui-input-inline" style="width:20px; margin-right:0px;"><div class="layui-form-mid layui-word-aux">X:</div></div>
+					<div class="layui-input-inline" style="width:100px; margin-right:0px;">
+						<input type="text" autocomplete="off" id="brx" class="layui-input" readonly="readonly">
+				    </div>
+				    <div class="layui-input-inline" style="width:40px; margin-right:0px;"><label class="layui-form-label" style="width:100px;"></label></div>
+					<div class="layui-input-inline" style="width:20px; margin-right:0px;"><div class="layui-form-mid layui-word-aux">Y:</div></div>
+					<div class="layui-input-inline" style="width:100px; margin-right:0px;">
+						<input type="text" autocomplete="off" id="bry" class="layui-input" readonly="readonly">
+				    </div>
+    			</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			<button type="button" class="btn btn-primary" onClick="add_seat()">添加</button>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+function GetRequest() {	  
+  var url = location.search; //获取url中"?"符后的字串
+   var theRequest = new Object();
+   if (url.indexOf("?") != -1) {
+      var str = url.substr(1);
+      strs = str.split("&");
+      for(var i = 0; i < strs.length; i ++) {
+         theRequest[strs[i].split("=")[0]]=(strs[i].split("=")[1]);
+      }
+   }
+   return theRequest;
+}
+//参数处理
+var Request = new Object();
+Request = GetRequest();
+var articleNum;
+var IDNUM = Request["ID"];
+var PARENTID = Request["siteParentId"];
+var SITEID = Request["siteId"];
+var baseURL = "../../";
+var vm = new Vue({
+	  el: '#app',
+	  data: {
+	    gytId: '${request.contextPath}/statics/img/gyt_.jpg',//bgn(.jpg/.png)
+	    gyt_imgs: [],//bgns(.jpg/.png……)
+	    point_imgs: [],//bgns(.jpg/.png……)
+	    siteId: "",//该工艺图ID
+	    site: [],//下拉框点位选择(ParentID)
+	    site2: [],//下拉框点位选择(ID)
+	    site3: [],//下拉框点位选择(ChildrenID)
+	    tit:[],
+		tit_current:{
+			siteId:"",
+			text:"一号泵站", 
+			dcolor:'#418bca',
+			dsize:"16px",
+			dweight:"bold",
+			x:"160px",
+			y:"40px",
+			divId:"XXX",
+		},
+	    information:[],
+    	data_current:{
+   			gytId:"",//水厂泵站id
+   			x:"160px",
+   			y:"40px",
+   			divId:"",
+   			description:{
+	   			text:"", 
+	   			dcolor:"",
+	   			dsize:"",
+	   			dweight:""
+   			},
+   			data:{
+	   			siteId:"",//子点位泵、出水口ID
+	   			type:"",
+	   			tcolor:"",
+	   			tsize:"",
+	   			tweight:""
+   			}
+    	},
+   		point:[{
+   			gytId:"",//水厂泵站id
+   			siteId:"",
+   			type:"",
+   			x:"160px",
+   			y:"40px",
+   			divId:"",
+   			text:"",//src
+   			tweight:"",//width
+   			tsize:""//height
+   		}],
+   		seat:[],
+   		point_l:false,
+   		seat_l:false,
+   			beng_state:[{name:'余氯',value:'HOCL',unit:'mg/L'},{name:'浊度',value:'TUR',unit:'NTU'},{name:'pH',value:'PH',unit:''},{name:'cod',value:'COD',unit:''},{name:'瞬时流量',value:'FLS',unit:'m3/h'},{name:'累计流量',value:'FLC',unit:'m3'},{name:'出口压力',value:'PTOUT',unit:'MPa'},{name:'进口压力',value:'PTIN',unit:'MPa'},{name:'压力设定值',value:'PTSET',unit:'MPa'},{name:'水位',value:'LEVEL',unit:'m'},{name:'水位设定值',value:'LEVELSET',unit:'m'},{name:'调节阀开度反馈',value:'ACVPV',unit:''},{name:'调节阀开度设定',value:'ACVSV',unit:''},{name:'电动阀全开',value:'EVOL',unit:''},{name:'电动阀全关',value:'EVCL',unit:''},{name:'电动阀开命令',value:'EVOS',unit:''},{name:'电动阀关命令',value:'EVCS',unit:''},{name:'水泵设定频率',value:'Fs',unit:'Hz'},{name:'水泵运行频率',value:'Fr',unit:'Hz'},{name:'水泵运行电流',value:'Ar',unit:'A'},{name:'变频器运行电流',value:'VDFAr',unit:'A'},{name:'变频器运行频率',value:'VDFFr',unit:'Hz'},{name:'水泵运行状态',value:'ETA',unit:''},{name:'水泵运行模式',value:'Mode',unit:''},{name:'程家泵站和施阮泵站变频器运行频率',value:'Outf',unit:'Hz'},{name:'水泵变频运行',value:'Fcr',unit:'Hz'},{name:'水泵工频运行',value:'Pfr',unit:'Hz'}],
+   			point_state:[{name:'调节阀开度反馈',value:'ACVPV',unit:''},{name:'调节阀开度设定',value:'ACVSV',unit:''},{name:'电动阀全开',value:'EVOL',unit:''},{name:'电动阀全关',value:'EVCL',unit:''},{name:'电动阀开命令',value:'EVOS',unit:''},{name:'电动阀关命令',value:'EVCS',unit:''},{name:'水泵设定频率',value:'Fs',unit:'Hz'},{name:'水泵运行频率',value:'Fr',unit:'Hz'},{name:'水泵运行电流',value:'Ar',unit:'A'},{name:'变频器运行电流',value:'VDFAr',unit:'A'},{name:'变频器运行频率',value:'VDFFr',unit:'Hz'},{name:'水泵运行状态',value:'ETA',unit:''},{name:'水泵运行模式',value:'Mode',unit:''},{name:'程家泵站和施阮泵站变频器运行频率',value:'Outf',unit:'Hz'},{name:'水泵变频运行',value:'Fcr',unit:'Hz'},{name:'水泵工频运行',value:'Pfr',unit:'Hz'}],
+   		},
+	  methods:{
+		    change_gsc:function(){},
+	  }
+	})
+var gyt_src;
+var point_src;
+$(document).ready(function(){
+	vm.siteId = IDNUM;
+	vm.tit_current.siteId = IDNUM;
+	vm.data_current.gytId = IDNUM;
+	$.ajax({//请求所有工艺图bgn
+	    type: "POST",
+	    url: baseURL + "fac/data/file",
+	    contentType: "application/json",
+	    data: "",
+	    success: function(r){
+	    	var gyt_bgn=r.slice(1,r.length-2).split(",");
+	    	for(var i=0; i<gyt_bgn.length; i++){
+	    		var gyt={
+	    				name:gyt_bgn[i].slice(0,gyt_bgn[i].length-5),
+	    		    	src_small:"${request.contextPath}/statics/img/gyt_img/gyt_small/"+gyt_bgn[i],
+	    		    	src_big:"${request.contextPath}/statics/img/gyt_img/gyt_big/"+gyt_bgn[i].replace("3",'2'),
+	    		    }
+	    		vm.gyt_imgs.push(gyt);
+	    	}
+	    }
+	});
+	$.ajax({//请求所有point_bgn
+	    type: "POST",
+	    url: baseURL + "fac/data/file2",
+	    contentType: "application/json",
+	    data: "",
+	    success: function(r){
+	    	var gyt_bgn=r.slice(1,r.length-2).split(",");
+	    	for(var i=0; i<gyt_bgn.length; i++){
+	    		var point_bgn={
+	    				name:gyt_bgn[i].slice(0,gyt_bgn[i].length-4),
+	    		    	src:"${request.contextPath}/statics/img/gyt_img/green/"+gyt_bgn[i],
+	    		    }
+	    		vm.point_imgs.push(point_bgn);
+	    	}
+	    }
+	});
+/* 	$.ajax({//请求水厂泵站数据
+	    type: "POST",
+	    url: baseURL + "fac/data/list",
+	    contentType: "application/json",
+	    data: JSON.stringify({"siteId":vm.siteId}),
+	    success: function(r){
+	        console.log(r)
+	    }
+	}); */
+/* 	$.ajax({//获取水厂泵站
+	    type: "POST",
+	    url: baseURL + "sys/site/queryFacSite",
+	    contentType: "application/json",
+	    data: "",
+	    success: function(r){
+	    	var r = eval('('+ r +')');
+	     	for(var i=0; i<r.length; i++){
+	    		var site={
+	    				name:r[i].name,
+	    				value:r[i].siteId
+	    		};
+	    		Vue.set(vm.site, i, site);
+	    	}
+    		vm.$nextTick(function () {
+	             layui.use(['layer', 'form'], function(){
+	               var form = layui.form;           
+	               form.render();
+	             });
+	           }) 
+	           console.log(vm.site,"0000000000000000000000000");
+	    }
+	}); */
+	//获取关联组态选择列表
+	const params={
+		gytName:'',
+		siteParentId:'',
+		page:1,
+		limit:1000
+	}
+	$.ajax({
+	    type: "POST",
+	    url: baseURL + "fac/data/queryGytbase",
+	    contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+	    data: params,
+	    success: function(r){
+	    	var r = eval('('+ r +')');
+	    	console.log(r.data[0].siteParentId);
+	     	for(var i=0; i<r.data.length; i++){
+	    		var site={
+	    				name:r.data[i].gytName,
+	    				value:r.data[i].siteParentId
+	    		};
+	    		Vue.set(vm.site, i, site);
+	    	}
+    		vm.$nextTick(function () {
+	             layui.use(['layer', 'form'], function(){
+	               var form = layui.form;           
+	               form.render();
+	             });
+	           }) 
+	           console.log(vm.site,"0000000000000000000000000");
+	    }
+	});
+
+	$.ajax({//获取一级子点位
+	    type: "POST",
+	    url: baseURL + "sys/site/queryParentSite",
+	    contentType: "application/json",
+	    data: JSON.stringify(PARENTID),
+	    dataType:"json",
+	    success: function(r){
+		     	for(var i=0; i<r.length; i++){
+	    		var site3={
+	    				name:r[i].name,
+	    				value:r[i].siteId
+	    		};
+	    		Vue.set(vm.site3, i, site3);
+	    	}
+	    		vm.$nextTick(function () {
+		             layui.use(['layer', 'form'], function(){
+		               var form = layui.form;           
+		               form.render();
+		             });
+		           })
+	    }
+	});
+	$.ajax({//获取工艺图子点位
+	    type: "POST",
+	    url: baseURL + "sys/site/queryParentSite",
+	    contentType: "application/json",
+	    data: JSON.stringify(vm.siteId),
+	    dataType:"json",
+	    success: function(r){
+		     	for(var i=0; i<r.length; i++){
+	    		var site2={
+	    				name:r[i].name,
+	    				value:r[i].siteId
+	    		};
+	    		Vue.set(vm.site2, i, site2);
+	    	}
+		     	console.log(vm.site2);
+	    		vm.$nextTick(function () {//使用这个方法，获取vue更新后的dom
+		             layui.use(['layer', 'form'], function(){
+		               var form = layui.form;           
+		               form.render();
+		             });
+		           })
+	    }
+	});
+	$.ajax({//请求某点位下工艺图信息
+	    type: "POST",
+	    url: baseURL + "fac/data/queryGyt",
+	    contentType: "application/json",
+	    data:JSON.stringify(vm.siteId),
+	    dataType:"json",
+	    success: function(r){
+	    	if(r[0].gytbgn[0]){
+	    		vm.gytId = r[0].gytbgn[0].siteId;
+	    	}else{
+	    		vm.gytId = "${request.contextPath}/statics/img/gyt_.jpg";
+	    	}
+	    	vm.tit = r[0].title;
+	    	vm.information = r[0].information;
+	    	if(r[0].point){
+	    		vm.point_l=true;
+		    	vm.point = r[0].point;
+		    	set_style_point();
+	    	}
+	    	if(r[0].seat){
+	    		vm.seat_l=true;
+		    	vm.seat = r[0].seat;
+		    	set_style_seat();
+	    	}
+	    	console.log(vm.tit);
+	    	console.log(vm.information);
+	    	console.log(vm.point);
+	    	setTimeout("base_style()",100);
+	    }
+	});
+	//$(".thumbnail").click();
+	//$(".thumbnail").dblclick();
+	
+});
+function base_style(){
+	for(var i=0;i<vm.tit.length;i++){
+		$("#"+vm.tit[i].divId+" span").css({"font-size":vm.tit[i].dsize,"font-weight":vm.tit[i].dweight,"color":vm.tit[i].dcolor});
+		$("#"+vm.tit[i].divId).css({"top":vm.tit[i].y,"left":vm.tit[i].x});
+	}
+	for(var i=0;i<vm.information.length;i++){
+		$("#"+vm.information[i].divId+" .discription").css({"font-size":vm.information[i].description.dsize,"font-weight":vm.information[i].description.dweight,"color":vm.information[i].description.dcolor});
+		$("#"+vm.information[i].divId+" .data").css({"font-size":vm.information[i].data.tsize,"font-weight":vm.information[i].data.tweight,"color":vm.information[i].data.tcolor});
+		$("#"+vm.information[i].divId).css({"top":vm.information[i].y,"left":vm.information[i].x});
+	}
+	for(var i=0;i<vm.point.length;i++){
+		$("#"+vm.point[i].divId).css({"top":vm.point[i].y,"left":vm.point[i].x,"width":vm.point[i].tweight,"height":vm.point[i].tsize});
+	}
+}
+function add_gyt(){
+		vm.gytId=gyt_src;
+		$('#gyt_Modal').modal('hide');
+		var bgn={
+				gytId: vm.siteId,//水厂泵站id
+				siteId: vm.gytId//工艺图bgn
+				};
+		$.ajax({//新增工艺图到列表
+		    type: "POST",
+		    url: baseURL + "fac/data/updateGytbgn",
+		    contentType: "application/json",
+		    data:JSON.stringify(bgn),
+		    dataType:"json",
+		    success: function(r){
+		    	console.log(r);
+		    }
+		});
+}
+function gyt_click(obj){
+		$(".thumbnail").css("background-color","#fff");
+	    $(obj).css("background-color","yellow");
+	    indx = $(obj).parent().index();
+	    gyt_src = vm.gyt_imgs[indx].src_big;
+	  }
+function point_click(obj){
+	$(".thumbnail").css("background-color","#fff");
+    $(obj).css("background-color","yellow");
+    indx = $(obj).parent().index();
+    point_src = vm.point_imgs[indx].src;
+  }
+function gyt_dbclick(obj){
+	console.log(vm.siteId);
+		indx = $(obj).parent().index();
+		vm.gytId = vm.gyt_imgs[indx].src_big;
+		$('#gyt_Modal').modal('hide');
+		var bgn={
+				gytId: vm.siteId,//水厂泵站id
+				siteId: vm.gytId//工艺图bgn
+				};
+		$.ajax({//新增工艺图到列表
+		    type: "POST",
+		    url: baseURL + "fac/data/updateGytbgn",
+		    contentType: "application/json",
+		    data:JSON.stringify(bgn),
+		    dataType:"json",
+		    success: function(r){
+		    	console.log(r);
+		    }
+		});
+	}
+function tit_dbclick(obj){//双击编辑
+	console.log(obj.id);
+	for(var i=0;i<vm.tit.length;i++){
+		if(vm.tit[i].divId==obj.id){
+			vm.tit_current = vm.tit[i];
+			console.log(vm.tit_current);
+		}else{}
+	}
+	//alert(vm.tit_current.dcolor);
+	//$("#test11 div span span").css("background-color",vm.tit_current.dcolor);
+	$("#fontSize_titEdit").val(vm.tit_current.dsize);
+	$("#fontSize_titEdit").next().find('input.layui-input').attr("value",vm.tit_current.dsize);
+	$("#fontWeight_titEdit").val(vm.tit_current.dweight);
+	$("#fontWeight_titEdit").next().find('input.layui-input').attr("value",vm.tit_current.dweight);
+	$('#titEdit_Modal').modal('show');
+}
+function data_dbclick(obj){//双击编辑
+	console.log(obj.id);
+	for(var i=0;i<vm.information.length;i++){
+		if(vm.information[i].divId==obj.id){
+			vm.data_current = vm.information[i];
+			console.log(vm.data_current);
+			vm.$nextTick(function () {//使用这个方法，获取vue更新后的dom
+	             layui.use(['layer', 'form'], function(){
+		               var form = layui.form;           
+		               form.render();
+		             });
+		           })
+		}else{}
+	}
+	$("#test22 div span span").css("background-color",vm.data_current.description.dcolor);
+	$('#dataEdit_Modal').modal('show');
+}
+function link_modal_hide(obj){
+	$('#link_Modal').modal('hide');
+	WordsFollowMouseDOM(obj);
+}
+var myhint = document.getElementById("hint");
+var setpoint = 0;
+function WordsFollowMouseDOM(hintwords) {
+	document.addEventListener("mousemove", function (e) {
+		myhint.style.left = e.clientX -240 + "px";
+		myhint.style.top = e.clientY -76 + "px";
+		switch (hintwords) {
+			case 1:
+			myhint.innerHTML = "双击设置左上角坐标";
+			myhint.style.display = 'block';
+			setpoint = 1;
+			break;
+			case 2:
+			myhint.innerHTML = "双击设置右下角坐标";
+			myhint.style.display = 'block';
+			setpoint = 2;
+			break;
+			default:
+			myhint.innerHTML = "";
+			myhint.style.display = 'none';
+			break;
+		}
+	});
+}
+function c(){
+	WordsFollowMouseDOM(0);
+	 var objTop = getOffsetTop(document.getElementById("gyt_img"));//对象x位置
+	 var objLeft = getOffsetLeft(document.getElementById("gyt_img"));//对象y位置
+	 
+	 var mouseX = event.clientX+document.body.scrollLeft;//鼠标x位置
+	 var mouseY = event.clientY+document.body.scrollTop;//鼠标y位置
+	//计算点击的相对位置
+	 var objX = mouseX-objLeft;
+	 var objY = mouseY-objTop;
+	 clickObjPosition = objX + "," + objY;
+	if(setpoint==1){
+		myhint.style.display = 'none';
+		$('#link_Modal').modal('show');
+		$("#tlx").val(objX);
+		$("#tly").val(objY);
+	}else if(setpoint==2){
+		myhint.style.display = 'none';
+		$('#link_Modal').modal('show');
+		$("#brx").val(objX);
+		$("#bry").val(objY);
+	}else{myhint.style.display = 'none';return;}
+	}
+function getOffsetLeft(obj){
+    var tmp = obj.offsetLeft;
+    var val = obj.offsetParent;
+    while(val != null){
+        tmp += val.offsetLeft;
+        val = val.offsetParent;
+    }
+    return tmp;
+}
+function getOffsetTop(obj){
+    var tmp = obj.offsetTop;
+    var val = obj.offsetParent;
+    while(val != null){
+        tmp += val.offsetTop;
+        val = val.offsetParent;
+    }
+    return tmp;
+}
+var move_div;
+window.onload=function(){
+	var oM=document.getElementById('menu');
+	var aLi=oM.children;
+	var oUl=document.getElementById('app');
+	move_div = $("#app").find('.move_div');
+	console.log(move_div);
+	var _this=null;
+	/* for(var i=0;i<move_div.length;i++){
+	move_div[i].oncontextmenu=function(ev){
+	_this=this;
+	var oEvt=ev||event;
+	oM.style.display='block';
+	oM.style.left=oEvt.clientX+'px';
+	oM.style.top=oEvt.clientY+'px';
+	return false;
+	}
+	} */
+	oM.onclick=function(){
+		/* console.log("************"+_this.id);
+		console.log(vm.tit.length);
+		for(var i=0;i<vm.tit.length;i++){
+			if(vm.tit[i].id==_this.id){
+				vm.tit.splice(i,1);
+			}
+		} */
+		
+	}
+	aLi[0].onclick=function(){
+		var del={
+			siteId:IDNUM,
+			divId:_this.id
+		};
+		var deleteUrl="";
+		if(_this.id.indexOf("tit") != -1){
+			deleteUrl="fac/data/deleteTitle";
+		}else if(_this.id.indexOf("data") != -1){
+			deleteUrl="fac/data/deleteInformation";
+		}else if(_this.id.indexOf("point") != -1){
+			deleteUrl="fac/data/deletePoint";
+		}else{
+			deleteUrl="";
+		  }
+		$.ajax({//delete工艺图tit
+		    type: "POST",
+		    url: baseURL + deleteUrl,
+		    contentType: "application/json",
+		    data:JSON.stringify(del),
+		    dataType:"json",
+		    success: function(r){
+			console.log(r);
+			for(i=0; i<vm.tit.length; i++){
+				  if(vm.tit[i].divId == _this.id){
+					  vm.tit.splice(i,1);
+					  console.log(vm.tit);
+				  }
+			  }
+			$("#"+_this.id).remove();
+		    }
+		});
+	}
+	document.onclick=function(){
+		oM.style.display='none';
+		//平移
+		move_div = $("#app").find('.move_div');
+		console.log(move_div);
+		for(var i=0;i<move_div.length;i++){
+			move_div[i].oncontextmenu=function(ev){
+			_this=this;
+			var oEvt=ev||event;
+			oM.style.display='block';
+			oM.style.left=oEvt.clientX+'px';
+			oM.style.top=oEvt.clientY+'px';
+			return false;
+			}
+			}
+		$(".move_div").draggable({containment: "#gyt_main",scroll: false,
+		  stop: function( event, ui ) {
+			  console.log(ui.helper.context.id);
+			  console.log(ui.offset.top);
+			  console.log(ui.offset.left);
+			  var left = $('#'+ui.helper.context.id).css('left');
+			  var top = $('#'+ui.helper.context.id).css('top');
+			  console.log(left+"***"+top);
+			  if(ui.helper.context.id.indexOf("tit") != -1){
+				  for(i=0; i<vm.tit.length; i++){
+					  if(vm.tit[i].divId == ui.helper.context.id){
+						  console.log(ui.helper.context.id);
+						  console.log(vm.tit[i]);
+						  vm.tit[i].x = left;
+						  vm.tit[i].y = top;
+						  console.log(vm.tit[i]);
+						  $.ajax({//update工艺图tit
+							    type: "POST",
+							    url: baseURL + "fac/data/updateGytTitle",
+							    contentType: "application/json",
+							    data:JSON.stringify(vm.tit[i]),
+							    dataType:"json",
+							    success: function(r){
+								console.log(r);
+							    }
+							});
+					  }
+				  }
+				  console.log(vm.tit);
+			  }else if(ui.helper.context.id.indexOf("data") != -1){
+				  for(i=0; i<vm.information.length; i++){
+					  if(vm.information[i].divId == ui.helper.context.id){
+						  vm.information[i].x = left;
+						  vm.information[i].y = top;
+						  console.log(vm.information[i]);
+						  var newData={"gytId":vm.siteId,
+									  "x":vm.information[i].x,
+									  "y":vm.information[i].y,
+									  "divId":vm.information[i].divId,
+									  "text":vm.information[i].description.text, 
+									  "dcolor":vm.information[i].description.dcolor,
+									  "dsize":vm.information[i].description.dsize,
+									  "dweight":vm.information[i].description.dweight,
+									  "siteId":vm.information[i].data.siteId,
+									  "type":vm.information[i].data.type,
+									  "tcolor":vm.information[i].data.tcolor,
+									  "tsize":vm.information[i].data.tsize,
+									  "tweight":vm.information[i].data.tweight
+									  };
+						  console.log(newData);
+						  $.ajax({//update工艺图tit
+							    type: "POST",
+							    url: baseURL + "fac/data/updateGytInformation",
+							    contentType: "application/json",
+							    data:JSON.stringify(newData),
+							    dataType:"json",
+							    success: function(r){
+								console.log(r);
+							    }
+							});
+					  }
+				  }
+				  console.log(vm.information);
+			  }else if(ui.helper.context.id.indexOf("point") != -1){
+				  for(i=0; i<vm.point.length; i++){
+					  if(vm.point[i].divId == ui.helper.context.id){
+						  vm.point[i].x = left;
+						  vm.point[i].y = top;
+					  }
+					  console.log(vm.point[i]);
+					  $.ajax({//update工艺图tit
+						    type: "POST",
+						    url: baseURL + "fac/data/updateGytPoint",
+						    contentType: "application/json",
+						    data:JSON.stringify(vm.point[i]),
+						    dataType:"json",
+						    success: function(r){
+							console.log(r);
+						    }
+						});
+				  }
+			  }else{
+				  return;
+			  }
+			  }
+			});
+		    $(".resizable" ).resizable(
+	    		{
+    				stop: function( event, ui ) {
+    					console.log(event.target.id+ui.size);
+    					for(i=0; i<vm.point.length; i++){
+    						  if(vm.point[i].divId == event.target.id){
+    							  vm.point[i].tweight = ui.size.width+"px";
+    							  vm.point[i].tsize = ui.size.height+"px";
+    						  }
+    						  console.log(vm.point[i]);
+    						  $.ajax({//update工艺图tit
+    							    type: "POST",
+    							    url: baseURL + "fac/data/updateGytPoint",
+    							    contentType: "application/json",
+    							    data:JSON.stringify(vm.point[i]),
+    							    dataType:"json",
+    							    success: function(r){
+    								console.log(r);
+    							    }
+    							});
+    					  }
+    				}
+    			}		
+		    );
+	};
+	};
+</script>
+<script>
+layui.use('colorpicker', function(){
+  var $ = layui.$,colorpicker = layui.colorpicker;
+  //预定义颜色项
+  colorpicker.render({
+    elem: '#test1'
+    ,color: "#418bca"
+    ,predefine: true // 开启预定义颜色
+    ,colors: ['#ffffff','#f1f1f1','#aaaaaa',"#666666","#363636","#000000","#418bca","#59c1dc","#2f7abb","#5bb85d"] //自定义预定义颜色项
+  });
+  colorpicker.render({
+	    elem: '#test11'
+	    ,color: vm.tit_current.dcolor
+	    ,predefine: true // 开启预定义颜色
+	    ,colors: ['#ffffff','#f1f1f1','#aaaaaa',"#666666","#363636","#000000","#418bca","#59c1dc","#2f7abb","#5bb85d"] //自定义预定义颜色项
+	  });
+  colorpicker.render({
+	    elem: '#test2'
+	    ,color: '#418bca'
+	    ,predefine: true // 开启预定义颜色
+	    ,colors: ['#ffffff','#f1f1f1','#aaaaaa',"#666666","#363636","#000000","#418bca","#59c1dc","#2f7abb","#5bb85d"] //自定义预定义颜色项
+	  });
+  colorpicker.render({
+	    elem: '#test22'
+	    ,color: vm.data_current.description.dcolor
+	    ,predefine: true // 开启预定义颜色
+	    ,colors: ['#ffffff','#f1f1f1','#aaaaaa',"#666666","#363636","#000000","#418bca","#59c1dc","#2f7abb","#5bb85d"] //自定义预定义颜色项
+	  });
+});
+
+
+layui.use(['form'], function(){
+  var form = layui.form;
+  form.render();
+});
+var tit_num;
+function add_tit(){
+	alert(vm.tit.length);
+	if(vm.tit.length==0){
+		tit_num = 0;
+	}else{
+		var tit_numList=[];
+	  	for(var i=0;i<vm.tit.length;i++){
+	      console.log(vm.tit[i].divId.substring(4));
+	      tit_numList.push(vm.tit[i].divId.substring(4));
+	    }
+	  	tit_num = (parseInt(Max(tit_numList))+1);
+	    alert(tit_num);
+	}
+	$('#tit_Modal').modal('hide');
+	var tit_id="tit_"+tit_num;
+	var color=$("#test1 div span span").css('background-color'); 
+	var text=$("#tit").val();
+	var size=$("#fontSize_tit").val();
+	var weight=$("#fontWeight_tit").val();
+	vm.tit_current={
+		siteId:vm.siteId,
+		divId:tit_id,
+		text:text,
+	   	dcolor:color,
+	   	dsize:size,
+	   	dweight:weight,
+	   	x:"50px",
+	   	y:"50px"
+	};
+	var tit_length = vm.tit.length;
+	Vue.set(vm.tit, tit_length, vm.tit_current);
+	console.log(vm.tit_current);
+	console.log(vm.tit[tit_length]);
+	setTimeout("set_style_tit()",100);
+	$.ajax({//新增工艺图tit
+	    type: "POST",
+	    url: baseURL + "fac/data/saveGytTitle",
+	    contentType: "application/json",
+	    data:JSON.stringify(vm.tit_current),
+	    dataType:"json",
+	    success: function(r){
+		console.log(r);
+	    }
+	});
+}
+function edit_tit(){
+	$('#titEdit_Modal').modal('hide');
+	vm.tit_current.dcolor=$("#test11 div span span").css('background-color'); 
+	vm.tit_current.text=$("#titEdit").val();
+	vm.tit_current.dsize=$("#fontSize_titEdit").val();
+	vm.tit_current.dweight=$("#fontWeight_titEdit").val();
+	console.log(vm.tit_current);
+	for(var i=0;i<vm.tit.length;i++){
+		if(vm.tit[i].divId==vm.tit_current.divId){
+			vm.tit[i] = vm.tit_current;
+		}else{}
+	}
+	console.log(vm.tit);
+	setTimeout("set_style_tit()",100);
+	$.ajax({//新增工艺图tit
+	    type: "POST",
+	    url: baseURL + "fac/data/updateGytTitle",
+	    contentType: "application/json",
+	    data:JSON.stringify(vm.tit_current),
+	    dataType:"json",
+	    success: function(r){
+		console.log(r);
+	    }
+	});
+}
+function set_style_tit(){
+	for(var i=0;i<vm.tit.length;i++){
+		$("#"+vm.tit[i].divId+" span").css({"font-size":vm.tit[i].dsize,"font-weight":vm.tit[i].dweight,"color":vm.tit[i].dcolor});
+		$("#"+vm.tit[i].divId).css({"top":vm.tit[i].y,"left":vm.tit[i].x});
+	}
+}
+var data_num;
+function Max(obj){
+	obj = obj.map(Number);
+    var max = obj[0];
+    for(var j = 1; j < obj.length; j++) {
+       var cur = obj[j];
+       cur > max ? max = cur : null
+    }
+    console.log(obj,max);
+    return(max);
+}
+function add_data(){
+	$('#data_Modal').modal('hide');
+	alert(vm.information.length);
+	if(vm.information.length==0){
+		data_num = 0;
+	}else{
+		var data_numList=[];
+	  	for(var i=0;i<vm.information.length;i++){
+	      console.log(vm.information[i].divId.substring(5));
+	      data_numList.push(vm.information[i].divId.substring(5));
+	    }
+	  	data_num = (parseInt(Max(data_numList))+1);
+	    alert(data_num);
+	}
+	var data_id="data_"+data_num;
+	var dcolor=$("#test2 div span span").css('background-color'); 
+	var text=$("#describe").val();
+	var dsize=$("#fontSize_discription").val();
+	var tsize=$("#fontSize_data").val();
+	var dweight=$("#fontWeight_discription").val();
+	var tweight=$("#fontWeight_data").val();
+	var siteId=$("#siteId").val();
+	var type=$("#type").val();
+	vm.data_current={
+			gytId: vm.siteId,//水厂泵站id
+			x:"160px",
+			y:"40px",
+			divId:data_id,
+			description:{
+	   			text:text, 
+	   			dcolor:dcolor,
+	   			dsize:dsize,
+	   			dweight:dweight
+			},
+			data:{
+	   			siteId:siteId,//子点位泵、出水口ID
+	   			type:type,
+	   			tcolor:"#000000",
+	   			tsize:tsize,
+	   			tweight:tweight
+			}
+	};
+	var data_length = vm.information.length;
+	Vue.set(vm.information, data_length, vm.data_current);
+	console.log(vm.information);
+	console.log(vm.data_current);
+	setTimeout("set_style_data()",100);
+	$.ajax({//新增工艺图data
+	    type: "POST",
+	    url: baseURL + "fac/data/saveGytInformation",
+	    contentType: "application/json",
+	    data:JSON.stringify(vm.data_current),
+	    dataType:"json",
+	    success: function(r){
+		console.log(r);
+		if(r==200){
+			$.ajax({//请求水厂泵站数据
+			    type: "POST",
+			    url: baseURL + "fac/data/list",
+			    contentType: "application/json",
+			    data: JSON.stringify({"siteId":vm.data_current.data.siteId}),
+			    success: function(r){
+			        console.log(r)
+			    }
+			});
+		}
+	    }
+	});
+}
+function edit_data(){
+	$('#dataEdit_Modal').modal('hide');
+	vm.data_current.description.dcolor=$("#test22 div span span").css('background-color'); 
+	vm.data_current.description.text=$("#describeEdit").val();
+	vm.data_current.description.dsize=$("#fontSize_discriptionEdit").val();
+	vm.data_current.description.dweight=$("#fontWeight_discriptionEdit").val();
+	vm.data_current.data.siteId=$("#siteIdEdit").val();
+	vm.data_current.data.type=$("#typeEdit").val();
+	vm.data_current.data.tsize=$("#fontSize_dataEdit").val();
+	vm.data_current.data.tweight=$("#fontWeight_dataEdit").val();
+	console.log(vm.data_current);
+	for(var i=0;i<vm.information.length;i++){
+		if(vm.information[i].divId==vm.data_current.divId){
+			vm.information[i] = vm.data_current;
+			var newData={"gytId":vm.siteId,
+					  "x":vm.information[i].x,
+					  "y":vm.information[i].y,
+					  "divId":vm.information[i].divId,
+					  "text":vm.information[i].description.text, 
+					  "dcolor":vm.information[i].description.dcolor,
+					  "dsize":vm.information[i].description.dsize,
+					  "dweight":vm.information[i].description.dweight,
+					  "siteId":vm.information[i].data.siteId,
+					  "type":vm.information[i].data.type,
+					  "tcolor":vm.information[i].data.tcolor,
+					  "tsize":vm.information[i].data.tsize,
+					  "tweight":vm.information[i].data.tweight
+					  };
+		  console.log(newData);
+		}else{}
+	}
+	console.log(vm.information);
+	setTimeout("set_style_data()",100);
+	$.ajax({//更新工艺图information
+	    type: "POST",
+	    url: baseURL + "fac/data/updateGytInformation",
+	    contentType: "application/json",
+	    data:JSON.stringify(newData),
+	    dataType:"json",
+	    success: function(r){
+		console.log(r);
+	    }
+	});
+}
+function set_style_data(){
+	console.log(vm.data_current);
+	$("#"+vm.data_current.divId+" .discription").css({"font-size":vm.data_current.description.dsize,"font-weight":vm.data_current.description.dweight,"color":vm.data_current.description.dcolor});
+	$("#"+vm.data_current.divId+" .data").css({"font-size":vm.data_current.data.tsize,"font-weight":vm.data_current.data.tweight,"color":vm.data_current.data.tcolor});
+	$("#"+vm.data_current.divId).css({"top":vm.data_current.y,"left":vm.data_current.x});
+}
+var point_num;
+function add_point(){
+	$('#point_Modal').modal('hide');
+	if(vm.point.length==0){
+		point_num = 0;
+	}/* else{
+		point_num = vm.point[vm.point.length-1].divId.substring(6);
+		point_num++;
+	} */else{
+		var point_numList=[];
+	  	for(var i=0;i<vm.point.length;i++){
+	      console.log(vm.point[i].divId.substring(6));
+	      point_numList.push(vm.point[i].divId.substring(6));
+	    }
+	  	point_num = (parseInt(Max(point_numList))+1);
+	    alert(point_num);
+	}
+	var point_id="point_"+point_num;
+	var siteId=$("#siteId2").val();
+	var type=$("#type2").val();
+	vm.point_current={
+		gytId:vm.siteId,//水厂泵站id
+		siteId:siteId,
+		type:type,
+		x:"160px",
+		y:"40px",
+		divId:point_id,
+		text:point_src,//src
+		tweight:"",//width
+		tsize:""//height
+	};
+	var point_length = vm.point.length;
+	Vue.set(vm.point, point_length, vm.point_current);
+	console.log(vm.point);
+	setTimeout("set_style_point()",100);
+	console.log(vm.point_current);
+	$.ajax({//新增工艺图data
+	    type: "POST",
+	    url: baseURL + "fac/data/saveGytPoint",
+	    contentType: "application/json",
+	    data:JSON.stringify(vm.point_current),
+	    dataType:"json",
+	    success: function(r){
+		console.log(r);
+	    }
+	});
+}
+var seat_num;
+var seat=[];
+function add_seat(){
+	if(vm.seat.length==0){
+		seat_num = 0;
+	}else{
+		var seat_numList=[];
+	  	for(var i=0;i<vm.seat.length;i++){
+	      console.log(vm.seat[i].divId.substring(5));
+	      seat_numList.push(vm.point[i].divId.substring(5));
+	    }
+	  	seat_num = (parseInt(Max(seat_numList))+1);
+	    alert(seat_num);
+	}
+	var seat_id="link_"+seat_num;
+	var linkSiteId=$("#linkSiteId").val();
+	var linkParentId=$("#linkSiteId").text();
+	console.log($("#linkSiteId option:selected").text())
+	vm.seat_current=[{
+		linkSiteId:linkSiteId,//关联组态
+		siteId:vm.siteId,
+		linkParentId:linkParentId,
+		divId:seat_id,
+		dsize:$('#bry').val()-$('#tly').val(),//height
+		dweight:$('#brx').val()-$('#tlx').val(),//width
+		x:$('#tlx').val(),
+		y:$('#tly').val(),
+	}];
+	var seat_length = vm.seat.length;
+	Vue.set(vm.seat, seat_length, vm.seat_current);
+	console.log(vm.seat);
+	setTimeout("set_style_seat()",100);
+	console.log(vm.point_current);
+	$.ajax({//新增工艺图data
+	    type: "POST",
+	    url: baseURL + "fac/data/saveGytSeat",
+	    contentType: "application/json",
+	    data:JSON.stringify(vm.seat_current),
+	    dataType:"json",
+	    success: function(r){
+			console.log(r);
+			$('#link_Modal').modal('hide');
+	    }
+	});	
+}
+function set_style_point(){
+	for(var i=0;i<vm.point.length;i++){
+		$("#"+vm.point[i].divId).css({"top":vm.point[i].y,"left":vm.point[i].x,"width":vm.point[i].tweight,"height":vm.point[i].tsize});
+	}
+}
+function set_style_seat(){
+	for(var i=0;i<vm.seat.length;i++){
+		$("#"+vm.seat[i].divId).css({"top":vm.seat[i].y,"left":vm.seat[i].x,"width":vm.seat[i].tweight,"height":vm.seat[i].tsize});
+	}
+}
+</script>
+</body>
+</html>
